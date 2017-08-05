@@ -10,6 +10,7 @@ import java.util.Optional;
 @Data
 public class TvShow {
 
+    private final int id;
     private final String backdropPath;
     private final String name;
     private final int numberOfEpisodes;
@@ -24,6 +25,7 @@ public class TvShow {
 
     @JsonCreator()
     public TvShow(
+            @JsonProperty("id") int id,
             @JsonProperty("backdrop_path") String backdropPath,
             @JsonProperty("name") String name,
             @JsonProperty("number_of_episodes") int numberOfEpisodes,
@@ -35,6 +37,7 @@ public class TvShow {
             @JsonProperty("first_air_date") String firstAirDate,
             @JsonProperty("last_air_date") String lastAirDate,
             @JsonProperty("genres") List<Genre> genres) {
+        this.id = id;
         this.backdropPath = backdropPath;
         this.name = name;
         this.numberOfEpisodes = numberOfEpisodes;

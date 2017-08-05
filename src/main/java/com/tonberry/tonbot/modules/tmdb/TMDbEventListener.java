@@ -60,6 +60,8 @@ class TMDbEventListener {
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder.withTitle(movie.getTitle());
 
+            embedBuilder.withUrl("https://www.themoviedb.org/movie/" + movie.getId());
+
             List<String> descriptionComponents = new ArrayList<>();
             if (movie.getTagline().isPresent()) {
                 descriptionComponents.add("*" + movie.getTagline().get() + "*");
@@ -69,10 +71,6 @@ class TMDbEventListener {
             }
             String description = StringUtils.join(descriptionComponents, "\n\n");
             embedBuilder.withDescription(description);
-
-            if (movie.getImdbId().isPresent()) {
-                embedBuilder.withUrl("http://www.imdb.com/title/" + movie.getImdbId().get());
-            }
 
             embedBuilder.appendField("Release Date", movie.getReleaseDate(), true);
             embedBuilder.appendField("Rating", movie.getVoteAverage() + "/10", true);
@@ -103,6 +101,8 @@ class TMDbEventListener {
 
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder.withTitle(tvShow.getName());
+
+            embedBuilder.withUrl("https://www.themoviedb.org/tv/" + tvShow.getId());
 
             embedBuilder.withDescription(tvShow.getOverview());
 
