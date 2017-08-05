@@ -1,19 +1,19 @@
-package com.tonberry.tonbot.modules.helloworld;
+package com.tonberry.tonbot.modules.coinflip;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.tonberry.tonbot.Plugin;
 
-public class HelloWorldModule extends AbstractModule {
+public class CoinFlipModule extends AbstractModule {
 
     public void configure() {
         Multibinder<Plugin> pluginBinder = Multibinder.newSetBinder(binder(), Plugin.class);
         pluginBinder.addBinding().toInstance(
                 Plugin.builder()
-                        .name("Hello World Responder")
-                        .usageDescription("``t! hello`` Bot says hello.")
-                        .eventListeners(ImmutableSet.of(new HelloWorldEventListener()))
+                        .name("Coin Flipper")
+                        .usageDescription("``t! flip a coin`` Flips a coin")
+                        .eventListeners(ImmutableSet.of(new CoinFlipper()))
                         .build()
         );
     }

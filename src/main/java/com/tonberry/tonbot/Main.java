@@ -3,6 +3,7 @@ package com.tonberry.tonbot;
 import com.google.common.base.Preconditions;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.tonberry.tonbot.modules.coinflip.CoinFlipModule;
 import com.tonberry.tonbot.modules.diagnostics.DiscordDiagnosticsModule;
 import com.tonberry.tonbot.modules.helloworld.HelloWorldModule;
 import org.slf4j.Logger;
@@ -20,7 +21,8 @@ public class Main {
         Injector injector = Guice.createInjector(
                 new TonbotModule(token),
                 new DiscordDiagnosticsModule(),
-                new HelloWorldModule());
+                new HelloWorldModule(),
+                new CoinFlipModule());
         Tonbot bot = injector.getInstance(Tonbot.class);
 
         try {

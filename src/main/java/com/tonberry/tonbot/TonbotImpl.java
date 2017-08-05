@@ -37,6 +37,7 @@ class TonbotImpl implements Tonbot {
                         discordClient.getDispatcher().registerListener(eventListener);
                         LOG.info("Registered event listener '{}'", eventListener.getClass().getName());
                     });
+            discordClient.getDispatcher().registerListener(new HelpHandler(plugins));
 
             discordClient.login();
 
