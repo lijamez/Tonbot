@@ -1,0 +1,32 @@
+package com.tonberry.tonbot;
+
+import com.google.common.base.Preconditions;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.multibindings.Multibinder;
+import sx.blah.discord.api.ClientBuilder;
+import sx.blah.discord.api.IDiscordClient;
+
+class TonbotModule extends AbstractModule {
+
+    private final String token;
+
+    public TonbotModule(String token) {
+        this.token = Preconditions.checkNotNull(token, "token must be non-null.");
+    }
+
+    public void configure() {
+        bind(Tonbot.class).to(TonbotImpl.class);
+
+        Multibinder.newSetBinder(binder(), Plugin.class);
+    }
+
+    @Provides
+    @Singleton
+    IDiscordClient discordClient() {
+        return new ClientBuilder()
+                .withToken(token)
+                .build();
+    }
+}
