@@ -31,4 +31,22 @@ class TMDbClientIntegrationTest extends Specification {
         movie != null
         movie.getTitle() == "The Avengers"
     }
+
+    def "search for tv shows"() {
+        when:
+        TvShowSearchResult searchResult = this.client.searchTvShows("stranger things")
+
+        then:
+        searchResult != null
+        !searchResult.getResults().isEmpty()
+    }
+
+    def "get a particular tv show"() {
+        when:
+        TvShow tvShow = this.client.getTvShow(66732)
+
+        then:
+        tvShow != null
+        tvShow.getName() == "Stranger Things"
+    }
 }

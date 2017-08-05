@@ -55,7 +55,8 @@ public class TMDbModule extends AbstractModule {
         public Plugin get() {
             return Plugin.builder()
                     .name("Movie Info (powered by The Movie Database)")
-                    .usageDescription("``" + prefix + " movie <search term>``  Gets information about a movie.")
+                    .usageDescription("``" + prefix + " movie <search term>``  Gets information about a movie.\n"
+                        + "``" + prefix + " tv <search term>``  Gets information about a TV show.")
                     .eventListeners(ImmutableSet.of(tmdbEventListener))
                     .build();
         }

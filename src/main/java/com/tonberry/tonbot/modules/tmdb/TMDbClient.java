@@ -39,19 +39,9 @@ public class TMDbClient {
                     .setParameter("query", query)
                     .build();
 
-            HttpGet httpGet = new HttpGet(uri);
+            return get(uri, MovieSearchResult.class);
 
-            HttpResponse response = httpClient.execute(httpGet);
-
-            if (response.getStatusLine().getStatusCode() != 200) {
-                throw new TMDbClientException("TMDb service returned a " + response.getStatusLine().getStatusCode() + " status code.");
-            }
-
-            MovieSearchResult searchResult = objectMapper.readValue(response.getEntity().getContent(), MovieSearchResult.class);
-
-            return searchResult;
-
-        } catch (URISyntaxException | IOException e) {
+        } catch (URISyntaxException e) {
             throw new TMDbClientException("Couldn't search for movies.", e);
         }
     }
@@ -66,6 +56,51 @@ public class TMDbClient {
                     .setParameter("api_key", apiKey)
                     .build();
 
+            return get(uri, Movie.class);
+
+        } catch (URISyntaxException e) {
+            throw new TMDbClientException("Couldn't get the movie.", e);
+        }
+    }
+
+    public TvShowSearchResult searchTvShows(String query) {
+        Preconditions.checkNotNull(query, "query must be non-null.");
+
+        try {
+            URI uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost("api.themoviedb.org")
+                    .setPath("/3/search/tv")
+                    .setParameter("api_key", apiKey)
+                    .setParameter("query", query)
+                    .build();
+
+            return get(uri, TvShowSearchResult.class);
+
+        } catch (URISyntaxException e) {
+            throw new TMDbClientException("Couldn't search for TV shows.", e);
+        }
+    }
+
+    public TvShow getTvShow(int tvShowId) {
+
+        try {
+            URI uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost("api.themoviedb.org")
+                    .setPath("/3/tv/" + tvShowId)
+                    .setParameter("api_key", apiKey)
+                    .build();
+
+            return get(uri, TvShow.class);
+
+        } catch (URISyntaxException e) {
+            throw new TMDbClientException("Couldn't search for TV shows.", e);
+        }
+    }
+
+    private <T> T get(URI uri, Class<T> clazz) {
+        try {
             HttpGet httpGet = new HttpGet(uri);
 
             HttpResponse response = httpClient.execute(httpGet);
@@ -74,12 +109,11 @@ public class TMDbClient {
                 throw new TMDbClientException("TMDb service returned a " + response.getStatusLine().getStatusCode() + " status code.");
             }
 
-            Movie movie = objectMapper.readValue(response.getEntity().getContent(), Movie.class);
+            T searchResult = objectMapper.readValue(response.getEntity().getContent(), clazz);
 
-            return movie;
-
-        } catch (URISyntaxException | IOException e) {
-            throw new TMDbClientException("Couldn't get the movie.", e);
+            return searchResult;
+        } catch (IOException e) {
+            throw new TMDbClientException("Failed to make TMDb call.", e);
         }
     }
 
