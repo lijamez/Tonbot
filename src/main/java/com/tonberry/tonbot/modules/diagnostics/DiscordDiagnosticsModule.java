@@ -26,7 +26,7 @@ public class DiscordDiagnosticsModule extends AbstractModule {
         }
 
         public Plugin get() {
-            DiscordDiagnosticsLogger diagnosticsLogger = new DiscordDiagnosticsLogger(discordClient, 5000);
+            DiscordDiagnosticsLogger diagnosticsLogger = new DiscordDiagnosticsLogger(discordClient, 30000);
 
             return Plugin.builder()
                     .name("Discord Diagnostics Logger")

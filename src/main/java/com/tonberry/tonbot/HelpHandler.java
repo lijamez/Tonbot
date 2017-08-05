@@ -1,6 +1,7 @@
 package com.tonberry.tonbot;
 
 import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
@@ -8,15 +9,18 @@ import java.util.Set;
 
 class HelpHandler {
 
+    private final String prefix;
     private final Set<Plugin> plugins;
 
-    public HelpHandler(Set<Plugin> plugins) {
+    @Inject
+    public HelpHandler(@Prefix String prefix, Set<Plugin> plugins) {
+        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
         this.plugins = Preconditions.checkNotNull(plugins, "plugins must be non-null.");
     }
 
     @EventSubscriber
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.getMessage().getContent().startsWith("t! help")) {
+        if (event.getMessage().getContent().startsWith(prefix + " help")) {
             StringBuffer sb = new StringBuffer();
 
             plugins.stream()

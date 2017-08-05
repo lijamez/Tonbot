@@ -16,6 +16,6 @@ class DiscordDiagnosticsLogger extends PeriodicTask {
     @Override
     public void performTask() {
         IDiscordClient discordClient = this.getDiscordClient();
-        LOG.info("Currently in the following guilds: " + discordClient.getGuilds());
+        LOG.info("Currently in " + discordClient.getGuilds().size() + " guilds.");
     }
 }

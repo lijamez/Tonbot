@@ -16,13 +16,16 @@ class TonbotImpl implements Tonbot {
 
     private final IDiscordClient discordClient;
     private final Set<Plugin> plugins;
+    private final HelpHandler helpHandler;
 
     @Inject
     public TonbotImpl(
             final IDiscordClient discordClient,
-            final Set<Plugin> plugins) {
+            final Set<Plugin> plugins,
+            final HelpHandler helpHandler) {
         this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
         this.plugins = Preconditions.checkNotNull(plugins, "plugins must be non-null.");
+        this.helpHandler = Preconditions.checkNotNull(helpHandler, "helpHandler must be non-null.");
     }
 
     public void run() {
@@ -37,7 +40,7 @@ class TonbotImpl implements Tonbot {
                         discordClient.getDispatcher().registerListener(eventListener);
                         LOG.info("Registered event listener '{}'", eventListener.getClass().getName());
                     });
-            discordClient.getDispatcher().registerListener(new HelpHandler(plugins));
+            discordClient.getDispatcher().registerListener(helpHandler);
 
             discordClient.login();
 

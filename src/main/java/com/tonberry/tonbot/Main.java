@@ -5,7 +5,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.tonberry.tonbot.modules.coinflip.CoinFlipModule;
 import com.tonberry.tonbot.modules.diagnostics.DiscordDiagnosticsModule;
-import com.tonberry.tonbot.modules.helloworld.HelloWorldModule;
+import com.tonberry.tonbot.modules.tmdb.TMDbModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,15 +14,18 @@ public class Main {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        String token = args[0];
+        String discordBotToken = System.getProperty("discordBotToken");
+        Preconditions.checkNotNull(discordBotToken, "discordBotToken system property must be set.");
 
-        Preconditions.checkNotNull(token, "Please enter a token as the first argument.");
+        String tmdbApiKey = System.getProperty("tmdbApiKey");
+        Preconditions.checkNotNull(tmdbApiKey, "tmdbApiKey system property must be set.");
 
         Injector injector = Guice.createInjector(
-                new TonbotModule(token),
+                new TonbotModule(discordBotToken, "t!"),
                 new DiscordDiagnosticsModule(),
-                new HelloWorldModule(),
-                new CoinFlipModule());
+                new CoinFlipModule(),
+                new TMDbModule(tmdbApiKey));
+
         Tonbot bot = injector.getInstance(Tonbot.class);
 
         try {

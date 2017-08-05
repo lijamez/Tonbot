@@ -11,13 +11,16 @@ import sx.blah.discord.api.IDiscordClient;
 class TonbotModule extends AbstractModule {
 
     private final String token;
+    private final String prefix;
 
-    public TonbotModule(String token) {
+    public TonbotModule(String token, String prefix) {
         this.token = Preconditions.checkNotNull(token, "token must be non-null.");
+        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
     }
 
     public void configure() {
         bind(Tonbot.class).to(TonbotImpl.class);
+        bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
 
         Multibinder.newSetBinder(binder(), Plugin.class);
     }
