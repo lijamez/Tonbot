@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 
 class TMDbEventListener {
 
-    private final TMDbClient tmDbClient;
+    private final TMDbClient tmdbClient;
     private final String movieSearchPrefix;
 
     @Inject
     public TMDbEventListener(TMDbClient tmdbClient, @Prefix String prefix) {
-        this.tmDbClient = Preconditions.checkNotNull(tmdbClient, "tmdbClient must be non-null.");
+        this.tmdbClient = Preconditions.checkNotNull(tmdbClient, "tmdbClient must be non-null.");
 
         Preconditions.checkNotNull(prefix, "prefix must be non-null.");
         this.movieSearchPrefix = prefix + " movie ";
@@ -33,11 +33,11 @@ class TMDbEventListener {
 
             if (messageString.startsWith(movieSearchPrefix)) {
                 String query = messageString.substring(movieSearchPrefix.length(), messageString.length());
-                MovieSearchResult result = this.tmDbClient.searchMovies(query);
+                MovieSearchResult result = this.tmdbClient.searchMovies(query);
                 if (result.getResults().size() > 0) {
                     MovieSearchResult.Movie topMatch = result.getResults().get(0);
 
-                    Movie movie = tmDbClient.getMovie(topMatch.getId());
+                    Movie movie = tmdbClient.getMovie(topMatch.getId());
 
                     EmbedBuilder embedBuilder = new EmbedBuilder();
                     embedBuilder.withTitle(movie.getTitle());
@@ -65,7 +65,7 @@ class TMDbEventListener {
                     embedBuilder.appendField("Genres", StringUtils.join(genreNames, "\n"), true);
 
                     if (movie.getPosterPath().isPresent()) {
-                        String imageUrl = tmDbClient.getImageUrl(movie.getPosterPath().get());
+                        String imageUrl = tmdbClient.getImageUrl(movie.getPosterPath().get());
                         embedBuilder.withImage(imageUrl);
                     }
 
