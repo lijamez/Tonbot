@@ -2,18 +2,24 @@ package com.tonberry.tonbot.modules.systeminfo;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.multibindings.Multibinder;
 import com.tonberry.tonbot.common.Plugin;
 import com.tonberry.tonbot.common.Prefix;
+import com.tonberry.tonbot.common.TonbotPluginModule;
+import sx.blah.discord.api.IDiscordClient;
 
-public class SystemInfoModule extends AbstractModule {
+public class SystemInfoModule extends TonbotPluginModule {
+
+    public SystemInfoModule(String prefix, IDiscordClient discordClient) {
+        super(prefix, discordClient);
+    }
 
     public void configure() {
-        Multibinder<Plugin> pluginBinder = Multibinder.newSetBinder(binder(), Plugin.class);
-        pluginBinder.addBinding().toProvider(SystemInfoModule.PluginProvider.class);
+        super.configure();
+
+        bind(Plugin.class).toProvider(PluginProvider.class);
+        expose(Plugin.class);
     }
 
     static class PluginProvider implements Provider<Plugin> {

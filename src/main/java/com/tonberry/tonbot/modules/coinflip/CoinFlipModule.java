@@ -8,12 +8,20 @@ import com.google.inject.Provider;
 import com.google.inject.multibindings.Multibinder;
 import com.tonberry.tonbot.common.Plugin;
 import com.tonberry.tonbot.common.Prefix;
+import com.tonberry.tonbot.common.TonbotPluginModule;
+import sx.blah.discord.api.IDiscordClient;
 
-public class CoinFlipModule extends AbstractModule {
+public class CoinFlipModule extends TonbotPluginModule {
+
+    public CoinFlipModule(String prefix, IDiscordClient discordClient) {
+        super(prefix, discordClient);
+    }
 
     public void configure() {
-        Multibinder<Plugin> pluginBinder = Multibinder.newSetBinder(binder(), Plugin.class);
-        pluginBinder.addBinding().toProvider(PluginProvider.class);
+        super.configure();
+
+        bind(Plugin.class).toProvider(PluginProvider.class);
+        expose(Plugin.class);
     }
 
     static class PluginProvider implements Provider<Plugin> {

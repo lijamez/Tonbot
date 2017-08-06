@@ -7,13 +7,20 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.multibindings.Multibinder;
 import com.tonberry.tonbot.common.Plugin;
+import com.tonberry.tonbot.common.TonbotPluginModule;
 import sx.blah.discord.api.IDiscordClient;
 
-public class DiscordDiagnosticsModule extends AbstractModule {
+public class DiscordDiagnosticsModule extends TonbotPluginModule {
+
+    public DiscordDiagnosticsModule(String prefix, IDiscordClient discordClient) {
+        super(prefix, discordClient);
+    }
 
     public void configure() {
-        Multibinder<Plugin> pluginBinder = Multibinder.newSetBinder(binder(), Plugin.class);
-        pluginBinder.addBinding().toProvider(DiscordDiagnosticsModule.PluginProvider.class);
+        super.configure();
+
+        bind(Plugin.class).toProvider(DiscordDiagnosticsModule.PluginProvider.class);
+        expose(Plugin.class);
     }
 
     public static class PluginProvider implements Provider<Plugin> {

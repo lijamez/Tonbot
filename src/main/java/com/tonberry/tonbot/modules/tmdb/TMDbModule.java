@@ -8,22 +8,31 @@ import com.google.inject.*;
 import com.google.inject.multibindings.Multibinder;
 import com.tonberry.tonbot.common.Plugin;
 import com.tonberry.tonbot.common.Prefix;
+import com.tonberry.tonbot.common.TonbotPluginModule;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
+import sx.blah.discord.api.IDiscordClient;
 
-public class TMDbModule extends AbstractModule {
+public class TMDbModule extends TonbotPluginModule {
 
     private final String apiKey;
 
-    public TMDbModule(String apiKey) {
-        this.apiKey = Preconditions.checkNotNull(apiKey, "apiKey must be non-null.");
+    public TMDbModule(String prefix, IDiscordClient discordClient) {
+        super(prefix, discordClient);
+
+        String tmdbApiKey = System.getProperty("tmdbApiKey");
+        Preconditions.checkNotNull(tmdbApiKey, "tmdbApiKey system property must be set.");
+
+        this.apiKey = tmdbApiKey;
     }
 
     public void configure() {
+        super.configure();
+
         bind(String.class).annotatedWith(TMDbApiKey.class).toInstance(apiKey);
 
-        Multibinder<Plugin> pluginBinder = Multibinder.newSetBinder(binder(), Plugin.class);
-        pluginBinder.addBinding().toProvider(TMDbModule.PluginProvider.class);
+        bind(Plugin.class).toProvider(TMDbModule.PluginProvider.class);
+        expose(Plugin.class);
     }
 
     @Provides

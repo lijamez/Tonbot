@@ -1,7 +1,9 @@
 package com.tonberry.tonbot.modules.tmdb
 
-import com.google.inject.Guice
-import com.tonberry.tonbot.IntegrationTestModule
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.apache.http.client.HttpClient
+import org.apache.http.impl.client.HttpClients
 import spock.lang.Specification
 
 class TMDbClientIntegrationTest extends Specification {
@@ -10,8 +12,11 @@ class TMDbClientIntegrationTest extends Specification {
 
     def setup() {
         String tmdbApiKey = System.getProperty("tmdbApiKey");
-        this.client = Guice.createInjector(new IntegrationTestModule(), new TMDbModule(tmdbApiKey))
-            .getInstance(TMDbClient.class);
+        HttpClient httpClient  = HttpClients.createDefault();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        this.client = new TMDbClient(httpClient, objectMapper, tmdbApiKey);
     }
 
     def "search for movies"() {
