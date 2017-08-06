@@ -8,15 +8,14 @@ import com.tonberry.tonbot.common.Prefix;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
-import java.util.Set;
+import java.util.List;
 
 class HelpHandler {
 
     private final String prefix;
-    private final Set<Plugin> plugins;
+    private final List<Plugin> plugins;
 
-    @Inject
-    public HelpHandler(@Prefix String prefix, Set<Plugin> plugins) {
+    public HelpHandler(String prefix, List<Plugin> plugins) {
         this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
         this.plugins = Preconditions.checkNotNull(plugins, "plugins must be non-null.");
     }

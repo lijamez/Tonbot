@@ -65,6 +65,8 @@ public class MovieAction implements MessageReceivedAction {
                 embedBuilder.withImage(imageUrl);
             }
 
+            embedBuilder.withFooterText("Powered by The Movie Database");
+
             BotUtils.sendEmbeddedContent(event.getChannel(), embedBuilder.build());
         } else {
             BotUtils.sendMessage(event.getChannel(), "No results found! :shrug:");

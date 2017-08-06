@@ -4,21 +4,21 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.inject.Exposed;
+import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.tonberry.tonbot.common.Plugin;
-import com.tonberry.tonbot.common.TonbotPluginModule;
+import com.tonberry.tonbot.common.Prefix;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
-import sx.blah.discord.api.IDiscordClient;
 
-public class TimeModule extends TonbotPluginModule {
+class TimeModule extends AbstractModule {
 
+    private final String prefix;
     private final String wolframAlphaAppId;
 
-    public TimeModule(String prefix, IDiscordClient discordClient) {
-        super(prefix, discordClient);
+    public TimeModule(String prefix) {
+        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 
         String wolframAlphaAppId = System.getProperty("wolframAlphaAppId");
         Preconditions.checkNotNull(wolframAlphaAppId, "wolframAlphaAppId system property must be set.");
@@ -27,11 +27,9 @@ public class TimeModule extends TonbotPluginModule {
     }
 
     public void configure() {
-        super.configure();
-
+        bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
         bind(String.class).annotatedWith(WolframAlphaAppId.class).toInstance(wolframAlphaAppId);
     }
-
 
     @Provides
     @Singleton
@@ -50,11 +48,10 @@ public class TimeModule extends TonbotPluginModule {
 
     @Provides
     @Singleton
-    @Exposed
     Plugin plugin(TimeEventListener timeEventListener) {
         return Plugin.builder()
                 .name("Time")
-                .usageDescription("``" + this.getPrefix() + " time <query>``  Anything about time. Conversions, current time, etc.")
+                .usageDescription("``" + prefix + " time <query>``  Anything about time. Conversions, current time, etc.")
                 .eventListeners(ImmutableSet.of(timeEventListener))
                 .build();
     }

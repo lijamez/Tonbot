@@ -2,16 +2,10 @@ package com.tonberry.tonbot;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.inject.ConfigurationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.tonberry.tonbot.common.Plugin;
-import com.tonberry.tonbot.common.TonbotPluginModule;
-import com.tonberry.tonbot.modules.coinflip.CoinFlipModule;
-import com.tonberry.tonbot.modules.diagnostics.DiscordDiagnosticsModule;
-import com.tonberry.tonbot.modules.systeminfo.SystemInfoModule;
-import com.tonberry.tonbot.modules.time.TimeModule;
-import com.tonberry.tonbot.modules.tmdb.TMDbModule;
+import com.tonberry.tonbot.common.TonbotPluginArgs;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +13,6 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Main {
 
@@ -55,28 +47,16 @@ public class Main {
                 .withToken(discordBotToken)
                 .build();
 
-        List<TonbotPluginModule> pluginModules = ImmutableList.of(
-                new DiscordDiagnosticsModule(prefix, discordClient),
-                new CoinFlipModule(prefix, discordClient),
-                new TMDbModule(prefix, discordClient),
-                new TimeModule(prefix, discordClient),
-                new SystemInfoModule(prefix, discordClient));
-
-        Set<Plugin> plugins = pluginModules.stream()
-                .map(pluginModule -> {
-                    try {
-                        return Guice.createInjector(pluginModule).getInstance(Plugin.class);
-                    } catch (ConfigurationException e) {
-                        LOG.warn("Couldn't get a Plugin from " + pluginModule + ". Skipping it.", e);
-                        return null;
-                    }
-                })
-                .filter(plugin -> plugin != null)
-                .collect(Collectors.toSet());
-
+        List<String> pluginFqns = ImmutableList.of(
+                "com.tonberry.tonbot.modules.coinflip.CoinFlipPluginFactory",
+                "com.tonberry.tonbot.modules.diagnostics.DiscordDiagnosticsPluginFactory",
+                "com.tonberry.tonbot.modules.systeminfo.SystemInfoPluginFactory",
+                "com.tonberry.tonbot.modules.time.TimePluginFactory",
+                "com.tonberry.tonbot.modules.tmdb.TMDbPluginFactory"
+        );
 
         Injector injector = Guice.createInjector(
-                new TonbotModule(discordBotToken, prefix, plugins, discordClient));
+                new TonbotModule(discordBotToken, prefix, pluginFqns, discordClient));
 
         Tonbot bot = injector.getInstance(Tonbot.class);
 

@@ -3,44 +3,39 @@ package com.tonberry.tonbot.modules.diagnostics;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.multibindings.Multibinder;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.tonberry.tonbot.common.Plugin;
-import com.tonberry.tonbot.common.TonbotPluginModule;
+import com.tonberry.tonbot.common.Prefix;
 import sx.blah.discord.api.IDiscordClient;
 
-public class DiscordDiagnosticsModule extends TonbotPluginModule {
+class DiscordDiagnosticsModule extends AbstractModule {
+
+    private static final long PERIOD_MS = 300000;
+
+    private final String prefix;
+    private final IDiscordClient discordClient;
 
     public DiscordDiagnosticsModule(String prefix, IDiscordClient discordClient) {
-        super(prefix, discordClient);
+        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null");
+        this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null");
     }
 
     public void configure() {
-        super.configure();
-
-        bind(Plugin.class).toProvider(DiscordDiagnosticsModule.PluginProvider.class);
-        expose(Plugin.class);
+        bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
+        bind(IDiscordClient.class).toInstance(discordClient);
     }
 
-    public static class PluginProvider implements Provider<Plugin> {
+    @Provides
+    @Singleton
+    Plugin plugin(IDiscordClient discordClient) {
+        DiscordDiagnosticsLogger diagnosticsLogger = new DiscordDiagnosticsLogger(discordClient, PERIOD_MS);
 
-        private final IDiscordClient discordClient;
-
-        @Inject
-        public PluginProvider(IDiscordClient discordClient) {
-            this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
-        }
-
-        public Plugin get() {
-            DiscordDiagnosticsLogger diagnosticsLogger = new DiscordDiagnosticsLogger(discordClient, 30000);
-
-            return Plugin.builder()
-                    .name("Discord Diagnostics Logger")
-                    .usageDescription("")
-                    .hidden(true)
-                    .periodicTasks(ImmutableSet.of(diagnosticsLogger))
-                    .build();
-        }
+        return Plugin.builder()
+                .name("Discord Diagnostics Logger")
+                .usageDescription("")
+                .hidden(true)
+                .periodicTasks(ImmutableSet.of(diagnosticsLogger))
+                .build();
     }
 }

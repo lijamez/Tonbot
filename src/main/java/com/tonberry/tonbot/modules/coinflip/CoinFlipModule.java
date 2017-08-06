@@ -3,44 +3,30 @@ package com.tonberry.tonbot.modules.coinflip;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.multibindings.Multibinder;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.tonberry.tonbot.common.Plugin;
 import com.tonberry.tonbot.common.Prefix;
-import com.tonberry.tonbot.common.TonbotPluginModule;
-import sx.blah.discord.api.IDiscordClient;
 
-public class CoinFlipModule extends TonbotPluginModule {
+class CoinFlipModule extends AbstractModule {
 
-    public CoinFlipModule(String prefix, IDiscordClient discordClient) {
-        super(prefix, discordClient);
+    private final String prefix;
+
+    public CoinFlipModule(String prefix) {
+        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
     }
 
     public void configure() {
-        super.configure();
-
-        bind(Plugin.class).toProvider(PluginProvider.class);
-        expose(Plugin.class);
+        bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
     }
 
-    static class PluginProvider implements Provider<Plugin> {
-
-        private final String prefix;
-        private final CoinFlipper coinFlipper;
-
-        @Inject
-        public PluginProvider(@Prefix String prefix, CoinFlipper coinFlipper) {
-            this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
-            this.coinFlipper = Preconditions.checkNotNull(coinFlipper, "coinFlipper must be non-null.");
-        }
-
-        public Plugin get() {
-            return Plugin.builder()
-                    .name("Coin Flipper")
-                    .usageDescription("``" + prefix + " flip a coin`` Flips a coin")
-                    .eventListeners(ImmutableSet.of(coinFlipper))
-                    .build();
-        }
+    @Provides
+    @Singleton
+    Plugin plugin(CoinFlipper coinFlipper) {
+        return Plugin.builder()
+                .name("Coin Flipper")
+                .usageDescription("``" + prefix + " flip a coin`` Flips a coin")
+                .eventListeners(ImmutableSet.of(coinFlipper))
+                .build();
     }
 }

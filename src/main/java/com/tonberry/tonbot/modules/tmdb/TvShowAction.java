@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.EmbedBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,6 +57,8 @@ public class TvShowAction implements MessageReceivedAction {
                 String imageUrl = tmdbClient.getImageUrl(tvShow.getPosterPath().get());
                 embedBuilder.withImage(imageUrl);
             }
+
+            embedBuilder.withFooterText("Powered by The Movie Database");
 
             BotUtils.sendEmbeddedContent(event.getChannel(), embedBuilder.build());
         } else {

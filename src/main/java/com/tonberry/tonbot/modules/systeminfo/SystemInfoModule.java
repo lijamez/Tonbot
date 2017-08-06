@@ -2,43 +2,31 @@ package com.tonberry.tonbot.modules.systeminfo;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.tonberry.tonbot.common.Plugin;
 import com.tonberry.tonbot.common.Prefix;
-import com.tonberry.tonbot.common.TonbotPluginModule;
-import sx.blah.discord.api.IDiscordClient;
 
-public class SystemInfoModule extends TonbotPluginModule {
+class SystemInfoModule extends AbstractModule {
 
-    public SystemInfoModule(String prefix, IDiscordClient discordClient) {
-        super(prefix, discordClient);
+    private final String prefix;
+
+    public SystemInfoModule(String prefix) {
+        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
     }
 
     public void configure() {
-        super.configure();
-
-        bind(Plugin.class).toProvider(PluginProvider.class);
-        expose(Plugin.class);
+        bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
     }
 
-    static class PluginProvider implements Provider<Plugin> {
-
-        private final SystemInfoEventListener eventListener;
-        private final String prefix;
-
-        @Inject
-        public PluginProvider(SystemInfoEventListener eventListener, @Prefix String prefix) {
-            this.eventListener = Preconditions.checkNotNull(eventListener, "tmdbEventListener must be non-null.");
-            this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
-        }
-
-        public Plugin get() {
-            return Plugin.builder()
-                    .name("System Info")
-                    .usageDescription("``" + prefix + " systeminfo``  Displays system information.")
-                    .eventListeners(ImmutableSet.of(eventListener))
-                    .build();
-        }
+    @Provides
+    @Singleton
+    Plugin plugin(SystemInfoEventListener eventListener) {
+        return Plugin.builder()
+                .name("System Info")
+                .usageDescription("``" + prefix + " systeminfo``  Displays system information.")
+                .eventListeners(ImmutableSet.of(eventListener))
+                .build();
     }
 }

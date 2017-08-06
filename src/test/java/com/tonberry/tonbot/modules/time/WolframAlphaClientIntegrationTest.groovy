@@ -1,7 +1,6 @@
 package com.tonberry.tonbot.modules.time
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.http.client.HttpClient
 import org.apache.http.impl.client.HttpClients
