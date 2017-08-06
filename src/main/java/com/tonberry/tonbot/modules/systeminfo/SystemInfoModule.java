@@ -30,7 +30,7 @@ public class SystemInfoModule extends AbstractModule {
         public Plugin get() {
             return Plugin.builder()
                     .name("System Info")
-                    .usageDescription("``systeminfo``  Displays system information.")
+                    .usageDescription("``" + prefix + " systeminfo``  Displays system information.")
                     .eventListeners(ImmutableSet.of(eventListener))
                     .build();
         }
