@@ -54,7 +54,6 @@ public class SystemInfoAction implements MessageReceivedAction {
         embedBuilder.appendField("Memory Usage", memUsedMb + " / " + memTotalMb + " MB (" + memUsedPercent + "%)", true);
 
         int cpuLoadPercent = (int) (processor.getSystemCpuLoad() * 100);
-        System.out.println(processor.getSystemCpuLoad());
         embedBuilder.appendField("CPU Load", Integer.toString(cpuLoadPercent) + "%", true);
 
         BotUtils.sendEmbeddedContent(event.getChannel(), embedBuilder.build());
