@@ -5,12 +5,11 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.tonberry.tonbot.modules.coinflip.CoinFlipModule;
 import com.tonberry.tonbot.modules.diagnostics.DiscordDiagnosticsModule;
+import com.tonberry.tonbot.modules.systeminfo.SystemInfoModule;
 import com.tonberry.tonbot.modules.tmdb.TMDbModule;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
 
 public class Main {
 
@@ -48,7 +47,8 @@ public class Main {
                 new TonbotModule(discordBotToken, prefix),
                 new DiscordDiagnosticsModule(),
                 new CoinFlipModule(),
-                new TMDbModule(tmdbApiKey));
+                new TMDbModule(tmdbApiKey),
+                new SystemInfoModule());
 
         Tonbot bot = injector.getInstance(Tonbot.class);
 

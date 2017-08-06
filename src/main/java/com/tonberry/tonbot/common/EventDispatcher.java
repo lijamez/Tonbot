@@ -80,7 +80,12 @@ public abstract class EventDispatcher {
                 .mapToInt(String::length)
                 .sum();
         // The part of the message that doesn't contain the prefix or route.
-        String remainingMessage = messageString.substring(prefixAndRouteChars, messageString.length());
+        String remainingMessage;
+        if (prefixAndRouteChars > messageString.length()) {
+            remainingMessage = "";
+        } else {
+            remainingMessage = messageString.substring(prefixAndRouteChars, messageString.length());
+        }
 
         bestAction.enact(event, remainingMessage);
     }
