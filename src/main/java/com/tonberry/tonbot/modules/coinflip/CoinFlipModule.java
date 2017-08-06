@@ -6,8 +6,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.multibindings.Multibinder;
-import com.tonberry.tonbot.Plugin;
-import com.tonberry.tonbot.Prefix;
+import com.tonberry.tonbot.common.Plugin;
+import com.tonberry.tonbot.common.Prefix;
 
 public class CoinFlipModule extends AbstractModule {
 

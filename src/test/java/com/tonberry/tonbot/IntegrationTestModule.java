@@ -1,6 +1,7 @@
 package com.tonberry.tonbot;
 
 import com.google.inject.AbstractModule;
+import com.tonberry.tonbot.common.Prefix;
 
 public class IntegrationTestModule extends AbstractModule {
 

@@ -1,6 +1,6 @@
 package com.tonberry.tonbot.modules.diagnostics;
 
-import com.tonberry.tonbot.PeriodicTask;
+import com.tonberry.tonbot.common.PeriodicTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sx.blah.discord.api.IDiscordClient;

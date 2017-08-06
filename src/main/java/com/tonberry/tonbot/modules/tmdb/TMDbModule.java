@@ -6,8 +6,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.*;
 import com.google.inject.multibindings.Multibinder;
-import com.tonberry.tonbot.Plugin;
-import com.tonberry.tonbot.Prefix;
+import com.tonberry.tonbot.common.Plugin;
+import com.tonberry.tonbot.common.Prefix;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 

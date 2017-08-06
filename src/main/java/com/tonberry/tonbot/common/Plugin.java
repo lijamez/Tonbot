@@ -1,10 +1,9 @@
-package com.tonberry.tonbot;
+package com.tonberry.tonbot.common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NonNull;
 
 import java.util.Set;
 

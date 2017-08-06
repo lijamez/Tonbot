@@ -6,7 +6,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.multibindings.Multibinder;
-import com.tonberry.tonbot.Plugin;
+import com.tonberry.tonbot.common.Plugin;
 import sx.blah.discord.api.IDiscordClient;
 
 public class DiscordDiagnosticsModule extends AbstractModule {

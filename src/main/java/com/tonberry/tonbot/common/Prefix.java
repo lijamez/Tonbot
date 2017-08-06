@@ -1,4 +1,4 @@
-package com.tonberry.tonbot;
+package com.tonberry.tonbot.common;
 
 import com.google.inject.BindingAnnotation;
 
