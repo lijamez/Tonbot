@@ -1,11 +1,11 @@
 package com.tonberry.tonbot.modules.coinflip;
 
 import com.google.inject.Guice;
-import com.tonberry.tonbot.common.Plugin;
+import com.tonberry.tonbot.common.PluginResources;
 import com.tonberry.tonbot.common.TonbotPluginArgs;
-import com.tonberry.tonbot.common.TonbotPluginFactory;
+import com.tonberry.tonbot.common.TonbotPlugin;
 
-public class CoinFlipPluginFactory implements TonbotPluginFactory {
+public class CoinFlipPlugin implements TonbotPlugin {
 
     private CoinFlipModule module;
 
@@ -13,8 +13,8 @@ public class CoinFlipPluginFactory implements TonbotPluginFactory {
         this.module = new CoinFlipModule(args.getPrefix());
     }
 
-    public Plugin build() {
+    public PluginResources build() {
         return Guice.createInjector(module)
-                .getInstance(Plugin.class);
+                .getInstance(PluginResources.class);
     }
 }

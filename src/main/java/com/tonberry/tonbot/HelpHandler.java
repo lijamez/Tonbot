@@ -1,10 +1,8 @@
 package com.tonberry.tonbot;
 
 import com.google.common.base.Preconditions;
-import com.google.inject.Inject;
 import com.tonberry.tonbot.common.BotUtils;
-import com.tonberry.tonbot.common.Plugin;
-import com.tonberry.tonbot.common.Prefix;
+import com.tonberry.tonbot.common.PluginResources;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
@@ -13,11 +11,11 @@ import java.util.List;
 class HelpHandler {
 
     private final String prefix;
-    private final List<Plugin> plugins;
+    private final List<PluginResources> pluginResources;
 
-    public HelpHandler(String prefix, List<Plugin> plugins) {
+    public HelpHandler(String prefix, List<PluginResources> pluginResources) {
         this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
-        this.plugins = Preconditions.checkNotNull(plugins, "plugins must be non-null.");
+        this.pluginResources = Preconditions.checkNotNull(pluginResources, "pluginResources must be non-null.");
     }
 
     @EventSubscriber
@@ -25,7 +23,7 @@ class HelpHandler {
         if (event.getMessage().getContent().startsWith(getTrigger())) {
             StringBuffer sb = new StringBuffer();
 
-            plugins.stream()
+            pluginResources.stream()
                     .filter(plugin -> !plugin.isHidden())
                     .forEach(plugin -> {
                         sb.append("**" + plugin.getName() + "**\n");

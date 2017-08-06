@@ -1,11 +1,11 @@
 package com.tonberry.tonbot.modules.systeminfo;
 
 import com.google.inject.Guice;
-import com.tonberry.tonbot.common.Plugin;
+import com.tonberry.tonbot.common.PluginResources;
+import com.tonberry.tonbot.common.TonbotPlugin;
 import com.tonberry.tonbot.common.TonbotPluginArgs;
-import com.tonberry.tonbot.common.TonbotPluginFactory;
 
-public class SystemInfoPluginFactory implements TonbotPluginFactory {
+public class SystemInfoPlugin implements TonbotPlugin {
 
     private SystemInfoModule module;
 
@@ -13,8 +13,8 @@ public class SystemInfoPluginFactory implements TonbotPluginFactory {
         this.module = new SystemInfoModule(args.getPrefix());
     }
 
-    public Plugin build() {
+    public PluginResources build() {
         return Guice.createInjector(module)
-                .getInstance(Plugin.class);
+                .getInstance(PluginResources.class);
     }
 }

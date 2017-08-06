@@ -13,6 +13,7 @@ class WolframAlphaClientIntegrationTest extends Specification {
     def setup() {
         String wolframAlphaAppId = System.getProperty("wolframAlphaAppId")
         HttpClient httpClient  = HttpClients.createDefault();
+
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 

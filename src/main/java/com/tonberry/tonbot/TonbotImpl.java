@@ -1,7 +1,7 @@
 package com.tonberry.tonbot;
 
 import com.google.common.base.Preconditions;
-import com.tonberry.tonbot.common.Plugin;
+import com.tonberry.tonbot.common.PluginResources;
 import com.tonberry.tonbot.common.Prefix;
 import com.tonberry.tonbot.common.TonbotPluginArgs;
 import org.slf4j.Logger;
@@ -36,25 +36,22 @@ class TonbotImpl implements Tonbot {
 
     public void run() {
         try {
-            TonbotPluginArgs pluginArgs = TonbotPluginArgs.builder()
-                    .discordClient(discordClient)
-                    .prefix(prefix)
-                    .build();
 
-            List<Plugin> plugins = pluginLoader.instantiatePlugins(pluginFqns, pluginArgs);
 
-            printPluginsInfo(plugins);
+            List<PluginResources> pluginResources = pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient);
+
+            printPluginsInfo(pluginResources);
 
             LOG.info("Registering listeners...");
-            plugins.stream()
-                    .map(Plugin::getEventListeners)
+            pluginResources.stream()
+                    .map(PluginResources::getEventListeners)
                     .flatMap(Collection::stream)
                     .forEach(eventListener -> {
                         discordClient.getDispatcher().registerListener(eventListener);
                         LOG.info("Registered event listener '{}'", eventListener.getClass().getName());
                     });
 
-            HelpHandler helpHandler = new HelpHandler(prefix, plugins);
+            HelpHandler helpHandler = new HelpHandler(prefix, pluginResources);
             discordClient.getDispatcher().registerListener(helpHandler);
 
             discordClient.login();
@@ -65,8 +62,8 @@ class TonbotImpl implements Tonbot {
 
             LOG.info("Discord API is ready.");
 
-            plugins.stream()
-                    .map(Plugin::getPeriodicTasks)
+            pluginResources.stream()
+                    .map(PluginResources::getPeriodicTasks)
                     .flatMap(Collection::stream)
                     .forEach(periodicTask -> {
                         periodicTask.start();
@@ -82,11 +79,11 @@ class TonbotImpl implements Tonbot {
         }
     }
 
-    private void printPluginsInfo(List<Plugin> plugins) {
+    private void printPluginsInfo(List<PluginResources> pluginResources) {
         final StringBuffer pluginsSb = new StringBuffer();
-        pluginsSb.append(plugins.size());
-        pluginsSb.append(" plugins found: \n");
-        plugins.forEach(plugin -> {
+        pluginsSb.append(pluginResources.size());
+        pluginsSb.append(" Plugins found: \n");
+        pluginResources.forEach(plugin -> {
             pluginsSb.append(plugin.getName());
             pluginsSb.append("\n");
         });

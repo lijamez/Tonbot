@@ -1,10 +1,10 @@
 package com.tonberry.tonbot.common;
 
 /**
- * Tonbot uses classes of this type to instantiate {@link Plugin}s.
+ * Tonbot uses classes of this type to instantiate {@link PluginResources}s.
  * The Tonbot plugin loader will create an instance of this class using a zero-parameter constructor.
  */
-public interface TonbotPluginFactory {
+public interface TonbotPlugin {
 
     /**
      * Accepta a set of arguments from Tonbot. Tonbot will supply these arguments before build() is called.
@@ -15,8 +15,8 @@ public interface TonbotPluginFactory {
     void initialize(TonbotPluginArgs args);
 
     /**
-     * Called by the Tonbot plugin loader to create a new {@link Plugin}.
-     * @return {@link Plugin}. Null values will be ignored by the plugin loader.
+     * Called by the Tonbot plugin loader to create a new {@link PluginResources}.
+     * @return {@link PluginResources}. Null values will be ignored by the plugin loader.
      */
-    Plugin build();
+    PluginResources build();
 }

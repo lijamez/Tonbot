@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.tonberry.tonbot.common.Plugin;
+import com.tonberry.tonbot.common.PluginResources;
 import com.tonberry.tonbot.common.Prefix;
 
 class SystemInfoModule extends AbstractModule {
@@ -22,8 +22,8 @@ class SystemInfoModule extends AbstractModule {
 
     @Provides
     @Singleton
-    Plugin plugin(SystemInfoEventListener eventListener) {
-        return Plugin.builder()
+    PluginResources plugin(SystemInfoEventListener eventListener) {
+        return PluginResources.builder()
                 .name("System Info")
                 .usageDescription("``" + prefix + " systeminfo``  Displays system information.")
                 .eventListeners(ImmutableSet.of(eventListener))

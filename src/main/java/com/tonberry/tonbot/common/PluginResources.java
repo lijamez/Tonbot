@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Data
 @Builder
-public class Plugin {
+public class PluginResources {
 
     private final String name;
     private final String usageDescription;
@@ -17,7 +17,7 @@ public class Plugin {
     private final Set<Object> eventListeners;
     private final Set<PeriodicTask> periodicTasks;
 
-    private Plugin(String name, String usageDescription, boolean hidden, Set<Object> eventListeners, Set<PeriodicTask> periodicTasks) {
+    private PluginResources(String name, String usageDescription, boolean hidden, Set<Object> eventListeners, Set<PeriodicTask> periodicTasks) {
         this.name = Preconditions.checkNotNull(name, "name must be non-null");
         this.usageDescription = Preconditions.checkNotNull(usageDescription, "usageDescription must be non-null.");
         this.hidden = hidden;

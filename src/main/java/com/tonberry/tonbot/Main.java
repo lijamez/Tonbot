@@ -1,69 +1,74 @@
 package com.tonberry.tonbot;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.Resources;
 import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.tonberry.tonbot.common.Plugin;
-import com.tonberry.tonbot.common.TonbotPluginArgs;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 
-import java.util.List;
+import java.io.IOException;
+import java.net.URL;
 
 public class Main {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-    private static final String DEFAULT_PREFIX = "t!";
+    private static final String CONFIG_DIR_OPT = "c";
+    private static final String CONFIG_DIR_LONG_OPT = "configDir";
+
+    private static final String DEFAULT_CONFIG_DIR = "";
+    private static final String CONFIG_FILE_NAME = "config.json";
 
     public static void main(String[] args) {
-        String discordBotToken = System.getProperty("discordBotToken");
-        Preconditions.checkNotNull(discordBotToken, "discordBotToken system property must be set.");
-
+        Options options = new Options();
+        options.addOption(CONFIG_DIR_OPT, CONFIG_DIR_LONG_OPT, true, "specify a custom config directory");
         CommandLineParser parser = new DefaultParser();
-
-        // Read CLI options
-        Options cliOptions = new Options();
-        cliOptions.addOption("p","prefix", true, "specify the prefix which the bot will respond to");
-
         CommandLine cmd = null;
         try {
-            cmd = parser.parse(cliOptions, args);
+            cmd = parser.parse(options, args);
         } catch (ParseException e) {
-            LOG.error("Unable to parse command line arguments.", e);
+            LOG.error("Could not parse command line arguments.", e);
             System.exit(1);
         }
 
-        String prefix = cmd.getOptionValue("prefix");
-        if (prefix == null) {
-            prefix = DEFAULT_PREFIX;
+        String configDir = cmd.getOptionValue(CONFIG_DIR_LONG_OPT);
+        if (configDir == null) {
+            configDir = DEFAULT_CONFIG_DIR;
+        } else if (!configDir.endsWith("/")){
+            configDir = configDir + "/";
         }
 
+        LOG.info("The config directory is: " + configDir);
+
+        Config config = readConfig(configDir);
+
         IDiscordClient discordClient = new ClientBuilder()
-                .withToken(discordBotToken)
+                .withToken(config.getDiscordBotToken())
                 .build();
 
-        List<String> pluginFqns = ImmutableList.of(
-                "com.tonberry.tonbot.modules.coinflip.CoinFlipPluginFactory",
-                "com.tonberry.tonbot.modules.diagnostics.DiscordDiagnosticsPluginFactory",
-                "com.tonberry.tonbot.modules.systeminfo.SystemInfoPluginFactory",
-                "com.tonberry.tonbot.modules.time.TimePluginFactory",
-                "com.tonberry.tonbot.modules.tmdb.TMDbPluginFactory"
-        );
-
-        Injector injector = Guice.createInjector(
-                new TonbotModule(discordBotToken, prefix, pluginFqns, discordClient));
-
-        Tonbot bot = injector.getInstance(Tonbot.class);
+        Tonbot bot = Guice.createInjector(
+                new TonbotModule(config.getDiscordBotToken(), config.getPrefix(), config.getPluginNames(), discordClient, configDir))
+                .getInstance(Tonbot.class);
 
         try {
             bot.run();
         } catch (Exception e) {
             LOG.error("Tonbot died due to an uncaught exception. RIP.", e);
+        }
+    }
+
+    private static Config readConfig(String configDir) {
+        URL url = Resources.getResource(configDir + CONFIG_FILE_NAME);
+
+        ObjectMapper objMapper = new ObjectMapper();
+        try {
+            Config config = objMapper.readValue(url, Config.class);
+            return config;
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to read config.json.", e);
         }
     }
 }

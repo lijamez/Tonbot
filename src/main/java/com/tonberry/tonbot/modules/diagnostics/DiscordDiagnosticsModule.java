@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.tonberry.tonbot.common.Plugin;
+import com.tonberry.tonbot.common.PluginResources;
 import com.tonberry.tonbot.common.Prefix;
 import sx.blah.discord.api.IDiscordClient;
 
@@ -28,10 +28,10 @@ class DiscordDiagnosticsModule extends AbstractModule {
 
     @Provides
     @Singleton
-    Plugin plugin(IDiscordClient discordClient) {
+    PluginResources plugin(IDiscordClient discordClient) {
         DiscordDiagnosticsLogger diagnosticsLogger = new DiscordDiagnosticsLogger(discordClient, PERIOD_MS);
 
-        return Plugin.builder()
+        return PluginResources.builder()
                 .name("Discord Diagnostics Logger")
                 .usageDescription("")
                 .hidden(true)

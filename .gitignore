@@ -55,7 +55,7 @@ hs_err_pid*
 .idea/gradle.xml
 .idea/libraries
 
-# Mongo Explorer plugin:
+# Mongo Explorer pluginResources:
 .idea/mongoSettings.xml
 
 ## File-based project format:
@@ -66,13 +66,13 @@ hs_err_pid*
 # IntelliJ
 /out/
 
-# mpeltonen/sbt-idea plugin
+# mpeltonen/sbt-idea pluginResources
 .idea_modules/
 
-# JIRA plugin
-atlassian-ide-plugin.xml
+# JIRA pluginResources
+atlassian-ide-pluginResources.xml
 
-# Crashlytics plugin (for Android Studio and IntelliJ)
+# Crashlytics pluginResources (for Android Studio and IntelliJ)
 com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
@@ -105,3 +105,6 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Tonbot
+/src/main/resources/private/
