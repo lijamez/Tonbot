@@ -60,6 +60,8 @@ class TonbotImpl implements Tonbot {
                     });
 
             LOG.info("Tonbot is online!");
+
+            discordClient.changePlayingText("say: " + helpHandler.getTrigger());
         } catch (DiscordException e) {
             LOG.error("Failed to start Tonbot.", e);
             throw e;

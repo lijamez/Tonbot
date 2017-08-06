@@ -23,7 +23,7 @@ class HelpHandler {
 
     @EventSubscriber
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.getMessage().getContent().startsWith(prefix + " help")) {
+        if (event.getMessage().getContent().startsWith(getTrigger())) {
             StringBuffer sb = new StringBuffer();
 
             plugins.stream()
@@ -36,5 +36,9 @@ class HelpHandler {
 
             BotUtils.sendMessage(event.getChannel(), sb.toString());
         }
+    }
+
+    public String getTrigger() {
+        return prefix + " help";
     }
 }
