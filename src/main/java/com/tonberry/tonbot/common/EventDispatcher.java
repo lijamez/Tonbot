@@ -87,7 +87,13 @@ public abstract class EventDispatcher {
             remainingMessage = messageString.substring(prefixAndRouteChars, messageString.length());
         }
 
-        bestAction.enact(event, remainingMessage);
+        try {
+            bestAction.enact(event, remainingMessage);
+        } catch (Exception e) {
+            BotUtils.sendMessage(event.getChannel(), "Something bad happened. :confounded:");
+            throw e;
+        }
+
     }
 
     /**

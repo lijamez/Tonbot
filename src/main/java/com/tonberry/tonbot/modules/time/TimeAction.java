@@ -61,7 +61,9 @@ public class TimeAction implements MessageReceivedAction {
             embedBuilder.withImage(clockImagesPod.getSubpods().get(0).getImage().getSrc());
         }
 
-        embedBuilder.withDescription(resultPod.getSubpods().get(0).getPlaintext());
+        if (resultPod != null) {
+            embedBuilder.withDescription(resultPod.getSubpods().get(0).getPlaintext());
+        }
 
         embedBuilder.withFooterText("Powered by WolframAlpha");
 
