@@ -3,7 +3,6 @@ package com.tonberry.tonbot;
 import com.google.common.base.Preconditions;
 import com.tonberry.tonbot.common.PluginResources;
 import com.tonberry.tonbot.common.Prefix;
-import com.tonberry.tonbot.common.TonbotPluginArgs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sx.blah.discord.api.IDiscordClient;

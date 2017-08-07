@@ -2,7 +2,6 @@ package com.tonberry.tonbot.modules.time;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
-import com.google.common.io.Resources;
 import com.google.inject.Guice;
 import com.tonberry.tonbot.common.PluginResources;
 import com.tonberry.tonbot.common.TonbotPlugin;

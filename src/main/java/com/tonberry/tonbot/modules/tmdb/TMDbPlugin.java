@@ -2,11 +2,10 @@ package com.tonberry.tonbot.modules.tmdb;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
-import com.google.common.io.Resources;
 import com.google.inject.Guice;
 import com.tonberry.tonbot.common.PluginResources;
-import com.tonberry.tonbot.common.TonbotPluginArgs;
 import com.tonberry.tonbot.common.TonbotPlugin;
+import com.tonberry.tonbot.common.TonbotPluginArgs;
 
 import java.io.IOException;
 import java.net.URL;
