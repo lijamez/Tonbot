@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.tonberry.tonbot.common.EventDispatcher;
 import com.tonberry.tonbot.common.Prefix;
-import com.tonberry.tonbot.modules.time.TimeAction;
 
 class DecisionMakerEventListener extends EventDispatcher {
 
