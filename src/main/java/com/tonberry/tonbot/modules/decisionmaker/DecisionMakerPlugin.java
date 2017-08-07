@@ -1,16 +1,16 @@
-package com.tonberry.tonbot.modules.coinflip;
+package com.tonberry.tonbot.modules.decisionmaker;
 
 import com.google.inject.Guice;
 import com.tonberry.tonbot.common.PluginResources;
 import com.tonberry.tonbot.common.TonbotPlugin;
 import com.tonberry.tonbot.common.TonbotPluginArgs;
 
-public class CoinFlipPlugin implements TonbotPlugin {
+public class DecisionMakerPlugin implements TonbotPlugin {
 
-    private CoinFlipModule module;
+    private DecisionMakerModule module;
 
     public void initialize(TonbotPluginArgs args) {
-        this.module = new CoinFlipModule(args.getPrefix());
+        this.module = new DecisionMakerModule(args.getPrefix());
     }
 
     public PluginResources build() {

@@ -1,4 +1,4 @@
-package com.tonberry.tonbot.modules.coinflip;
+package com.tonberry.tonbot.modules.decisionmaker;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
@@ -8,11 +8,11 @@ import com.google.inject.Singleton;
 import com.tonberry.tonbot.common.PluginResources;
 import com.tonberry.tonbot.common.Prefix;
 
-class CoinFlipModule extends AbstractModule {
+class DecisionMakerModule extends AbstractModule {
 
     private final String prefix;
 
-    public CoinFlipModule(String prefix) {
+    public DecisionMakerModule(String prefix) {
         this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
     }
 
@@ -22,12 +22,13 @@ class CoinFlipModule extends AbstractModule {
 
     @Provides
     @Singleton
-    PluginResources plugin(CoinFlipper coinFlipper) {
+    PluginResources plugin(DecisionMakerEventListener eventListener) {
         return PluginResources.builder()
                 .name("Decision Maker")
                 .shortSummary("Make Important Decisions")
-                .usageDescription("``" + prefix + " flip a coin``    Flips a coin")
-                .eventListeners(ImmutableSet.of(coinFlipper))
+                .usageDescription("``" + prefix + " coinflip``    Flips a coin\n"
+                    + "``" + prefix + " pickanumber``    Picks a number between two other numbers")
+                .eventListeners(ImmutableSet.of(eventListener))
                 .build();
     }
 }
