@@ -7,8 +7,8 @@ import com.tonberry.tonbot.common.PluginResources;
 import com.tonberry.tonbot.common.TonbotPlugin;
 import com.tonberry.tonbot.common.TonbotPluginArgs;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 public class TimePlugin implements TonbotPlugin {
 
@@ -17,11 +17,11 @@ public class TimePlugin implements TonbotPlugin {
     public void initialize(TonbotPluginArgs args) {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        URL configFileUrl = args.getConfigFileUrl().orElse(null);
-        Preconditions.checkNotNull(configFileUrl, "configFileUrl must be non-null.");
+        File configFile = args.getConfigFile().orElse(null);
+        Preconditions.checkNotNull(configFile, "configFile must be non-null.");
 
         try {
-            Config config = objectMapper.readValue(configFileUrl, Config.class);
+            Config config = objectMapper.readValue(configFile, Config.class);
             this.module = new TimeModule(args.getPrefix(), config.getWolframAlphaAppId());
         } catch (IOException e) {
             throw new RuntimeException("Could not read configuration file.", e);

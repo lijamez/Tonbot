@@ -1,7 +1,7 @@
 package com.tonberry.tonbot;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.io.Resources;
+import com.google.common.base.Preconditions;
 import com.google.inject.Guice;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 public class Main {
 
@@ -37,7 +37,7 @@ public class Main {
         String configDir = cmd.getOptionValue(CONFIG_DIR_LONG_OPT);
         if (configDir == null) {
             configDir = DEFAULT_CONFIG_DIR;
-        } else if (!configDir.endsWith("/")){
+        } else if (!configDir.endsWith("/")) {
             configDir = configDir + "/";
         }
 
@@ -61,11 +61,12 @@ public class Main {
     }
 
     private static Config readConfig(String configDir) {
-        URL url = Resources.getResource(configDir + CONFIG_FILE_NAME);
+        File configFile = new File(configDir + "/" + CONFIG_FILE_NAME);
+        Preconditions.checkArgument(configFile.exists(), "config file doesn't exist at: " + configFile.getAbsolutePath());
 
         ObjectMapper objMapper = new ObjectMapper();
         try {
-            Config config = objMapper.readValue(url, Config.class);
+            Config config = objMapper.readValue(configFile, Config.class);
             return config;
         } catch (IOException e) {
             throw new RuntimeException("Unable to read config.json.", e);

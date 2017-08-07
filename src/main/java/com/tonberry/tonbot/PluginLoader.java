@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sx.blah.discord.api.IDiscordClient;
 
+import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -80,17 +81,16 @@ class PluginLoader {
     }
 
     private TonbotPluginArgs getPluginArgs(TonbotPlugin plugin, String prefix, IDiscordClient discordClient) {
-        URL configUrl = null;
-        try {
-            configUrl = Resources.getResource(configDir + "plugin_config/" + plugin.getClass().getName() + ".config");
-        } catch (IllegalArgumentException e) {
-            // This is fine. It just means there's no configuration file for this particular plugin.
+        File configFile = new File(configDir + "plugin_config/" + plugin.getClass().getName() + ".config");
+
+        if (!configFile.exists()) {
+            configFile = null;
         }
 
         TonbotPluginArgs pluginArgs = TonbotPluginArgs.builder()
                 .discordClient(discordClient)
                 .prefix(prefix)
-                .configFileUrl(configUrl)
+                .configFile(configFile)
                 .build();
 
         return pluginArgs;

@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import sx.blah.discord.api.IDiscordClient;
 
-import java.net.URL;
+import java.io.File;
 import java.util.Optional;
 
 /**
@@ -17,15 +17,15 @@ public class TonbotPluginArgs {
 
     private final String prefix;
     private final IDiscordClient discordClient;
-    private final URL configFileUrl;
+    private final File configFile;
 
-    private TonbotPluginArgs(String prefix, IDiscordClient discordClient, URL configFileUrl) {
+    private TonbotPluginArgs(String prefix, IDiscordClient discordClient, File configFile) {
         this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
         this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
-        this.configFileUrl = configFileUrl;
+        this.configFile = configFile;
     }
 
-    public Optional<URL> getConfigFileUrl() {
-        return Optional.ofNullable(configFileUrl);
+    public Optional<File> getConfigFile() {
+        return Optional.ofNullable(configFile);
     }
 }
