@@ -24,8 +24,9 @@ class CoinFlipModule extends AbstractModule {
     @Singleton
     PluginResources plugin(CoinFlipper coinFlipper) {
         return PluginResources.builder()
-                .name("Coin Flipper")
-                .usageDescription("``" + prefix + " flip a coin`` Flips a coin")
+                .name("Decision Maker")
+                .shortSummary("Make Important Decisions")
+                .usageDescription("``" + prefix + " flip a coin``    Flips a coin")
                 .eventListeners(ImmutableSet.of(coinFlipper))
                 .build();
     }

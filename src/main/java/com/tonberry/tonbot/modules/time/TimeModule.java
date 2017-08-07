@@ -47,7 +47,8 @@ class TimeModule extends AbstractModule {
     PluginResources plugin(TimeEventListener timeEventListener) {
         return PluginResources.builder()
                 .name("Time")
-                .usageDescription("``" + prefix + " time <query>``  Anything about time. Conversions, current time, etc.")
+                .shortSummary("Tell Time")
+                .usageDescription("``" + prefix + " time <query>``    Anything about time. Conversions, current time, etc.")
                 .eventListeners(ImmutableSet.of(timeEventListener))
                 .build();
     }

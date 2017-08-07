@@ -25,7 +25,8 @@ class SystemInfoModule extends AbstractModule {
     PluginResources plugin(SystemInfoEventListener eventListener) {
         return PluginResources.builder()
                 .name("System Info")
-                .usageDescription("``" + prefix + " systeminfo``  Displays system information.")
+                .shortSummary("Display System Vitals")
+                .usageDescription("``" + prefix + " systeminfo``    Displays system information.")
                 .eventListeners(ImmutableSet.of(eventListener))
                 .build();
     }

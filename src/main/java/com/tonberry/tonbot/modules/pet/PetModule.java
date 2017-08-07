@@ -24,6 +24,7 @@ class PetModule extends AbstractModule {
     PluginResources pluginResources(PetEventListener eventListener) {
         return PluginResources.builder()
                 .name("Pet")
+                .shortSummary("Receive approval from users")
                 .usageDescription("Pet the bot.")
                 .eventListeners(ImmutableSet.of(eventListener))
                 .hidden(true)

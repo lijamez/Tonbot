@@ -5,6 +5,7 @@ import com.tonberry.tonbot.common.BotUtils;
 import com.tonberry.tonbot.common.PluginResources;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+import sx.blah.discord.util.EmbedBuilder;
 
 import java.util.List;
 
@@ -21,17 +22,17 @@ class HelpHandler {
     @EventSubscriber
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getMessage().getContent().startsWith(getTrigger())) {
-            StringBuffer sb = new StringBuffer();
+
+            EmbedBuilder embedBuilder = new EmbedBuilder();
+            embedBuilder.withDesc("Here's what I can do...");
 
             pluginResources.stream()
                     .filter(plugin -> !plugin.isHidden())
                     .forEach(plugin -> {
-                        sb.append("**" + plugin.getName() + "**\n");
-                        sb.append(plugin.getUsageDescription());
-                        sb.append("\n\n");
+                        embedBuilder.appendField(plugin.getShortSummary(), plugin.getUsageDescription(), false);
                     });
 
-            BotUtils.sendMessage(event.getChannel(), sb.toString());
+            BotUtils.sendEmbeddedContent(event.getChannel(), embedBuilder.build());
         }
     }
 

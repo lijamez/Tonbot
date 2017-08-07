@@ -33,6 +33,7 @@ class DiscordDiagnosticsModule extends AbstractModule {
 
         return PluginResources.builder()
                 .name("Discord Diagnostics Logger")
+                .shortSummary("Display diagnostic information")
                 .usageDescription("")
                 .hidden(true)
                 .periodicTasks(ImmutableSet.of(diagnosticsLogger))

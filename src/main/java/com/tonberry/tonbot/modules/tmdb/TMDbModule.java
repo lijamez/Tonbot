@@ -47,8 +47,9 @@ class TMDbModule extends AbstractModule {
     PluginResources plugin(TMDbEventListener tmdbEventListener) {
         return PluginResources.builder()
                 .name("Movie Info")
-                .usageDescription("``" + prefix + " movie <search term>``  Gets information about a movie.\n"
-                        + "``" + prefix + " tv <search term>``  Gets information about a TV show.")
+                .shortSummary("Tell You About Movies and TV Shows")
+                .usageDescription("``" + prefix + " movie <search term>``    Gets information about a movie.\n"
+                        + "``" + prefix + " tv <search term>``    Gets information about a TV show.")
                 .eventListeners(ImmutableSet.of(tmdbEventListener))
                 .build();
     }
