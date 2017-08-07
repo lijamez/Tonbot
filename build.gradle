@@ -9,6 +9,8 @@ mainClassName = 'com.tonberry.tonbot.Main'
 run {
     // Pass all of the system properties to the application
     systemProperties System.getProperties()
+
+    args project.getProperty('runArgs')
 }
 
 repositories {
