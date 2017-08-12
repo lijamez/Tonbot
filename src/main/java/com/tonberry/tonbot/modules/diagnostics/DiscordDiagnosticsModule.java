@@ -5,9 +5,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.tonberry.tonbot.common.PluginResources;
+import com.tonberry.tonbot.common.Activity;
+import com.tonberry.tonbot.common.PeriodicTask;
 import com.tonberry.tonbot.common.Prefix;
 import sx.blah.discord.api.IDiscordClient;
+
+import java.util.Set;
 
 class DiscordDiagnosticsModule extends AbstractModule {
 
@@ -28,15 +31,9 @@ class DiscordDiagnosticsModule extends AbstractModule {
 
     @Provides
     @Singleton
-    PluginResources plugin(IDiscordClient discordClient) {
+    Set<PeriodicTask> periodicTasks() {
         DiscordDiagnosticsLogger diagnosticsLogger = new DiscordDiagnosticsLogger(discordClient, PERIOD_MS);
 
-        return PluginResources.builder()
-                .name("Discord Diagnostics Logger")
-                .shortSummary("Display diagnostic information")
-                .usageDescription("")
-                .hidden(true)
-                .periodicTasks(ImmutableSet.of(diagnosticsLogger))
-                .build();
+        return ImmutableSet.of(diagnosticsLogger);
     }
 }

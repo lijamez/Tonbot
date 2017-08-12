@@ -1,20 +1,43 @@
 package com.tonberry.tonbot.modules.systeminfo;
 
 import com.google.inject.Guice;
-import com.tonberry.tonbot.common.PluginResources;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.tonberry.tonbot.common.Activity;
+import com.tonberry.tonbot.common.PeriodicTask;
 import com.tonberry.tonbot.common.TonbotPlugin;
 import com.tonberry.tonbot.common.TonbotPluginArgs;
 
-public class SystemInfoPlugin implements TonbotPlugin {
+import java.util.Set;
 
-    private SystemInfoModule module;
+public class SystemInfoPlugin extends TonbotPlugin {
 
-    public void initialize(TonbotPluginArgs args) {
-        this.module = new SystemInfoModule(args.getPrefix());
+    private Injector injector;
+
+    public SystemInfoPlugin(TonbotPluginArgs args) {
+        super(args);
+
+        this.injector = Guice.createInjector(new SystemInfoModule(args.getPrefix()));
     }
 
-    public PluginResources build() {
-        return Guice.createInjector(module)
-                .getInstance(PluginResources.class);
+    @Override
+    public String getFriendlyName() {
+        return "System Info";
+    }
+
+    @Override
+    public String getActionDescription() {
+        return "Display System Vitals";
+    }
+
+    @Override
+    public boolean isHidden() {
+        return false;
+    }
+
+    @Override
+    public Set<Activity> getActivities() {
+        return injector.getInstance(Key.get(new TypeLiteral<Set<Activity>>() {}));
     }
 }

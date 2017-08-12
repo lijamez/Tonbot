@@ -3,18 +3,24 @@ package com.tonberry.tonbot.modules.tmdb;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.inject.Guice;
-import com.tonberry.tonbot.common.PluginResources;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.tonberry.tonbot.common.Activity;
 import com.tonberry.tonbot.common.TonbotPlugin;
 import com.tonberry.tonbot.common.TonbotPluginArgs;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
-public class TMDbPlugin implements TonbotPlugin {
+public class TMDbPlugin extends TonbotPlugin {
 
-    private TMDbModule module;
+    private Injector injector;
 
-    public void initialize(TonbotPluginArgs args) {
+    public TMDbPlugin(TonbotPluginArgs args) {
+        super(args);
+
         File configFile = args.getConfigFile().orElse(null);
         Preconditions.checkNotNull(configFile, "configFile must be non-null.");
 
@@ -22,15 +28,25 @@ public class TMDbPlugin implements TonbotPlugin {
 
         try {
             Config config = objectMapper.readValue(configFile, Config.class);
-            this.module = new TMDbModule(args.getPrefix(), config.getTmdbApiKey());
+            this.injector = Guice.createInjector(new TMDbModule(args.getPrefix(), config.getTmdbApiKey()));
         } catch (IOException e) {
             throw new RuntimeException("Could not read configuration file.", e);
         }
 
     }
 
-    public PluginResources build() {
-        return Guice.createInjector(module)
-                .getInstance(PluginResources.class);
+    @Override
+    public Set<Activity> getActivities() {
+        return injector.getInstance(Key.get(new TypeLiteral<Set<Activity>>() {}));
+    }
+
+    @Override
+    public String getFriendlyName() {
+        return "Movie Info";
+    }
+
+    @Override
+    public String getActionDescription() {
+        return "Tell You About Movies and TV Shows";
     }
 }

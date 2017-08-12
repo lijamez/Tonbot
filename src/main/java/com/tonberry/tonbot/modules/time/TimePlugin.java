@@ -3,18 +3,25 @@ package com.tonberry.tonbot.modules.time;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.inject.Guice;
-import com.tonberry.tonbot.common.PluginResources;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.tonberry.tonbot.common.Activity;
+import com.tonberry.tonbot.common.PeriodicTask;
 import com.tonberry.tonbot.common.TonbotPlugin;
 import com.tonberry.tonbot.common.TonbotPluginArgs;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
-public class TimePlugin implements TonbotPlugin {
+public class TimePlugin extends TonbotPlugin {
 
-    private TimeModule module;
+    private Injector injector;
 
-    public void initialize(TonbotPluginArgs args) {
+    public TimePlugin(TonbotPluginArgs args) {
+        super(args);
+
         ObjectMapper objectMapper = new ObjectMapper();
 
         File configFile = args.getConfigFile().orElse(null);
@@ -22,14 +29,29 @@ public class TimePlugin implements TonbotPlugin {
 
         try {
             Config config = objectMapper.readValue(configFile, Config.class);
-            this.module = new TimeModule(args.getPrefix(), config.getWolframAlphaAppId());
+            this.injector = Guice.createInjector(new TimeModule(args.getPrefix(), config.getWolframAlphaAppId()));
         } catch (IOException e) {
             throw new RuntimeException("Could not read configuration file.", e);
         }
     }
 
-    public PluginResources build() {
-        return Guice.createInjector(module)
-                .getInstance(PluginResources.class);
+    @Override
+    public String getFriendlyName() {
+        return "Time";
+    }
+
+    @Override
+    public String getActionDescription() {
+        return "Tell Time";
+    }
+
+    @Override
+    public boolean isHidden() {
+        return false;
+    }
+
+    @Override
+    public Set<Activity> getActivities() {
+        return injector.getInstance(Key.get(new TypeLiteral<Set<Activity>>() {}));
     }
 }

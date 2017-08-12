@@ -1,9 +1,7 @@
 package com.tonberry.tonbot;
 
 import com.google.common.base.Preconditions;
-import com.google.common.io.Resources;
 import com.google.inject.Inject;
-import com.tonberry.tonbot.common.PluginResources;
 import com.tonberry.tonbot.common.TonbotPlugin;
 import com.tonberry.tonbot.common.TonbotPluginArgs;
 import org.slf4j.Logger;
@@ -11,7 +9,8 @@ import org.slf4j.LoggerFactory;
 import sx.blah.discord.api.IDiscordClient;
 
 import java.io.File;
-import java.net.URL;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,52 +35,53 @@ class PluginLoader {
      * @param discordClient The discord client. Non-null.
      * @return A list of {@link PluginResources}s.
      */
-    public List<PluginResources> instantiatePlugins(List<String> pluginFqns, String prefix, IDiscordClient discordClient) {
+    public List<TonbotPlugin> instantiatePlugins(List<String> pluginFqns, String prefix, IDiscordClient discordClient) {
         Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
         Preconditions.checkNotNull(prefix, "prefix must be non-null.");
         Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 
         return pluginFqns.stream()
-                .map(factoryClassName -> {
+                .map(String::trim)
+                .map(pluginClassName -> {
+                    Class<?> pluginClass;
                     try {
-                        Class<?> factoryClass = Class.forName(factoryClassName);
-                        if (!TonbotPlugin.class.isAssignableFrom(factoryClass)) {
-                            LOG.warn("PluginResources '{}' could not be loaded because it is not a TonbotPlugin.", factoryClassName);
-                            return null;
-                        }
-
-                        URL configUrl = null;
-                        try {
-                            configUrl = Resources.getResource("plugin_config/" + factoryClass.getName() + ".config");
-                        } catch (IllegalArgumentException e) {
-                            // This is fine. There's no configuration file for this particular plugin.
-                        }
-
-                        TonbotPlugin plugin = (TonbotPlugin) factoryClass.newInstance();
-
-                        TonbotPluginArgs pluginArgs = getPluginArgs(plugin, prefix, discordClient);
-                        try {
-                            plugin.initialize(pluginArgs);
-                            PluginResources pluginResources = plugin.build();
-                            return pluginResources;
-                        } catch (Exception e) {
-                            LOG.warn("PluginResources '{}' could not be loaded.", factoryClassName, e);
-                        }
-
+                        pluginClass = Class.forName(pluginClassName);
                     } catch (ClassNotFoundException e) {
-                        LOG.warn("PluginResources '{}' could not be loaded because it was not found on the classpath.", factoryClassName);
-                    } catch (IllegalAccessException | InstantiationException e) {
-                        LOG.warn("PluginResources '{}' could not be loaded because the builder not be instantiated.", factoryClassName, e);
+                        LOG.warn("Plugin '{}' could not be loaded because it was not found on the classpath.", pluginClassName);
+                        return null;
                     }
 
-                    return null;
+                    if (!TonbotPlugin.class.isAssignableFrom(pluginClass)) {
+                        LOG.warn("PluginResources '{}' could not be loaded because it is not a TonbotPlugin.", pluginClass);
+                        return null;
+                    }
+
+                    Constructor<TonbotPlugin> constructor;
+                    try {
+                        constructor = (Constructor<TonbotPlugin>) pluginClass.getConstructor(TonbotPluginArgs.class);
+                    } catch (NoSuchMethodException e) {
+                        LOG.error("Plugin '{}' must have a single argument constuctor that accepts a TonbotPluginArgs.", pluginClassName);
+                        return null;
+                    }
+
+                    TonbotPluginArgs pluginArgs = getPluginArgs(pluginClassName, prefix, discordClient);
+
+                    TonbotPlugin plugin;
+                    try {
+                        plugin = constructor.newInstance(pluginArgs);
+                    } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                        LOG.error("Unable to create an instance of plugin '{}'.", pluginClassName, e);
+                        return null;
+                    }
+
+                    return plugin;
                 })
                 .filter(plugin -> plugin != null)
                 .collect(Collectors.toList());
     }
 
-    private TonbotPluginArgs getPluginArgs(TonbotPlugin plugin, String prefix, IDiscordClient discordClient) {
-        File configFile = new File(configDir + "plugin_config/" + plugin.getClass().getName() + ".config");
+    private TonbotPluginArgs getPluginArgs(String pluginClassName, String prefix, IDiscordClient discordClient) {
+        File configFile = new File(configDir + "plugin_config/" + pluginClassName + ".config");
 
         if (!configFile.exists()) {
             configFile = null;

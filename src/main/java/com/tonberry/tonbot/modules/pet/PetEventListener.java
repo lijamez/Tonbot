@@ -13,7 +13,7 @@ import sx.blah.discord.util.EmbedBuilder;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class PetEventListener {
+class PetEventListener {
 
     private static final List<String> TRIGGER_WORDS = ImmutableList.of(
             "good bot",

@@ -5,8 +5,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.tonberry.tonbot.common.PluginResources;
+import com.tonberry.tonbot.common.Activity;
+import com.tonberry.tonbot.common.PeriodicTask;
 import com.tonberry.tonbot.common.Prefix;
+
+import java.time.Period;
+import java.util.Set;
 
 class DecisionMakerModule extends AbstractModule {
 
@@ -22,13 +26,7 @@ class DecisionMakerModule extends AbstractModule {
 
     @Provides
     @Singleton
-    PluginResources plugin(DecisionMakerEventListener eventListener) {
-        return PluginResources.builder()
-                .name("Decision Maker")
-                .shortSummary("Make Important Decisions")
-                .usageDescription("``" + prefix + " coinflip``    Flips a coin\n"
-                    + "``" + prefix + " pickanumber``    Picks a number between two other numbers")
-                .eventListeners(ImmutableSet.of(eventListener))
-                .build();
+    Set<Activity> activities(CoinFlipActivity coinFlip, NumberPickerActivity numberPicker) {
+        return ImmutableSet.of(coinFlip, numberPicker);
     }
 }

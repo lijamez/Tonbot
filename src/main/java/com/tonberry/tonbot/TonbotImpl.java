@@ -1,8 +1,9 @@
 package com.tonberry.tonbot;
 
 import com.google.common.base.Preconditions;
-import com.tonberry.tonbot.common.PluginResources;
+import com.tonberry.tonbot.common.Activity;
 import com.tonberry.tonbot.common.Prefix;
+import com.tonberry.tonbot.common.TonbotPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sx.blah.discord.api.IDiscordClient;
@@ -11,6 +12,8 @@ import sx.blah.discord.util.DiscordException;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 class TonbotImpl implements Tonbot {
 
@@ -35,23 +38,28 @@ class TonbotImpl implements Tonbot {
 
     public void run() {
         try {
+            List<TonbotPlugin> plugins = pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient);
 
+            printPluginsInfo(plugins);
 
-            List<PluginResources> pluginResources = pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient);
-
-            printPluginsInfo(pluginResources);
-
-            LOG.info("Registering listeners...");
-            pluginResources.stream()
-                    .map(PluginResources::getEventListeners)
+            LOG.info("Registering activities...");
+            Set<Activity> activities = plugins.stream()
+                    .map(TonbotPlugin::getActivities)
                     .flatMap(Collection::stream)
-                    .forEach(eventListener -> {
-                        discordClient.getDispatcher().registerListener(eventListener);
-                        LOG.info("Registered event listener '{}'", eventListener.getClass().getName());
-                    });
+                    .collect(Collectors.toSet());
 
-            HelpHandler helpHandler = new HelpHandler(prefix, pluginResources);
-            discordClient.getDispatcher().registerListener(helpHandler);
+            HelpActivity helpActivity = new HelpActivity(prefix, plugins);
+            activities.add(helpActivity);
+
+            EventDispatcher eventDispatcher = new EventDispatcher(prefix, activities);
+
+            discordClient.getDispatcher().registerListener(eventDispatcher);
+
+            // Raw Listeners
+            plugins.stream()
+                    .map(TonbotPlugin::getRawEventListeners)
+                    .flatMap(Collection::stream)
+                    .forEach(eventListener -> discordClient.getDispatcher().registerListener(eventListener));
 
             discordClient.login();
 
@@ -61,8 +69,8 @@ class TonbotImpl implements Tonbot {
 
             LOG.info("Discord API is ready.");
 
-            pluginResources.stream()
-                    .map(PluginResources::getPeriodicTasks)
+            plugins.stream()
+                    .map(TonbotPlugin::getPeriodicTasks)
                     .flatMap(Collection::stream)
                     .forEach(periodicTask -> {
                         periodicTask.start();
@@ -71,19 +79,19 @@ class TonbotImpl implements Tonbot {
 
             LOG.info("Tonbot is online!");
 
-            discordClient.changePlayingText("say: " + helpHandler.getTrigger());
+            discordClient.changePlayingText("say: " + prefix + " help");
         } catch (DiscordException e) {
             LOG.error("Failed to start Tonbot.", e);
             throw e;
         }
     }
 
-    private void printPluginsInfo(List<PluginResources> pluginResources) {
+    private void printPluginsInfo(List<TonbotPlugin> plugins) {
         final StringBuffer pluginsSb = new StringBuffer();
-        pluginsSb.append(pluginResources.size());
+        pluginsSb.append(plugins.size());
         pluginsSb.append(" Plugins found: \n");
-        pluginResources.forEach(plugin -> {
-            pluginsSb.append(plugin.getName());
+        plugins.forEach(plugin -> {
+            pluginsSb.append(plugin.getFriendlyName());
             pluginsSb.append("\n");
         });
         LOG.info(pluginsSb.toString());

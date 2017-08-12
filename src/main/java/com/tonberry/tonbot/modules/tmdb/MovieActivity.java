@@ -3,30 +3,36 @@ package com.tonberry.tonbot.modules.tmdb;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import com.tonberry.tonbot.common.Activity;
+import com.tonberry.tonbot.common.ActivityDescriptor;
 import com.tonberry.tonbot.common.BotUtils;
-import com.tonberry.tonbot.common.MessageReceivedAction;
 import org.apache.commons.lang3.StringUtils;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.EmbedBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class MovieAction implements MessageReceivedAction {
+public class MovieActivity implements Activity {
 
-    private static final List<String> ROUTE = ImmutableList.of("movie");
+    private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
+            .route(ImmutableList.of("movie"))
+            .parameters(ImmutableList.of("movie name"))
+            .description("Gets information about a movie.")
+            .build();
 
     private final TMDbClient tmdbClient;
 
     @Inject
-    public MovieAction(TMDbClient tmdbClient) {
+    public MovieActivity(TMDbClient tmdbClient) {
         this.tmdbClient = Preconditions.checkNotNull(tmdbClient, "tmdbClient must be non-null.");
     }
 
     @Override
-    public List<String> getRoute() {
-        return ROUTE;
+    public ActivityDescriptor getDescriptor() {
+        return ACTIVITY_DESCRIPTOR;
     }
 
     @Override

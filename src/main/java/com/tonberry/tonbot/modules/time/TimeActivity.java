@@ -3,28 +3,34 @@ package com.tonberry.tonbot.modules.time;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
+import com.tonberry.tonbot.common.Activity;
+import com.tonberry.tonbot.common.ActivityDescriptor;
 import com.tonberry.tonbot.common.BotUtils;
-import com.tonberry.tonbot.common.MessageReceivedAction;
 import org.apache.commons.lang3.StringUtils;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.EmbedBuilder;
 
 import java.util.List;
+import java.util.Optional;
 
-public class TimeAction implements MessageReceivedAction {
+public class TimeActivity implements Activity {
 
-    private static final List<String> ROUTE = ImmutableList.of("time");
+    private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
+            .route(ImmutableList.of("time"))
+            .parameters(ImmutableList.of("query"))
+            .description("Anything about time. Conversions, current time, etc.")
+            .build();
 
     private final WolframAlphaClient waClient;
 
     @Inject
-    public TimeAction(WolframAlphaClient waClient) {
+    public TimeActivity(WolframAlphaClient waClient) {
         this.waClient = Preconditions.checkNotNull(waClient, "waClient must be non-null.");
     }
 
     @Override
-    public List<String> getRoute() {
-        return ROUTE;
+    public ActivityDescriptor getDescriptor() {
+        return ACTIVITY_DESCRIPTOR;
     }
 
     @Override

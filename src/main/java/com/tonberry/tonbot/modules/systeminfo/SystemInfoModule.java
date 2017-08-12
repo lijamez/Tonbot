@@ -5,8 +5,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.tonberry.tonbot.common.PluginResources;
+import com.tonberry.tonbot.common.Activity;
+import com.tonberry.tonbot.common.PeriodicTask;
 import com.tonberry.tonbot.common.Prefix;
+
+import java.util.Set;
 
 class SystemInfoModule extends AbstractModule {
 
@@ -22,12 +25,7 @@ class SystemInfoModule extends AbstractModule {
 
     @Provides
     @Singleton
-    PluginResources plugin(SystemInfoEventListener eventListener) {
-        return PluginResources.builder()
-                .name("System Info")
-                .shortSummary("Display System Vitals")
-                .usageDescription("``" + prefix + " systeminfo``    Displays system information.")
-                .eventListeners(ImmutableSet.of(eventListener))
-                .build();
+    Set<Activity> activities(SystemInfoActivity systemInfoActivity) {
+        return ImmutableSet.of(systemInfoActivity);
     }
 }

@@ -7,10 +7,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.tonberry.tonbot.common.PluginResources;
+import com.tonberry.tonbot.common.Activity;
+import com.tonberry.tonbot.common.PeriodicTask;
 import com.tonberry.tonbot.common.Prefix;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
+
+import java.util.Set;
 
 class TMDbModule extends AbstractModule {
 
@@ -44,13 +47,7 @@ class TMDbModule extends AbstractModule {
 
     @Provides
     @Singleton
-    PluginResources plugin(TMDbEventListener tmdbEventListener) {
-        return PluginResources.builder()
-                .name("Movie Info")
-                .shortSummary("Tell You About Movies and TV Shows")
-                .usageDescription("``" + prefix + " movie <search term>``    Gets information about a movie.\n"
-                        + "``" + prefix + " tv <search term>``    Gets information about a TV show.")
-                .eventListeners(ImmutableSet.of(tmdbEventListener))
-                .build();
+    Set<Activity> activities(TvShowActivity tvShowActivity, MovieActivity movieActivity) {
+        return ImmutableSet.of(tvShowActivity, movieActivity);
     }
 }

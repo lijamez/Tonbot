@@ -17,5 +17,7 @@ class DiscordDiagnosticsLogger extends PeriodicTask {
     public void performTask() {
         IDiscordClient discordClient = this.getDiscordClient();
         LOG.info("Currently in " + discordClient.getGuilds().size() + " guilds.");
+        LOG.info("Is ready? " + discordClient.isReady());
+        LOG.info("Is logged in? " + discordClient.isLoggedIn());
     }
 }

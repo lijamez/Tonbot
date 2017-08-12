@@ -1,22 +1,28 @@
 package com.tonberry.tonbot.modules.decisionmaker;
 
 import com.google.common.collect.ImmutableList;
+import com.tonberry.tonbot.common.Activity;
+import com.tonberry.tonbot.common.ActivityDescriptor;
 import com.tonberry.tonbot.common.BotUtils;
-import com.tonberry.tonbot.common.MessageReceivedAction;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-class NumberPickerAction implements MessageReceivedAction {
+class NumberPickerActivity implements Activity {
 
-    private static final List<String> ROUTE = ImmutableList.of("pickanumber");
+    private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
+            .route(ImmutableList.of("pickanumber"))
+            .parameters(ImmutableList.of("N", "M"))
+            .description("Picks a number between two other integers N and M")
+            .build();
 
     @Override
-    public List<String> getRoute() {
-        return ROUTE;
+    public ActivityDescriptor getDescriptor() {
+        return ACTIVITY_DESCRIPTOR;
     }
 
     @Override

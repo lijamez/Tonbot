@@ -1,19 +1,24 @@
 package com.tonberry.tonbot.modules.decisionmaker;
 
 import com.google.common.collect.ImmutableList;
+import com.tonberry.tonbot.common.Activity;
+import com.tonberry.tonbot.common.ActivityDescriptor;
 import com.tonberry.tonbot.common.BotUtils;
-import com.tonberry.tonbot.common.MessageReceivedAction;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
 import java.util.List;
+import java.util.Optional;
 
-class CoinFlipAction implements MessageReceivedAction {
+class CoinFlipActivity implements Activity {
 
-    private static final List<String> ROUTE = ImmutableList.of("coinflip");
+    private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
+            .route(ImmutableList.of("coinflip"))
+            .description("Flips a coin.")
+            .build();
 
     @Override
-    public List<String> getRoute() {
-        return ROUTE;
+    public ActivityDescriptor getDescriptor() {
+        return ACTIVITY_DESCRIPTOR;
     }
 
     @Override
