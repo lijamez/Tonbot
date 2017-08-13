@@ -1,15 +1,14 @@
 package com.tonberry.tonbot.modules.systeminfo;
 
+import java.util.Set;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.tonberry.tonbot.common.Activity;
-import com.tonberry.tonbot.common.PeriodicTask;
 import com.tonberry.tonbot.common.Prefix;
-
-import java.util.Set;
 
 class SystemInfoModule extends AbstractModule {
 

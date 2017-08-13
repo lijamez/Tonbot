@@ -1,16 +1,14 @@
 package com.tonberry.tonbot.modules.diagnostics;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
-import com.tonberry.tonbot.common.Activity;
 import com.tonberry.tonbot.common.PeriodicTask;
 import com.tonberry.tonbot.common.TonbotPlugin;
 import com.tonberry.tonbot.common.TonbotPluginArgs;
-
-import java.util.Set;
 
 public class DiscordDiagnosticsPlugin extends TonbotPlugin {
 

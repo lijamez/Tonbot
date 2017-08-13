@@ -1,13 +1,14 @@
 package com.tonberry.tonbot;
 
+import java.util.List;
+
 import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.tonberry.tonbot.common.Prefix;
-import sx.blah.discord.api.IDiscordClient;
 
-import java.util.List;
+import sx.blah.discord.api.IDiscordClient;
 
 class TonbotModule extends AbstractModule {
 

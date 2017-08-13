@@ -1,10 +1,11 @@
 package com.tonberry.tonbot.modules.time;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 
-import java.util.List;
+import lombok.Data;
 
 @Data
 class Pod {

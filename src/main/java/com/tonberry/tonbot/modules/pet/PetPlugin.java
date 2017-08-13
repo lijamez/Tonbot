@@ -1,12 +1,12 @@
 package com.tonberry.tonbot.modules.pet;
 
+import java.util.Set;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.tonberry.tonbot.common.TonbotPlugin;
 import com.tonberry.tonbot.common.TonbotPluginArgs;
-
-import java.util.Set;
 
 public class PetPlugin extends TonbotPlugin {
 

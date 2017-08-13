@@ -1,18 +1,19 @@
 package com.tonberry.tonbot.modules.tmdb;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.tonberry.tonbot.common.Activity;
 import com.tonberry.tonbot.common.ActivityDescriptor;
 import com.tonberry.tonbot.common.BotUtils;
-import org.apache.commons.lang3.StringUtils;
+
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.EmbedBuilder;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class TvShowActivity implements Activity {
 

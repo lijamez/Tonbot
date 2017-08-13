@@ -1,2 +1,3 @@
 rootProject.name = 'Tonbot'
 
+includeBuild '../tonbot-common'

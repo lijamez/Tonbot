@@ -1,5 +1,9 @@
 package com.tonberry.tonbot.modules.time;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Set;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.inject.Guice;
@@ -7,13 +11,8 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.tonberry.tonbot.common.Activity;
-import com.tonberry.tonbot.common.PeriodicTask;
 import com.tonberry.tonbot.common.TonbotPlugin;
 import com.tonberry.tonbot.common.TonbotPluginArgs;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Set;
 
 public class TimePlugin extends TonbotPlugin {
 

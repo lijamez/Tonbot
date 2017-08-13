@@ -1,17 +1,19 @@
 package com.tonberry.tonbot.modules.pet;
 
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.tonberry.tonbot.common.BotUtils;
 import com.tonberry.tonbot.common.Prefix;
-import org.apache.commons.lang3.StringUtils;
+
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.EmbedBuilder;
-
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 class PetEventListener {
 

@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import com.tonberry.tonbot.common.Activity;
 import com.tonberry.tonbot.common.ActivityDescriptor;
 import com.tonberry.tonbot.common.BotUtils;
+
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.ComputerSystem;
@@ -13,9 +14,6 @@ import oshi.hardware.GlobalMemory;
 import oshi.software.os.OperatingSystem;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.EmbedBuilder;
-
-import java.util.List;
-import java.util.Optional;
 
 public class SystemInfoActivity implements Activity {
 

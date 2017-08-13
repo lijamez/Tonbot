@@ -1,5 +1,10 @@
 package com.tonberry.tonbot.modules.tmdb;
 
+import java.util.Set;
+
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClients;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
@@ -8,12 +13,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.tonberry.tonbot.common.Activity;
-import com.tonberry.tonbot.common.PeriodicTask;
 import com.tonberry.tonbot.common.Prefix;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClients;
-
-import java.util.Set;
 
 class TMDbModule extends AbstractModule {
 

@@ -3,6 +3,7 @@ package com.tonberry.tonbot.modules.tmdb;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
+
 import lombok.Data;
 
 @Data

@@ -1,20 +1,20 @@
 package com.tonberry.tonbot;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.inject.Inject;
-import com.tonberry.tonbot.common.Activity;
-import com.tonberry.tonbot.common.ActivityDescriptor;
-import com.tonberry.tonbot.common.BotUtils;
-import com.tonberry.tonbot.common.Prefix;
-import org.apache.commons.lang3.StringUtils;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
-
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import com.tonberry.tonbot.common.Activity;
+import com.tonberry.tonbot.common.ActivityDescriptor;
+import com.tonberry.tonbot.common.BotUtils;
+
+import sx.blah.discord.api.events.EventSubscriber;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
 /**
  * Responsible for dispatching actions based on a message event and contents.

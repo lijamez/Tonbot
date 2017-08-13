@@ -4,10 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.tonberry.tonbot.common.Activity;
 import com.tonberry.tonbot.common.ActivityDescriptor;
 import com.tonberry.tonbot.common.BotUtils;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
-import java.util.List;
-import java.util.Optional;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
 class CoinFlipActivity implements Activity {
 

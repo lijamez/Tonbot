@@ -1,5 +1,10 @@
 package com.tonberry.tonbot.modules.time;
 
+import java.util.Set;
+
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClients;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
@@ -8,13 +13,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.tonberry.tonbot.common.Activity;
-import com.tonberry.tonbot.common.PeriodicTask;
 import com.tonberry.tonbot.common.Prefix;
-import com.tonberry.tonbot.modules.systeminfo.SystemInfoActivity;
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClients;
-
-import java.util.Set;
 
 class TimeModule extends AbstractModule {
 

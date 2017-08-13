@@ -1,12 +1,13 @@
 package com.tonberry.tonbot;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import lombok.Data;
 
-import java.util.List;
+import lombok.Data;
 
 @Data
 class Config {

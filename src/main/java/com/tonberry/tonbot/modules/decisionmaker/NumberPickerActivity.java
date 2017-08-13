@@ -1,16 +1,16 @@
 package com.tonberry.tonbot.modules.decisionmaker;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+
 import com.google.common.collect.ImmutableList;
 import com.tonberry.tonbot.common.Activity;
 import com.tonberry.tonbot.common.ActivityDescriptor;
 import com.tonberry.tonbot.common.BotUtils;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
+import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
 class NumberPickerActivity implements Activity {
 

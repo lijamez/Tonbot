@@ -1,10 +1,11 @@
 package com.tonberry.tonbot.modules.tmdb;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 
-import java.util.List;
+import lombok.Data;
 
 /**
  * https://developers.themoviedb.org/3/search/search-tv-shows

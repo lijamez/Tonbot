@@ -1,18 +1,20 @@
 package com.tonberry.tonbot;
 
-import com.google.common.base.Preconditions;
-import com.google.inject.Inject;
-import com.tonberry.tonbot.common.TonbotPlugin;
-import com.tonberry.tonbot.common.TonbotPluginArgs;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sx.blah.discord.api.IDiscordClient;
-
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
+import com.tonberry.tonbot.common.TonbotPlugin;
+import com.tonberry.tonbot.common.TonbotPluginArgs;
+
+import sx.blah.discord.api.IDiscordClient;
 
 class PluginLoader {
 

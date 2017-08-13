@@ -1,8 +1,10 @@
 package com.tonberry.tonbot.modules.diagnostics;
 
-import com.tonberry.tonbot.common.PeriodicTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.tonberry.tonbot.common.PeriodicTask;
+
 import sx.blah.discord.api.IDiscordClient;
 
 class DiscordDiagnosticsLogger extends PeriodicTask {
