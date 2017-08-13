@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableSet;
 import com.tonberry.tonbot.common.Activity;
 import com.tonberry.tonbot.common.ActivityDescriptor;
 import com.tonberry.tonbot.common.BotUtils;
+import com.tonberry.tonbot.common.TonbotBusinessException;
 
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -93,11 +94,12 @@ class EventDispatcher {
 
         try {
             bestActivity.enact(event, remainingMessage);
+        } catch (TonbotBusinessException e) {
+            BotUtils.sendMessage(event.getChannel(), e.getMessage());
         } catch (Exception e) {
             BotUtils.sendMessage(event.getChannel(), "Something bad happened. :confounded:");
             throw e;
         }
-
     }
 
     /**
