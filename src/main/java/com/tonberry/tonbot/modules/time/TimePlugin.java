@@ -16,41 +16,42 @@ import com.tonberry.tonbot.common.TonbotPluginArgs;
 
 public class TimePlugin extends TonbotPlugin {
 
-    private Injector injector;
+	private Injector injector;
 
-    public TimePlugin(TonbotPluginArgs args) {
-        super(args);
+	public TimePlugin(TonbotPluginArgs args) {
+		super(args);
 
-        ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper objectMapper = new ObjectMapper();
 
-        File configFile = args.getConfigFile().orElse(null);
-        Preconditions.checkNotNull(configFile, "configFile must be non-null.");
+		File configFile = args.getConfigFile().orElse(null);
+		Preconditions.checkNotNull(configFile, "configFile must be non-null.");
 
-        try {
-            Config config = objectMapper.readValue(configFile, Config.class);
-            this.injector = Guice.createInjector(new TimeModule(args.getPrefix(), config.getWolframAlphaAppId()));
-        } catch (IOException e) {
-            throw new RuntimeException("Could not read configuration file.", e);
-        }
-    }
+		try {
+			Config config = objectMapper.readValue(configFile, Config.class);
+			this.injector = Guice.createInjector(new TimeModule(args.getPrefix(), config.getWolframAlphaAppId()));
+		} catch (IOException e) {
+			throw new RuntimeException("Could not read configuration file.", e);
+		}
+	}
 
-    @Override
-    public String getFriendlyName() {
-        return "Time";
-    }
+	@Override
+	public String getFriendlyName() {
+		return "Time";
+	}
 
-    @Override
-    public String getActionDescription() {
-        return "Tell Time";
-    }
+	@Override
+	public String getActionDescription() {
+		return "Tell Time";
+	}
 
-    @Override
-    public boolean isHidden() {
-        return false;
-    }
+	@Override
+	public boolean isHidden() {
+		return false;
+	}
 
-    @Override
-    public Set<Activity> getActivities() {
-        return injector.getInstance(Key.get(new TypeLiteral<Set<Activity>>() {}));
-    }
+	@Override
+	public Set<Activity> getActivities() {
+		return injector.getInstance(Key.get(new TypeLiteral<Set<Activity>>() {
+		}));
+	}
 }

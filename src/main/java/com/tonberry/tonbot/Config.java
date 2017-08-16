@@ -12,19 +12,19 @@ import lombok.Data;
 @Data
 class Config {
 
-    private final String prefix;
-    private final String discordBotToken;
-    private final List<String> pluginNames;
+	private final String prefix;
+	private final String discordBotToken;
+	private final List<String> pluginNames;
 
-    @JsonCreator
-    public Config(
-            @JsonProperty("prefix") String prefix,
-            @JsonProperty("discordBotToken") String discordBotToken,
-            @JsonProperty("plugins") List<String> pluginNames) {
-        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
-        this.discordBotToken = Preconditions.checkNotNull(discordBotToken, "discordBotToken must be non-null.");
+	@JsonCreator
+	public Config(
+			@JsonProperty("prefix") String prefix,
+			@JsonProperty("discordBotToken") String discordBotToken,
+			@JsonProperty("plugins") List<String> pluginNames) {
+		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
+		this.discordBotToken = Preconditions.checkNotNull(discordBotToken, "discordBotToken must be non-null.");
 
-        Preconditions.checkNotNull(pluginNames, "pluginNames must be non-null.");
-        this.pluginNames = ImmutableList.copyOf(pluginNames);
-    }
+		Preconditions.checkNotNull(pluginNames, "pluginNames must be non-null.");
+		this.pluginNames = ImmutableList.copyOf(pluginNames);
+	}
 }

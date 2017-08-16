@@ -14,26 +14,26 @@ import sx.blah.discord.api.IDiscordClient;
 
 class DiscordDiagnosticsModule extends AbstractModule {
 
-    private static final long PERIOD_MS = 300000;
+	private static final long PERIOD_MS = 300000;
 
-    private final String prefix;
-    private final IDiscordClient discordClient;
+	private final String prefix;
+	private final IDiscordClient discordClient;
 
-    public DiscordDiagnosticsModule(String prefix, IDiscordClient discordClient) {
-        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null");
-        this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null");
-    }
+	public DiscordDiagnosticsModule(String prefix, IDiscordClient discordClient) {
+		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null");
+		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null");
+	}
 
-    public void configure() {
-        bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
-        bind(IDiscordClient.class).toInstance(discordClient);
-    }
+	public void configure() {
+		bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
+		bind(IDiscordClient.class).toInstance(discordClient);
+	}
 
-    @Provides
-    @Singleton
-    Set<PeriodicTask> periodicTasks() {
-        DiscordDiagnosticsLogger diagnosticsLogger = new DiscordDiagnosticsLogger(discordClient, PERIOD_MS);
+	@Provides
+	@Singleton
+	Set<PeriodicTask> periodicTasks() {
+		DiscordDiagnosticsLogger diagnosticsLogger = new DiscordDiagnosticsLogger(discordClient, PERIOD_MS);
 
-        return ImmutableSet.of(diagnosticsLogger);
-    }
+		return ImmutableSet.of(diagnosticsLogger);
+	}
 }

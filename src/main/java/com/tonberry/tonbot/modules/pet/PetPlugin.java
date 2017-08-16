@@ -10,31 +10,31 @@ import com.tonberry.tonbot.common.TonbotPluginArgs;
 
 public class PetPlugin extends TonbotPlugin {
 
-    private Injector injector;
+	private Injector injector;
 
-    public PetPlugin(TonbotPluginArgs args) {
-        super(args);
-        this.injector = Guice.createInjector(new PetModule(args.getPrefix()));
-    }
+	public PetPlugin(TonbotPluginArgs args) {
+		super(args);
+		this.injector = Guice.createInjector(new PetModule(args.getPrefix()));
+	}
 
-    @Override
-    public String getFriendlyName() {
-        return "Pet";
-    }
+	@Override
+	public String getFriendlyName() {
+		return "Pet";
+	}
 
-    @Override
-    public boolean isHidden() {
-        return true;
-    }
+	@Override
+	public boolean isHidden() {
+		return true;
+	}
 
-    @Override
-    public String getActionDescription() {
-        return "Emote when Praised";
-    }
+	@Override
+	public String getActionDescription() {
+		return "Emote when Praised";
+	}
 
-    @Override
-    public Set<Object> getRawEventListeners() {
-        PetEventListener listener = this.injector.getInstance(PetEventListener.class);
-        return ImmutableSet.of(listener);
-    }
+	@Override
+	public Set<Object> getRawEventListeners() {
+		PetEventListener listener = this.injector.getInstance(PetEventListener.class);
+		return ImmutableSet.of(listener);
+	}
 }

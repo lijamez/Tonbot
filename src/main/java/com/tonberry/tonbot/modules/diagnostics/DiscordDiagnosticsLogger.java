@@ -9,17 +9,17 @@ import sx.blah.discord.api.IDiscordClient;
 
 class DiscordDiagnosticsLogger extends PeriodicTask {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DiscordDiagnosticsLogger.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DiscordDiagnosticsLogger.class);
 
-    public DiscordDiagnosticsLogger(IDiscordClient discordClient, long periodMs) {
-        super(discordClient, periodMs);
-    }
+	public DiscordDiagnosticsLogger(IDiscordClient discordClient, long periodMs) {
+		super(discordClient, periodMs);
+	}
 
-    @Override
-    public void performTask() {
-        IDiscordClient discordClient = this.getDiscordClient();
-        LOG.info("Currently in " + discordClient.getGuilds().size() + " guilds.");
-        LOG.info("Is ready? " + discordClient.isReady());
-        LOG.info("Is logged in? " + discordClient.isLoggedIn());
-    }
+	@Override
+	public void performTask() {
+		IDiscordClient discordClient = this.getDiscordClient();
+		LOG.info("Currently in " + discordClient.getGuilds().size() + " guilds.");
+		LOG.info("Is ready? " + discordClient.isReady());
+		LOG.info("Is logged in? " + discordClient.isLoggedIn());
+	}
 }

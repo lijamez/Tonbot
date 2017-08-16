@@ -8,13 +8,13 @@ import lombok.Data;
 @Data
 class Image {
 
-    private final String src;
+	private final String src;
 
-    @JsonCreator
-    public Image(
-            @JsonProperty("src") String src) {
+	@JsonCreator
+	public Image(
+			@JsonProperty("src") String src) {
 
-        this.src = src;
-    }
+		this.src = src;
+	}
 
 }

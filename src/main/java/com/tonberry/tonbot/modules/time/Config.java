@@ -9,11 +9,11 @@ import lombok.Data;
 @Data
 class Config {
 
-    private final String wolframAlphaAppId;
+	private final String wolframAlphaAppId;
 
-    @JsonCreator
-    public Config(@JsonProperty("wolframAlphaAppId") String wolframAlphaAppId) {
-        this.wolframAlphaAppId = Preconditions.checkNotNull(wolframAlphaAppId, "wolframAlphaAppId must be non-null.");
-    }
+	@JsonCreator
+	public Config(@JsonProperty("wolframAlphaAppId") String wolframAlphaAppId) {
+		this.wolframAlphaAppId = Preconditions.checkNotNull(wolframAlphaAppId, "wolframAlphaAppId must be non-null.");
+	}
 
 }

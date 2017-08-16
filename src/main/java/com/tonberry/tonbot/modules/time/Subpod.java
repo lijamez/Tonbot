@@ -8,19 +8,19 @@ import lombok.Data;
 @Data
 class Subpod {
 
-    private final String title;
-    private final Image image;
-    private final String plaintext;
+	private final String title;
+	private final Image image;
+	private final String plaintext;
 
-    @JsonCreator
-    public Subpod(
-            @JsonProperty("title") String title,
-            @JsonProperty("img") Image image,
-            @JsonProperty("plaintext") String plaintext) {
+	@JsonCreator
+	public Subpod(
+			@JsonProperty("title") String title,
+			@JsonProperty("img") Image image,
+			@JsonProperty("plaintext") String plaintext) {
 
-        this.title = title;
-        this.image = image;
-        this.plaintext = plaintext;
-    }
+		this.title = title;
+		this.image = image;
+		this.plaintext = plaintext;
+	}
 
 }

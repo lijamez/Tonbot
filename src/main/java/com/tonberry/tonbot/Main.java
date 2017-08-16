@@ -20,62 +20,64 @@ import sx.blah.discord.api.IDiscordClient;
 
 public class Main {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-    private static final String CONFIG_DIR_OPT = "c";
-    private static final String CONFIG_DIR_LONG_OPT = "configDir";
+	private static final String CONFIG_DIR_OPT = "c";
+	private static final String CONFIG_DIR_LONG_OPT = "configDir";
 
-    private static final String DEFAULT_CONFIG_DIR = "";
-    private static final String CONFIG_FILE_NAME = "config.json";
+	private static final String DEFAULT_CONFIG_DIR = "";
+	private static final String CONFIG_FILE_NAME = "config.json";
 
-    public static void main(String[] args) {
-        Options options = new Options();
-        options.addOption(CONFIG_DIR_OPT, CONFIG_DIR_LONG_OPT, true, "specify a custom config directory");
-        CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = null;
-        try {
-            cmd = parser.parse(options, args);
-        } catch (ParseException e) {
-            LOG.error("Could not parse command line arguments.", e);
-            System.exit(1);
-        }
+	public static void main(String[] args) {
+		Options options = new Options();
+		options.addOption(CONFIG_DIR_OPT, CONFIG_DIR_LONG_OPT, true, "specify a custom config directory");
+		CommandLineParser parser = new DefaultParser();
+		CommandLine cmd = null;
+		try {
+			cmd = parser.parse(options, args);
+		} catch (ParseException e) {
+			LOG.error("Could not parse command line arguments.", e);
+			System.exit(1);
+		}
 
-        String configDir = cmd.getOptionValue(CONFIG_DIR_LONG_OPT);
-        if (configDir == null) {
-            configDir = DEFAULT_CONFIG_DIR;
-        } else if (!configDir.endsWith("/")) {
-            configDir = configDir + "/";
-        }
+		String configDir = cmd.getOptionValue(CONFIG_DIR_LONG_OPT);
+		if (configDir == null) {
+			configDir = DEFAULT_CONFIG_DIR;
+		} else if (!configDir.endsWith("/")) {
+			configDir = configDir + "/";
+		}
 
-        LOG.info("The config directory is: " + configDir);
+		LOG.info("The config directory is: " + configDir);
 
-        Config config = readConfig(configDir);
+		Config config = readConfig(configDir);
 
-        IDiscordClient discordClient = new ClientBuilder()
-                .withToken(config.getDiscordBotToken())
-                .build();
+		IDiscordClient discordClient = new ClientBuilder()
+				.withToken(config.getDiscordBotToken())
+				.build();
 
-        Tonbot bot = Guice.createInjector(
-                new TonbotModule(config.getDiscordBotToken(), config.getPrefix(), config.getPluginNames(), discordClient, configDir))
-                .getInstance(Tonbot.class);
+		Tonbot bot = Guice.createInjector(
+				new TonbotModule(config.getDiscordBotToken(), config.getPrefix(), config.getPluginNames(),
+						discordClient, configDir))
+				.getInstance(Tonbot.class);
 
-        try {
-            bot.run();
-        } catch (Exception e) {
-            LOG.error("Tonbot died due to an uncaught exception. RIP.", e);
-        }
-    }
+		try {
+			bot.run();
+		} catch (Exception e) {
+			LOG.error("Tonbot died due to an uncaught exception. RIP.", e);
+		}
+	}
 
-    private static Config readConfig(String configDir) {
-        File configFile = new File(configDir + "/" + CONFIG_FILE_NAME);
-        Preconditions.checkArgument(configFile.exists(), "config file doesn't exist at: " + configFile.getAbsolutePath());
+	private static Config readConfig(String configDir) {
+		File configFile = new File(configDir + "/" + CONFIG_FILE_NAME);
+		Preconditions.checkArgument(configFile.exists(),
+				"config file doesn't exist at: " + configFile.getAbsolutePath());
 
-        ObjectMapper objMapper = new ObjectMapper();
-        try {
-            Config config = objMapper.readValue(configFile, Config.class);
-            return config;
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to read config.json.", e);
-        }
-    }
+		ObjectMapper objMapper = new ObjectMapper();
+		try {
+			Config config = objMapper.readValue(configFile, Config.class);
+			return config;
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to read config.json.", e);
+		}
+	}
 }

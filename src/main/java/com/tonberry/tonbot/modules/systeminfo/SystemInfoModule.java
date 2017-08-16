@@ -12,19 +12,19 @@ import com.tonberry.tonbot.common.Prefix;
 
 class SystemInfoModule extends AbstractModule {
 
-    private final String prefix;
+	private final String prefix;
 
-    public SystemInfoModule(String prefix) {
-        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
-    }
+	public SystemInfoModule(String prefix) {
+		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
+	}
 
-    public void configure() {
-        bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
-    }
+	public void configure() {
+		bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
+	}
 
-    @Provides
-    @Singleton
-    Set<Activity> activities(SystemInfoActivity systemInfoActivity) {
-        return ImmutableSet.of(systemInfoActivity);
-    }
+	@Provides
+	@Singleton
+	Set<Activity> activities(SystemInfoActivity systemInfoActivity) {
+		return ImmutableSet.of(systemInfoActivity);
+	}
 }

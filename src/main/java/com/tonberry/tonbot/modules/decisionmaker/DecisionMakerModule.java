@@ -12,22 +12,22 @@ import com.tonberry.tonbot.common.Prefix;
 
 class DecisionMakerModule extends AbstractModule {
 
-    private final String prefix;
+	private final String prefix;
 
-    public DecisionMakerModule(String prefix) {
-        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
-    }
+	public DecisionMakerModule(String prefix) {
+		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
+	}
 
-    public void configure() {
-        bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
-    }
+	public void configure() {
+		bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
+	}
 
-    @Provides
-    @Singleton
-    Set<Activity> activities(
-            CoinFlipActivity coinFlip,
-            NumberPickerActivity numberPicker,
-            ShuffleActivity shuffler) {
-        return ImmutableSet.of(coinFlip, numberPicker, shuffler);
-    }
+	@Provides
+	@Singleton
+	Set<Activity> activities(
+			CoinFlipActivity coinFlip,
+			NumberPickerActivity numberPicker,
+			ShuffleActivity shuffler) {
+		return ImmutableSet.of(coinFlip, numberPicker, shuffler);
+	}
 }

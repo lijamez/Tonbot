@@ -20,83 +20,84 @@ import sx.blah.discord.util.DiscordException;
 
 class TonbotImpl implements Tonbot {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TonbotImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(TonbotImpl.class);
 
-    private final IDiscordClient discordClient;
-    private final PluginLoader pluginLoader;
-    private final List<String> pluginFqns;
-    private final String prefix;
+	private final IDiscordClient discordClient;
+	private final PluginLoader pluginLoader;
+	private final List<String> pluginFqns;
+	private final String prefix;
 
-    @Inject
-    public TonbotImpl(
-            final IDiscordClient discordClient,
-            final PluginLoader pluginLoader,
-            final List<String> pluginFqns,
-            @Prefix final String prefix) {
-        this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
-        this.pluginLoader = Preconditions.checkNotNull(pluginLoader, "pluginLoader must be non-null.");
-        this.pluginFqns = Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
-        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
-    }
+	@Inject
+	public TonbotImpl(
+			final IDiscordClient discordClient,
+			final PluginLoader pluginLoader,
+			final List<String> pluginFqns,
+			@Prefix final String prefix) {
+		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
+		this.pluginLoader = Preconditions.checkNotNull(pluginLoader, "pluginLoader must be non-null.");
+		this.pluginFqns = Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
+		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
+	}
 
-    public void run() {
-        try {
-            List<TonbotPlugin> plugins = pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient);
+	public void run() {
+		try {
+			List<TonbotPlugin> plugins = pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient);
 
-            printPluginsInfo(plugins);
+			printPluginsInfo(plugins);
 
-            LOG.info("Registering activities...");
-            Set<Activity> activities = plugins.stream()
-                    .map(TonbotPlugin::getActivities)
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toSet());
+			LOG.info("Registering activities...");
+			Set<Activity> activities = plugins.stream()
+					.map(TonbotPlugin::getActivities)
+					.flatMap(Collection::stream)
+					.collect(Collectors.toSet());
 
-            HelpActivity helpActivity = new HelpActivity(prefix, plugins);
-            activities.add(helpActivity);
+			HelpActivity helpActivity = new HelpActivity(prefix, plugins);
+			activities.add(helpActivity);
 
-            EventDispatcher eventDispatcher = new EventDispatcher(prefix, activities);
+			EventDispatcher eventDispatcher = new EventDispatcher(prefix, activities);
 
-            discordClient.getDispatcher().registerListener(eventDispatcher);
+			discordClient.getDispatcher().registerListener(eventDispatcher);
 
-            // Raw Listeners
-            plugins.stream()
-                    .map(TonbotPlugin::getRawEventListeners)
-                    .flatMap(Collection::stream)
-                    .forEach(eventListener -> discordClient.getDispatcher().registerListener(eventListener));
+			// Raw Listeners
+			plugins.stream()
+					.map(TonbotPlugin::getRawEventListeners)
+					.flatMap(Collection::stream)
+					.forEach(eventListener -> discordClient.getDispatcher().registerListener(eventListener));
 
-            discordClient.login();
+			discordClient.login();
 
-            LOG.info("Waiting for Discord API readiness...");
+			LOG.info("Waiting for Discord API readiness...");
 
-            while (!discordClient.isReady()) { }
+			while (!discordClient.isReady()) {
+			}
 
-            LOG.info("Discord API is ready.");
+			LOG.info("Discord API is ready.");
 
-            plugins.stream()
-                    .map(TonbotPlugin::getPeriodicTasks)
-                    .flatMap(Collection::stream)
-                    .forEach(periodicTask -> {
-                        periodicTask.start();
-                        LOG.info("Periodic task '{}' has started.", periodicTask.getClass().getName());
-                    });
+			plugins.stream()
+					.map(TonbotPlugin::getPeriodicTasks)
+					.flatMap(Collection::stream)
+					.forEach(periodicTask -> {
+						periodicTask.start();
+						LOG.info("Periodic task '{}' has started.", periodicTask.getClass().getName());
+					});
 
-            LOG.info("Tonbot is online!");
+			LOG.info("Tonbot is online!");
 
-            discordClient.changePlayingText("say: " + prefix + " help");
-        } catch (DiscordException e) {
-            LOG.error("Failed to start Tonbot.", e);
-            throw e;
-        }
-    }
+			discordClient.changePlayingText("say: " + prefix + " help");
+		} catch (DiscordException e) {
+			LOG.error("Failed to start Tonbot.", e);
+			throw e;
+		}
+	}
 
-    private void printPluginsInfo(List<TonbotPlugin> plugins) {
-        final StringBuffer pluginsSb = new StringBuffer();
-        pluginsSb.append(plugins.size());
-        pluginsSb.append(" Plugins found: \n");
-        plugins.forEach(plugin -> {
-            pluginsSb.append(plugin.getFriendlyName());
-            pluginsSb.append("\n");
-        });
-        LOG.info(pluginsSb.toString());
-    }
+	private void printPluginsInfo(List<TonbotPlugin> plugins) {
+		final StringBuffer pluginsSb = new StringBuffer();
+		pluginsSb.append(plugins.size());
+		pluginsSb.append(" Plugins found: \n");
+		plugins.forEach(plugin -> {
+			pluginsSb.append(plugin.getFriendlyName());
+			pluginsSb.append("\n");
+		});
+		LOG.info(pluginsSb.toString());
+	}
 }

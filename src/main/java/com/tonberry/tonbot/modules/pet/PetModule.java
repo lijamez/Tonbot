@@ -6,14 +6,14 @@ import com.tonberry.tonbot.common.Prefix;
 
 class PetModule extends AbstractModule {
 
-    private final String prefix;
+	private final String prefix;
 
-    public PetModule(String prefix) {
-        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
-    }
+	public PetModule(String prefix) {
+		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
+	}
 
-    @Override
-    protected void configure() {
-        bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
-    }
+	@Override
+	protected void configure() {
+		bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
+	}
 }

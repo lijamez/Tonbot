@@ -17,37 +17,37 @@ import com.tonberry.tonbot.common.Prefix;
 
 class TimeModule extends AbstractModule {
 
-    private final String prefix;
-    private final String wolframAlphaAppId;
+	private final String prefix;
+	private final String wolframAlphaAppId;
 
-    public TimeModule(String prefix, String wolframAlphaAppId) {
-        this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
-        this.wolframAlphaAppId = Preconditions.checkNotNull(wolframAlphaAppId, "wolframAlphaAppId must be non-null.");
-    }
+	public TimeModule(String prefix, String wolframAlphaAppId) {
+		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
+		this.wolframAlphaAppId = Preconditions.checkNotNull(wolframAlphaAppId, "wolframAlphaAppId must be non-null.");
+	}
 
-    public void configure() {
-        bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
-        bind(String.class).annotatedWith(WolframAlphaAppId.class).toInstance(wolframAlphaAppId);
-    }
+	public void configure() {
+		bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
+		bind(String.class).annotatedWith(WolframAlphaAppId.class).toInstance(wolframAlphaAppId);
+	}
 
-    @Provides
-    @Singleton
-    HttpClient httpClient() {
-        return HttpClients.createDefault();
-    }
+	@Provides
+	@Singleton
+	HttpClient httpClient() {
+		return HttpClients.createDefault();
+	}
 
-    @Provides
-    @Singleton
-    ObjectMapper objectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+	@Provides
+	@Singleton
+	ObjectMapper objectMapper() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-        return objectMapper;
-    }
+		return objectMapper;
+	}
 
-    @Provides
-    @Singleton
-    Set<Activity> activities(TimeActivity timeActivity) {
-        return ImmutableSet.of(timeActivity);
-    }
+	@Provides
+	@Singleton
+	Set<Activity> activities(TimeActivity timeActivity) {
+		return ImmutableSet.of(timeActivity);
+	}
 }

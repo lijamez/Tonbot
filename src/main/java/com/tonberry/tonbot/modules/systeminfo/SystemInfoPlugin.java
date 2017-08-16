@@ -12,31 +12,32 @@ import com.tonberry.tonbot.common.TonbotPluginArgs;
 
 public class SystemInfoPlugin extends TonbotPlugin {
 
-    private Injector injector;
+	private Injector injector;
 
-    public SystemInfoPlugin(TonbotPluginArgs args) {
-        super(args);
+	public SystemInfoPlugin(TonbotPluginArgs args) {
+		super(args);
 
-        this.injector = Guice.createInjector(new SystemInfoModule(args.getPrefix()));
-    }
+		this.injector = Guice.createInjector(new SystemInfoModule(args.getPrefix()));
+	}
 
-    @Override
-    public String getFriendlyName() {
-        return "System Info";
-    }
+	@Override
+	public String getFriendlyName() {
+		return "System Info";
+	}
 
-    @Override
-    public String getActionDescription() {
-        return "Display System Vitals";
-    }
+	@Override
+	public String getActionDescription() {
+		return "Display System Vitals";
+	}
 
-    @Override
-    public boolean isHidden() {
-        return false;
-    }
+	@Override
+	public boolean isHidden() {
+		return false;
+	}
 
-    @Override
-    public Set<Activity> getActivities() {
-        return injector.getInstance(Key.get(new TypeLiteral<Set<Activity>>() {}));
-    }
+	@Override
+	public Set<Activity> getActivities() {
+		return injector.getInstance(Key.get(new TypeLiteral<Set<Activity>>() {
+		}));
+	}
 }

@@ -8,10 +8,10 @@ import lombok.Data;
 @Data
 class WolframAlphaQueryResponse {
 
-    private final QueryResult queryResult;
+	private final QueryResult queryResult;
 
-    @JsonCreator
-    WolframAlphaQueryResponse(@JsonProperty("queryresult") QueryResult queryResult) {
-        this.queryResult = queryResult;
-    }
+	@JsonCreator
+	WolframAlphaQueryResponse(@JsonProperty("queryresult") QueryResult queryResult) {
+		this.queryResult = queryResult;
+	}
 }

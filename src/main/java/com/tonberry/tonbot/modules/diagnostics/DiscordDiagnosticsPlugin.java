@@ -12,31 +12,32 @@ import com.tonberry.tonbot.common.TonbotPluginArgs;
 
 public class DiscordDiagnosticsPlugin extends TonbotPlugin {
 
-    private Injector injector;
+	private Injector injector;
 
-    public DiscordDiagnosticsPlugin(TonbotPluginArgs args) {
-        super(args);
+	public DiscordDiagnosticsPlugin(TonbotPluginArgs args) {
+		super(args);
 
-        this.injector = Guice.createInjector(new DiscordDiagnosticsModule(args.getPrefix(), args.getDiscordClient()));
-    }
+		this.injector = Guice.createInjector(new DiscordDiagnosticsModule(args.getPrefix(), args.getDiscordClient()));
+	}
 
-    @Override
-    public String getFriendlyName() {
-        return "Discord Diagnostics Logger";
-    }
+	@Override
+	public String getFriendlyName() {
+		return "Discord Diagnostics Logger";
+	}
 
-    @Override
-    public String getActionDescription() {
-        return "Display diagnostic information";
-    }
+	@Override
+	public String getActionDescription() {
+		return "Display diagnostic information";
+	}
 
-    @Override
-    public boolean isHidden() {
-        return true;
-    }
+	@Override
+	public boolean isHidden() {
+		return true;
+	}
 
-    @Override
-    public Set<PeriodicTask> getPeriodicTasks() {
-        return injector.getInstance(Key.get(new TypeLiteral<Set<PeriodicTask>>() {}));
-    }
+	@Override
+	public Set<PeriodicTask> getPeriodicTasks() {
+		return injector.getInstance(Key.get(new TypeLiteral<Set<PeriodicTask>>() {
+		}));
+	}
 }
