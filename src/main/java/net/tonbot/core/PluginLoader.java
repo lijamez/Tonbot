@@ -1,4 +1,4 @@
-package com.tonberry.tonbot;
+package net.tonbot.core;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -11,9 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
-import com.tonberry.tonbot.common.TonbotPlugin;
-import com.tonberry.tonbot.common.TonbotPluginArgs;
 
+import net.tonbot.common.TonbotPlugin;
+import net.tonbot.common.TonbotPluginArgs;
 import sx.blah.discord.api.IDiscordClient;
 
 class PluginLoader {

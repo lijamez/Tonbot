@@ -1,4 +1,4 @@
-package com.tonberry.tonbot;
+package net.tonbot.core;
 
 import java.util.List;
 

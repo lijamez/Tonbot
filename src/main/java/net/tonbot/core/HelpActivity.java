@@ -1,4 +1,4 @@
-package com.tonberry.tonbot;
+package net.tonbot.core;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,11 +7,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.tonberry.tonbot.common.Activity;
-import com.tonberry.tonbot.common.ActivityDescriptor;
-import com.tonberry.tonbot.common.BotUtils;
-import com.tonberry.tonbot.common.TonbotPlugin;
 
+import net.tonbot.common.Activity;
+import net.tonbot.common.ActivityDescriptor;
+import net.tonbot.common.BotUtils;
+import net.tonbot.common.TonbotPlugin;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.util.EmbedBuilder;
 

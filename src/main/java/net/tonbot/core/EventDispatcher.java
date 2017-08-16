@@ -1,4 +1,4 @@
-package com.tonberry.tonbot;
+package net.tonbot.core;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -9,11 +9,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.tonberry.tonbot.common.Activity;
-import com.tonberry.tonbot.common.ActivityDescriptor;
-import com.tonberry.tonbot.common.BotUtils;
-import com.tonberry.tonbot.common.TonbotBusinessException;
 
+import net.tonbot.common.Activity;
+import net.tonbot.common.ActivityDescriptor;
+import net.tonbot.common.BotUtils;
+import net.tonbot.common.TonbotBusinessException;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 

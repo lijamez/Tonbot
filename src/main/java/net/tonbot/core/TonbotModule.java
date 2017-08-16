@@ -1,4 +1,4 @@
-package com.tonberry.tonbot;
+package net.tonbot.core;
 
 import java.util.List;
 
@@ -6,8 +6,8 @@ import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import com.tonberry.tonbot.common.Prefix;
 
+import net.tonbot.common.Prefix;
 import sx.blah.discord.api.IDiscordClient;
 
 class TonbotModule extends AbstractModule {

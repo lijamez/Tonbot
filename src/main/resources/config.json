@@ -2,11 +2,5 @@
   "prefix" : "t!",
   "discordBotToken" : "",
   "plugins" : [
-    "com.tonberry.tonbot.modules.decisionmaker.DecisionMakerPlugin",
-    "com.tonberry.tonbot.modules.diagnostics.DiscordDiagnosticsPlugin",
-    "com.tonberry.tonbot.modules.systeminfo.SystemInfoPlugin",
-    "com.tonberry.tonbot.modules.time.TimePlugin",
-    "com.tonberry.tonbot.modules.tmdb.TMDbPlugin",
-    "com.tonberry.tonbot.modules.pet.PetPlugin"
   ]
 }

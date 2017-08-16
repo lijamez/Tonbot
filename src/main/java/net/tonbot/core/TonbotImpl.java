@@ -1,4 +1,4 @@
-package com.tonberry.tonbot;
+package net.tonbot.core;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,10 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.tonberry.tonbot.common.Activity;
-import com.tonberry.tonbot.common.Prefix;
-import com.tonberry.tonbot.common.TonbotPlugin;
 
+import net.tonbot.common.Activity;
+import net.tonbot.common.Prefix;
+import net.tonbot.common.TonbotPlugin;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.util.DiscordException;
 
