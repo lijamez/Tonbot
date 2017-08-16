@@ -41,6 +41,7 @@ class PluginLoader {
 	 *            The discord client. Non-null.
 	 * @return A list of {@link PluginResources}s.
 	 */
+	@SuppressWarnings("unchecked")
 	public List<TonbotPlugin> instantiatePlugins(List<String> pluginFqns, String prefix, IDiscordClient discordClient) {
 		Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
 		Preconditions.checkNotNull(prefix, "prefix must be non-null.");

@@ -56,8 +56,7 @@ public class Main {
 				.build();
 
 		Tonbot bot = Guice.createInjector(
-				new TonbotModule(config.getDiscordBotToken(), config.getPrefix(), config.getPluginNames(),
-						discordClient, configDir))
+				new TonbotModule(config.getPrefix(), config.getPluginNames(), discordClient, configDir))
 				.getInstance(Tonbot.class);
 
 		try {
