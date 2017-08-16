@@ -36,6 +36,7 @@ dependencies {
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-ifplayer', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-tmdb', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-time', version: 'master-SNAPSHOT'
+	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-systeminfo', version: 'master-SNAPSHOT'
 
     compile group: 'com.github.austinv11', name: 'Discord4J', version: '2.8.4'
 
@@ -50,8 +51,6 @@ dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.2'
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.8.2'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-
-    compile group: 'com.github.oshi', name: 'oshi-core', version: '3.4.3'
 
     compileOnly 'org.projectlombok:lombok:1.16.18'
 
