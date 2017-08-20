@@ -35,7 +35,7 @@ class TonbotModule extends AbstractModule {
 		bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
 		bind(IDiscordClient.class).toInstance(discordClient);
 		bind(String.class).annotatedWith(ConfigDir.class).toInstance(configDir);
-		bind(BotUtils.class).in(Scopes.SINGLETON);
+		bind(BotUtils.class).to(BotUtilsImpl.class).in(Scopes.SINGLETON);
 	}
 
 	@Provides
