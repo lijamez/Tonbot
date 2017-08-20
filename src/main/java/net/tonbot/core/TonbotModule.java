@@ -5,8 +5,10 @@ import java.util.List;
 import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 
+import net.tonbot.common.BotUtils;
 import net.tonbot.common.Prefix;
 import sx.blah.discord.api.IDiscordClient;
 
@@ -33,6 +35,7 @@ class TonbotModule extends AbstractModule {
 		bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
 		bind(IDiscordClient.class).toInstance(discordClient);
 		bind(String.class).annotatedWith(ConfigDir.class).toInstance(configDir);
+		bind(BotUtils.class).in(Scopes.SINGLETON);
 	}
 
 	@Provides

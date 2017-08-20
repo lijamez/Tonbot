@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
+import net.tonbot.common.BotUtils;
 import net.tonbot.common.TonbotPlugin;
 import net.tonbot.common.TonbotPluginArgs;
 import sx.blah.discord.api.IDiscordClient;
@@ -39,13 +40,21 @@ class PluginLoader {
 	 *            The prefix. Non-null.
 	 * @param discordClient
 	 *            The discord client. Non-null.
+	 * @param botUtils
+	 *            {@link BotUtils}. Non-null.
 	 * @return A list of {@link PluginResources}s.
 	 */
 	@SuppressWarnings("unchecked")
-	public List<TonbotPlugin> instantiatePlugins(List<String> pluginFqns, String prefix, IDiscordClient discordClient) {
+	public List<TonbotPlugin> instantiatePlugins(
+			List<String> pluginFqns,
+			String prefix,
+			IDiscordClient discordClient,
+			BotUtils botUtils) {
+
 		Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
 		Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
+		Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 
 		return pluginFqns.stream()
 				.map(String::trim)
@@ -74,7 +83,7 @@ class PluginLoader {
 						return null;
 					}
 
-					TonbotPluginArgs pluginArgs = getPluginArgs(pluginClassName, prefix, discordClient);
+					TonbotPluginArgs pluginArgs = getPluginArgs(pluginClassName, prefix, discordClient, botUtils);
 
 					TonbotPlugin plugin;
 					try {
@@ -90,7 +99,8 @@ class PluginLoader {
 				.collect(Collectors.toList());
 	}
 
-	private TonbotPluginArgs getPluginArgs(String pluginClassName, String prefix, IDiscordClient discordClient) {
+	private TonbotPluginArgs getPluginArgs(String pluginClassName, String prefix, IDiscordClient discordClient,
+			BotUtils botUtils) {
 		File configFile = new File(configDir + "plugin_config/" + pluginClassName + ".config");
 
 		if (!configFile.exists()) {
@@ -101,6 +111,7 @@ class PluginLoader {
 				.discordClient(discordClient)
 				.prefix(prefix)
 				.configFile(configFile)
+				.botUtils(botUtils)
 				.build();
 
 		return pluginArgs;

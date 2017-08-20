@@ -21,10 +21,12 @@ class HelpActivity implements Activity {
 			.route(ImmutableList.of("help"))
 			.build();
 
+	private final BotUtils botUtils;
 	private final String prefix;
 	private final List<TonbotPlugin> plugins;
 
-	public HelpActivity(String prefix, List<TonbotPlugin> plugins) {
+	public HelpActivity(BotUtils botUtils, String prefix, List<TonbotPlugin> plugins) {
+		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		this.plugins = Preconditions.checkNotNull(plugins, "plugins must be non-null.");
 	}
@@ -65,7 +67,7 @@ class HelpActivity implements Activity {
 							});
 					embedBuilder.appendField(plugin.getActionDescription(), sb.toString(), false);
 				});
-
-		BotUtils.sendEmbeddedContent(event.getChannel(), embedBuilder.build());
+		
+		botUtils.sendEmbed(event.getChannel(), embedBuilder.build());
 	}
 }

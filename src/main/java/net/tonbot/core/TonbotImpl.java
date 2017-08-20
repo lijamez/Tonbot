@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 
 import net.tonbot.common.Activity;
+import net.tonbot.common.BotUtils;
 import net.tonbot.common.Prefix;
 import net.tonbot.common.TonbotPlugin;
 import sx.blah.discord.api.IDiscordClient;
@@ -26,22 +27,25 @@ class TonbotImpl implements Tonbot {
 	private final PluginLoader pluginLoader;
 	private final List<String> pluginFqns;
 	private final String prefix;
+	private final BotUtils botUtils;
 
 	@Inject
 	public TonbotImpl(
 			final IDiscordClient discordClient,
 			final PluginLoader pluginLoader,
 			final List<String> pluginFqns,
-			@Prefix final String prefix) {
+			@Prefix final String prefix,
+			final BotUtils botUtils) {
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		this.pluginLoader = Preconditions.checkNotNull(pluginLoader, "pluginLoader must be non-null.");
 		this.pluginFqns = Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
+		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 	}
 
 	public void run() {
 		try {
-			List<TonbotPlugin> plugins = pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient);
+			List<TonbotPlugin> plugins = pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient, botUtils);
 
 			printPluginsInfo(plugins);
 
@@ -51,10 +55,10 @@ class TonbotImpl implements Tonbot {
 					.flatMap(Collection::stream)
 					.collect(Collectors.toSet());
 
-			HelpActivity helpActivity = new HelpActivity(prefix, plugins);
+			HelpActivity helpActivity = new HelpActivity(botUtils, prefix, plugins);
 			activities.add(helpActivity);
 
-			EventDispatcher eventDispatcher = new EventDispatcher(prefix, activities);
+			EventDispatcher eventDispatcher = new EventDispatcher(botUtils, prefix, activities);
 
 			discordClient.getDispatcher().registerListener(eventDispatcher);
 

@@ -28,12 +28,14 @@ class EventDispatcher {
 
 	private static final String TOKENIZATION_DELIMITER = " ";
 
+	private final BotUtils botUtils;
 	private final String prefix;
 	private final Set<Activity> activities;
 
-	public EventDispatcher(String prefix, Set<Activity> activities) {
+	public EventDispatcher(BotUtils botUtils, String prefix, Set<Activity> activities) {
+		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
-
+		
 		Preconditions.checkNotNull(activities, "activities must be non-null.");
 		activities.forEach(activity -> {
 			Preconditions.checkArgument(activity.getDescriptor().getRoute().size() > 0,
@@ -97,10 +99,9 @@ class EventDispatcher {
 		try {
 			bestActivity.enact(event, remainingMessage);
 		} catch (TonbotBusinessException e) {
-			BotUtils.sendMessage(event.getChannel(), e.getMessage());
+			botUtils.sendMessage(event.getChannel(), e.getMessage());
 		} catch (Exception e) {
-			BotUtils.sendMessage(event.getChannel(), "Something bad happened. :confounded:");
-			throw e;
+			botUtils.sendMessage(event.getChannel(), "Something bad happened. :confounded:");
 		}
 	}
 
