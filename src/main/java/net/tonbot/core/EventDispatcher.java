@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
@@ -26,6 +28,8 @@ import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedE
  */
 class EventDispatcher {
 
+	private static final Logger LOG = LoggerFactory.getLogger(EventDispatcher.class);
+	
 	private static final String TOKENIZATION_DELIMITER = " ";
 
 	private final BotUtils botUtils;
@@ -102,6 +106,7 @@ class EventDispatcher {
 			botUtils.sendMessage(event.getChannel(), e.getMessage());
 		} catch (Exception e) {
 			botUtils.sendMessage(event.getChannel(), "Something bad happened. :confounded:");
+			LOG.error("Uncaught exception received from activity.", e);
 		}
 	}
 
