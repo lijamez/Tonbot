@@ -8,31 +8,29 @@ sourceCompatibility = 1.8
 mainClassName = 'net.tonbot.core.Main'
 
 configurations.all {
-    // check for updates every build
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+	// check for updates every build
+	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 run {
-    // Pass all of the system properties to the application
-    systemProperties System.getProperties()
+	// Pass all of the system properties to the application
+	systemProperties System.getProperties()
 
-    args project.findProperty('runArgs') ?: ''
+	args project.findProperty('runArgs') ?: ''
 }
 
 repositories {
-    mavenCentral()
-    jcenter() //This prevents issues with transitive dependencies
-    maven {
-        url  "https://jitpack.io"
-    }
+	mavenCentral()
+	jcenter() //This prevents issues with transitive dependencies
+	maven { url  "https://jitpack.io" }
 }
 
 dependencies {
-	
-	// Tonbot
-    compile 'com.github.lijamez:tonbot-common:master-SNAPSHOT'
 
-    // Tonbot Plugins
+	// Tonbot
+	compile 'com.github.lijamez:tonbot-common:master-SNAPSHOT'
+
+	// Tonbot Plugins
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-ifplayer', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-tmdb', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-time', version: 'master-SNAPSHOT'
@@ -40,23 +38,37 @@ dependencies {
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-decisionmaker', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-pet', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-statistics', version: 'master-SNAPSHOT'
+	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-music', version: 'master-SNAPSHOT'
 
-    compile group: 'com.github.austinv11', name: 'Discord4J', version: '2.8.4'
+	compile group: 'com.github.austinv11', name: 'Discord4J', version: '2.8.4'
 
-    compile group: 'com.google.inject', name: 'guice', version: '4.1.0'
-    compile group: 'com.google.guava', name: 'guava', version: '23.0'
+	compile group: 'com.google.inject', name: 'guice', version: '4.1.0'
+	compile group: 'com.google.guava', name: 'guava', version: '23.0'
 
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
-    compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
+	compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
 
-    // Logging
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.8.2'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.2'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.8.2'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+	// Logging
+	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.8.2'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.2'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.8.2'
+	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 
-    compileOnly 'org.projectlombok:lombok:1.16.18'
+	compileOnly 'org.projectlombok:lombok:1.16.18'
 
-    testCompile group: 'junit', name: 'junit', version: '4.12'
-    testCompile group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
+	testCompile group: 'junit', name: 'junit', version: '4.12'
+	testCompile group: 'org.spockframework', name: 'spock-core', version: '1.1-groovy-2.4'
+}
+
+// Force all jackson-related modules to use a single version so we don't end up with incompatibilities.
+configurations.all {
+	resolutionStrategy {
+		eachDependency { DependencyResolveDetails details ->
+			if (details.requested.group == 'com.fasterxml.jackson.core'
+				|| details.requested.group == 'com.fasterxml.jackson.datatype'
+				|| details.requested.group == 'com.fasterxml.jackson.module') {
+				details.useVersion "2.9.0"
+			}
+		}
+	}
 }
