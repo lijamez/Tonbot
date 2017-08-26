@@ -43,4 +43,11 @@ class TonbotModule extends AbstractModule {
 	List<String> pluginFqns() {
 		return pluginFqns;
 	}
+
+	@Provides
+	@Singleton
+	PlayingTextSetter playingTextSetter() {
+		// Every minute, set the playing text.
+		return new PlayingTextSetter(discordClient, 60000, prefix);
+	}
 }

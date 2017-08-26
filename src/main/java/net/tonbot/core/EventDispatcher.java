@@ -29,7 +29,7 @@ import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedE
 class EventDispatcher {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EventDispatcher.class);
-	
+
 	private static final String TOKENIZATION_DELIMITER = " ";
 
 	private final BotUtils botUtils;
@@ -39,7 +39,7 @@ class EventDispatcher {
 	public EventDispatcher(BotUtils botUtils, String prefix, Set<Activity> activities) {
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
-		
+
 		Preconditions.checkNotNull(activities, "activities must be non-null.");
 		activities.forEach(activity -> {
 			Preconditions.checkArgument(activity.getDescriptor().getRoute().size() > 0,

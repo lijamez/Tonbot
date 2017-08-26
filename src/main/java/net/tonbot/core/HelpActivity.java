@@ -65,14 +65,14 @@ class HelpActivity implements Activity {
 								sb.append(activity.getDescription());
 								sb.append("\n");
 							});
-					
+
 					String description = sb.toString();
-					
+
 					if (!description.isEmpty()) {
 						embedBuilder.appendField(plugin.getActionDescription(), sb.toString(), false);
 					}
 				});
-		
+
 		botUtils.sendEmbed(event.getChannel(), embedBuilder.build());
 	}
 }

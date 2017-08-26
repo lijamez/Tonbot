@@ -28,6 +28,7 @@ class TonbotImpl implements Tonbot {
 	private final List<String> pluginFqns;
 	private final String prefix;
 	private final BotUtils botUtils;
+	private final PlayingTextSetter playingTextSetter;
 
 	@Inject
 	public TonbotImpl(
@@ -35,12 +36,14 @@ class TonbotImpl implements Tonbot {
 			final PluginLoader pluginLoader,
 			final List<String> pluginFqns,
 			@Prefix final String prefix,
-			final BotUtils botUtils) {
+			final BotUtils botUtils,
+			final PlayingTextSetter playingTextSetter) {
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		this.pluginLoader = Preconditions.checkNotNull(pluginLoader, "pluginLoader must be non-null.");
 		this.pluginFqns = Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
+		this.playingTextSetter = Preconditions.checkNotNull(playingTextSetter, "playingTextSetter must be non-null.");
 	}
 
 	public void run() {
@@ -85,9 +88,9 @@ class TonbotImpl implements Tonbot {
 						LOG.info("Periodic task '{}' has started.", periodicTask.getClass().getName());
 					});
 
-			LOG.info("Tonbot is online!");
+			playingTextSetter.start();
 
-			discordClient.changePlayingText("say: " + prefix + " help");
+			LOG.info("Tonbot is online!");
 		} catch (DiscordException e) {
 			LOG.error("Failed to start Tonbot.", e);
 			throw e;

@@ -1,1 +1,11 @@
-rootProject.name = 'Tonbot'
+rootProject.name = 'tonbot-core'
+
+includeBuild '../tonbot-common'
+includeBuild '../tonbot-plugin-decisionmaker'
+includeBuild '../tonbot-plugin-ifplayer'
+includeBuild '../tonbot-plugin-pet'
+includeBuild '../tonbot-plugin-statistics'
+includeBuild '../tonbot-plugin-systeminfo'
+includeBuild '../tonbot-plugin-time'
+includeBuild '../tonbot-plugin-tmdb'
+includeBuild '../tonbot-plugin-music'
