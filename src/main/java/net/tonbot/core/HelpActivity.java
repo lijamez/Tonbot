@@ -51,6 +51,11 @@ class HelpActivity implements Activity {
 	private void printCommandHelp(IChannel channel, String args) {
 		List<String> route = Arrays.asList(StringUtils.split(args, " "));
 
+		if (route.equals(this.getDescriptor().getRoute())) {
+			botUtils.sendMessage(channel, "Very funny. :expressionless:");
+			return;
+		}
+
 		Optional<Activity> optActivity = plugins.stream()
 				.filter(plugin -> !plugin.isHidden())
 				.flatMap(plugin -> plugin.getActivities().stream())
