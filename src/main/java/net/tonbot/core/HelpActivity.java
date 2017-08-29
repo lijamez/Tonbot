@@ -1,6 +1,8 @@
 package net.tonbot.core;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +15,7 @@ import net.tonbot.common.ActivityDescriptor;
 import net.tonbot.common.BotUtils;
 import net.tonbot.common.TonbotPlugin;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
 class HelpActivity implements Activity {
@@ -38,6 +41,39 @@ class HelpActivity implements Activity {
 
 	@Override
 	public void enact(MessageReceivedEvent event, String args) {
+		if (StringUtils.isBlank(args)) {
+			printCommands(event.getChannel());
+		} else {
+			printCommandHelp(event.getChannel(), args);
+		}
+	}
+
+	private void printCommandHelp(IChannel channel, String args) {
+		List<String> route = Arrays.asList(StringUtils.split(args, " "));
+
+		Optional<Activity> optActivity = plugins.stream()
+				.filter(plugin -> !plugin.isHidden())
+				.flatMap(plugin -> plugin.getActivities().stream())
+				.filter(activity -> route.equals(activity.getDescriptor().getRoute()))
+				.findFirst();
+
+		if (optActivity.isPresent()) {
+			Optional<String> usageDescription = optActivity.get().getDescriptor().getUsageDescription();
+			if (usageDescription.isPresent()) {
+				StringBuffer sb = new StringBuffer();
+				sb.append("Usage for ``").append(prefix).append(" ").append(StringUtils.join(route, " "))
+						.append("``:\n\n");
+				sb.append(usageDescription.get());
+				botUtils.sendMessage(channel, sb.toString());
+			} else {
+				botUtils.sendMessage(channel, "Sorry, there's no additional help for that command.");
+			}
+		} else {
+			botUtils.sendMessage(channel, "Sorry, that command doesn't exist.");
+		}
+	}
+
+	private void printCommands(IChannel channel) {
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		embedBuilder.withDesc("Here's what I can do...");
 
@@ -73,6 +109,8 @@ class HelpActivity implements Activity {
 					}
 				});
 
-		botUtils.sendEmbed(event.getChannel(), embedBuilder.build());
+		embedBuilder
+				.withFooterText("You can also say '" + prefix + " help <command>' to get more help for that command.");
+		botUtils.sendEmbed(channel, embedBuilder.build());
 	}
 }
