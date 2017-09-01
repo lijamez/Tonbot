@@ -15,7 +15,7 @@ import sx.blah.discord.handle.obj.IUser;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class RoleRule extends Rule {
+class RoleRule extends Rule {
 
 	private final Predicate<List<String>> appliesToRouteMatcher;
 	private final IRole role;

@@ -7,7 +7,7 @@ import com.google.api.client.util.Preconditions;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 
-public class Rules {
+class Rules {
 
 	private Rules() {
 	}
