@@ -16,6 +16,9 @@ import net.tonbot.common.Activity;
 import net.tonbot.common.BotUtils;
 import net.tonbot.common.Prefix;
 import net.tonbot.common.TonbotPlugin;
+import net.tonbot.common.TonbotPluginArgs;
+import net.tonbot.core.permission.PermissionManager;
+import net.tonbot.core.permission.PermissionPlugin;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.util.DiscordException;
 
@@ -48,9 +51,23 @@ class TonbotImpl implements Tonbot {
 
 	public void run() {
 		try {
+			// Standard Plugins
 			List<TonbotPlugin> plugins = pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient, botUtils);
 
+			// System Plugins
+			// TODO: This method of creating a plugin is a little janky. Maybe let the
+			// plugin loader do it.
+			PermissionPlugin permissionPlugin = new PermissionPlugin(
+					TonbotPluginArgs.builder()
+							.botUtils(botUtils)
+							.prefix(prefix)
+							.discordClient(discordClient)
+							.build());
+			plugins.add(permissionPlugin);
+
 			printPluginsInfo(plugins);
+
+			PermissionManager permissionManager = permissionPlugin.getPermissionManager();
 
 			LOG.info("Registering activities...");
 			Set<Activity> activities = plugins.stream()
@@ -58,10 +75,11 @@ class TonbotImpl implements Tonbot {
 					.flatMap(Collection::stream)
 					.collect(Collectors.toSet());
 
-			HelpActivity helpActivity = new HelpActivity(botUtils, prefix, plugins);
+			HelpActivity helpActivity = new HelpActivity(botUtils, prefix, plugins, permissionManager);
+			permissionManager.addPublicActivity(helpActivity);
 			activities.add(helpActivity);
 
-			EventDispatcher eventDispatcher = new EventDispatcher(botUtils, prefix, activities);
+			EventDispatcher eventDispatcher = new EventDispatcher(botUtils, prefix, activities, permissionManager);
 
 			discordClient.getDispatcher().registerListener(eventDispatcher);
 

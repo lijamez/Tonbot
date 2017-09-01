@@ -16,6 +16,7 @@ import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
 import net.tonbot.common.BotUtils;
 import net.tonbot.common.TonbotBusinessException;
+import net.tonbot.core.permission.PermissionManager;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 
@@ -35,10 +36,16 @@ class EventDispatcher {
 	private final BotUtils botUtils;
 	private final String prefix;
 	private final Set<Activity> activities;
+	private final PermissionManager permissionManager;
 
-	public EventDispatcher(BotUtils botUtils, String prefix, Set<Activity> activities) {
+	public EventDispatcher(
+			BotUtils botUtils,
+			String prefix,
+			Set<Activity> activities,
+			PermissionManager permissionManager) {
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
+		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
 
 		Preconditions.checkNotNull(activities, "activities must be non-null.");
 		activities.forEach(activity -> {
@@ -85,6 +92,14 @@ class EventDispatcher {
 		}
 
 		if (bestActivity == null) {
+			return;
+		}
+
+		if (!permissionManager.checkAccessibility(bestActivity, event.getAuthor(), event.getGuild())) {
+			LOG.debug("Activity '{}' was denied to user '{}' in guild '{}'",
+					bestActivity.getClass(),
+					event.getAuthor(),
+					event.getGuild().getName());
 			return;
 		}
 
