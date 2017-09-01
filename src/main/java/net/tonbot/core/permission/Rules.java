@@ -2,7 +2,7 @@ package net.tonbot.core.permission;
 
 import java.util.List;
 
-import com.google.api.client.util.Preconditions;
+import com.google.common.base.Preconditions;
 
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
