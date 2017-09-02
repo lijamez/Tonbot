@@ -55,8 +55,9 @@ class PermissionControlModule extends AbstractModule {
 	@Provides
 	@Singleton
 	Set<Activity> activities(
-			PermissionsListActivity permissionsListActivity) {
-		return ImmutableSet.of(permissionsListActivity);
+			PermissionsListActivity permissionsListActivity,
+			AddRuleActivity addRuleActivity) {
+		return ImmutableSet.of(permissionsListActivity, addRuleActivity);
 	}
 
 	@Provides

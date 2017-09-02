@@ -24,6 +24,14 @@ public interface PermissionManager {
 	 *            The rules to be added. Non-null.
 	 */
 	void addAll(Collection<Rule> inputRules);
+	
+	/**
+	 * Adds a rule at a particular index.
+	 * @param index The index.
+	 * @param rule {@link Rule}. Non-null.
+	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 */
+	void add(int index, Rule rule);
 
 	/**
 	 * Gets the rules for the specified guild.

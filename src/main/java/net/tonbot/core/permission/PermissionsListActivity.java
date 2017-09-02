@@ -91,7 +91,7 @@ class PermissionsListActivity implements Activity {
 		} else {
 			sb.append("CAN NOT");
 		}
-		sb.append("** be used by ").append(roleRule.getRole().getName());
+		sb.append("** be used by role **").append(roleRule.getRole().getName()).append("**");
 
 		return sb.toString();
 	}

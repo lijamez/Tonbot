@@ -71,6 +71,22 @@ class PermissionManagerImpl implements PermissionManager {
 		}
 	}
 
+	@Override
+	public void add(int index, Rule rule) {
+		Preconditions.checkNotNull(rule, "rule must be non-null.");
+		
+		lock.writeLock().lock();
+		try {
+			long guildId = rule.getGuild().getLongID();
+			GuildConfiguration guildConfig = guildConfigs.computeIfAbsent(
+					guildId,
+					k -> new GuildConfiguration(new ArrayList<>(), true));
+			guildConfig.getRules().add(index, rule);
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
 	private void addAllInternal(Collection<Rule> inputRules) {
 		for (Rule rule : inputRules) {
 			long guildId = rule.getGuild().getLongID();
