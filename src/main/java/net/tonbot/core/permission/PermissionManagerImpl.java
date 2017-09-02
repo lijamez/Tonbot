@@ -98,6 +98,17 @@ class PermissionManagerImpl implements PermissionManager {
 	}
 
 	@Override
+	public boolean getDefaultAllowForGuild(IGuild guild) {
+		lock.readLock().lock();
+		try {
+			GuildConfiguration guildConfig = guildConfigs.get(guild.getLongID());
+			return guildConfig.isDefaultAllow();
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
 	public void initializeForGuild(IGuild guild) {
 		Preconditions.checkNotNull(guild, "guild must be non-null.");
 
@@ -105,13 +116,13 @@ class PermissionManagerImpl implements PermissionManager {
 
 		for (Activity publicActivity : publicActivities) {
 			List<String> route = publicActivity.getDescriptor().getRoute();
-			Rule rule = Rules.routeForRole(route, guild, guild.getEveryoneRole(), true);
+			Rule rule = new RoleRule(route, guild, guild.getEveryoneRole(), true);
 			rules.add(rule);
 		}
 
 		for (Activity restrictedActivity : restrictedActivities) {
 			List<String> route = restrictedActivity.getDescriptor().getRoute();
-			Rule rule = Rules.routeForRole(route, guild, guild.getEveryoneRole(), false);
+			Rule rule = new RoleRule(route, guild, guild.getEveryoneRole(), false);
 			rules.add(rule);
 		}
 

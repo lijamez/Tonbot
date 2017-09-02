@@ -1,7 +1,6 @@
 package net.tonbot.core.permission;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 import com.google.common.base.Preconditions;
 
@@ -17,14 +16,14 @@ import sx.blah.discord.handle.obj.IUser;
 @ToString(callSuper = true)
 class RoleRule extends Rule {
 
-	private final Predicate<List<String>> appliesToRouteMatcher;
+	private final List<String> appliesToRoute;
 	private final IRole role;
 
-	public RoleRule(Predicate<List<String>> appliesToRouteMatcher, IGuild guild, IRole role, boolean allow) {
+	public RoleRule(List<String> appliesToRoute, IGuild guild, IRole role, boolean allow) {
 		super(guild, allow);
 
-		this.appliesToRouteMatcher = Preconditions.checkNotNull(appliesToRouteMatcher,
-				"appliesToRouteMatcher must be non-null.");
+		this.appliesToRoute = Preconditions.checkNotNull(appliesToRoute,
+				"appliesToRoute must be non-null.");
 		this.role = Preconditions.checkNotNull(role, "role must be non-null.");
 	}
 
@@ -33,7 +32,7 @@ class RoleRule extends Rule {
 		Preconditions.checkNotNull(route, "route must be non-null.");
 		Preconditions.checkNotNull(user, "user must be non-null.");
 
-		if (!appliesToRouteMatcher.test(route)) {
+		if (!appliesToRoute.equals(route)) {
 			return false;
 		}
 

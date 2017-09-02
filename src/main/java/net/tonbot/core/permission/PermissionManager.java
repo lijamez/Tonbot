@@ -35,6 +35,16 @@ public interface PermissionManager {
 	List<Rule> getRulesForGuild(IGuild guild);
 
 	/**
+	 * Determines whether if an activity should be allowed or not if none of the
+	 * rules matched.
+	 * 
+	 * @param guild
+	 *            {@link IGuild}. Non-null.
+	 * @return The default allowability.
+	 */
+	boolean getDefaultAllowForGuild(IGuild guild);
+
+	/**
 	 * Initializes the rules for the guild.
 	 * 
 	 * @param guild
