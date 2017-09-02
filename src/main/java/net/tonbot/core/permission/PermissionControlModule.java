@@ -21,7 +21,6 @@ class PermissionControlModule extends AbstractModule {
 	private final BotUtils botUtils;
 	private final IDiscordClient discordClient;
 	private final List<Activity> publicActivities;
-	private final List<Activity> restrictedActivities;
 
 	public PermissionControlModule(
 			BotUtils botUtils,
@@ -29,7 +28,6 @@ class PermissionControlModule extends AbstractModule {
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		this.publicActivities = new ArrayList<>();
-		this.restrictedActivities = new ArrayList<>();
 	}
 
 	@Override
@@ -44,10 +42,9 @@ class PermissionControlModule extends AbstractModule {
 	@Provides
 	@Singleton
 	@RestrictedActivities
-	List<Activity> restrictedActivities(PermissionsListActivity permissionsListActivity) {
+	List<Activity> restrictedActivities(Set<Activity> permissionControlActivities) {
 		List<Activity> activities = new ArrayList<>();
-		activities.addAll(restrictedActivities);
-		activities.add(permissionsListActivity);
+		activities.addAll(permissionControlActivities);
 
 		return activities;
 	}
@@ -56,8 +53,9 @@ class PermissionControlModule extends AbstractModule {
 	@Singleton
 	Set<Activity> activities(
 			PermissionsListActivity permissionsListActivity,
-			AddRuleActivity addRuleActivity) {
-		return ImmutableSet.of(permissionsListActivity, addRuleActivity);
+			AddRuleActivity addRuleActivity,
+			DeleteRuleActivity deleteRuleActivity) {
+		return ImmutableSet.of(permissionsListActivity, addRuleActivity, deleteRuleActivity);
 	}
 
 	@Provides

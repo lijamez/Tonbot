@@ -74,7 +74,7 @@ class PermissionManagerImpl implements PermissionManager {
 	@Override
 	public void add(int index, Rule rule) {
 		Preconditions.checkNotNull(rule, "rule must be non-null.");
-		
+
 		lock.writeLock().lock();
 		try {
 			long guildId = rule.getGuild().getLongID();
@@ -94,6 +94,20 @@ class PermissionManagerImpl implements PermissionManager {
 					guildId,
 					k -> new GuildConfiguration(new ArrayList<>(), true));
 			guildConfig.getRules().add(rule);
+		}
+	}
+
+	@Override
+	public Rule remove(IGuild guild, int index) {
+		lock.writeLock().lock();
+		try {
+			GuildConfiguration guildConfig = guildConfigs.get(guild.getLongID());
+			if (guildConfig == null) {
+				throw new IllegalStateException("No guild configuration found.");
+			}
+			return guildConfig.getRules().remove(index);
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 
