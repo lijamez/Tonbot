@@ -70,6 +70,16 @@ public interface PermissionManager {
 	boolean getDefaultAllowForGuild(IGuild guild);
 
 	/**
+	 * Sets the default allow/deny for the guild.
+	 * 
+	 * @param guild
+	 *            {@link IGuild}. Non-null.
+	 * @param defaultAllow
+	 *            The default allowability.
+	 */
+	void setDefaultAllowForGuild(IGuild guild, boolean defaultAllow);
+
+	/**
 	 * Initializes the rules for the guild.
 	 * 
 	 * @param guild

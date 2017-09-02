@@ -139,6 +139,20 @@ class PermissionManagerImpl implements PermissionManager {
 	}
 
 	@Override
+	public void setDefaultAllowForGuild(IGuild guild, boolean defaultAllow) {
+		lock.writeLock().lock();
+		try {
+			GuildConfiguration guildConfig = guildConfigs.get(guild.getLongID());
+			if (guildConfig == null) {
+				throw new IllegalStateException("No guild configuration found.");
+			}
+			guildConfig.setDefaultAllow(defaultAllow);
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	@Override
 	public void initializeForGuild(IGuild guild) {
 		Preconditions.checkNotNull(guild, "guild must be non-null.");
 

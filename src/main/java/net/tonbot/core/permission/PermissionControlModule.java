@@ -54,8 +54,10 @@ class PermissionControlModule extends AbstractModule {
 	Set<Activity> activities(
 			PermissionsListActivity permissionsListActivity,
 			AddRuleActivity addRuleActivity,
-			DeleteRuleActivity deleteRuleActivity) {
-		return ImmutableSet.of(permissionsListActivity, addRuleActivity, deleteRuleActivity);
+			DeleteRuleActivity deleteRuleActivity,
+			SetDefaultAllowabilityActivity setDefaultAllowabilityActivity) {
+		return ImmutableSet.of(permissionsListActivity, addRuleActivity, deleteRuleActivity,
+				setDefaultAllowabilityActivity);
 	}
 
 	@Provides
