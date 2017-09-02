@@ -69,18 +69,16 @@ class PermissionsListActivity implements Activity {
 
 		sb.append("\nIf none of the above rules match, then the user **");
 		if (permissionManager.getDefaultAllowForGuild(guild)) {
-			sb.append("will");
+			sb.append("WILL");
 		} else {
-			sb.append("will not");
+			sb.append("WILL NOT");
 		}
 		sb.append("** be able to use the command.");
 
 		IPrivateChannel pmChannel = discordClient.getOrCreatePMChannel(event.getAuthor());
 
 		String result = sb.toString();
-		System.out.println(result);
 		botUtils.sendMessage(pmChannel, result);
-
 	}
 
 	private String renderRoleRule(RoleRule roleRule) {
@@ -89,9 +87,9 @@ class PermissionsListActivity implements Activity {
 		String routeStr = StringUtils.join(roleRule.getAppliesToRoute(), " ");
 		sb.append("``").append(routeStr).append("`` **");
 		if (roleRule.isAllow()) {
-			sb.append("can");
+			sb.append("CAN");
 		} else {
-			sb.append("can not");
+			sb.append("CAN NOT");
 		}
 		sb.append("** be used by ").append(roleRule.getRole().getName());
 
