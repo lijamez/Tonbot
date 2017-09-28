@@ -1,20 +1,14 @@
 package net.tonbot.core;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Preconditions;
 import com.google.inject.Guice;
 
 import sx.blah.discord.api.ClientBuilder;
@@ -26,9 +20,6 @@ public class Main {
 
 	private static final String CONFIG_DIR_OPT = "c";
 	private static final String CONFIG_DIR_LONG_OPT = "configDir";
-
-	private static final String DEFAULT_CONFIG_DIR = "";
-	private static final String CONFIG_FILE_NAME = "config.json";
 
 	public static void main(String[] args) {
 		Options options = new Options();
@@ -43,45 +34,34 @@ public class Main {
 		}
 
 		String configDir = cmd.getOptionValue(CONFIG_DIR_LONG_OPT);
-		if (configDir == null) {
-			configDir = DEFAULT_CONFIG_DIR;
-		} else if (!configDir.endsWith("/")) {
-			configDir = configDir + "/";
+		ConfigManager configMgr = new ConfigManager(configDir);
+
+		LOG.info("The config directory is: " + configMgr.getConfigDirPath());
+
+		Config config = configMgr.readConfig();
+
+		String token = config.getDiscordBotToken();
+
+		if (StringUtils.isBlank(token)) {
+			// An empty token is a sign that the bot isn't setup yet. In that case, return a
+			// friendly error message.
+			LOG.error("Tonbot is not configured! Please edit the config.json at " + configMgr.getConfigDirPath());
+			System.exit(1);
 		}
 
-		LOG.info("The config directory is: " + configDir);
-
-		Config config = readConfig(configDir);
-
 		IDiscordClient discordClient = new ClientBuilder()
-				.withToken(config.getDiscordBotToken())
+				.withToken(token)
 				.build();
 
 		Tonbot bot = Guice.createInjector(
-				new TonbotModule(config.getPrefix(), config.getPluginNames(), discordClient, configDir))
+				new TonbotModule(config.getPrefix(), config.getPluginNames(), discordClient,
+						configMgr.getConfigDirPath()))
 				.getInstance(Tonbot.class);
 
 		try {
 			bot.run();
 		} catch (Exception e) {
 			LOG.error("Tonbot died due to an uncaught exception. RIP.", e);
-		}
-	}
-
-	private static Config readConfig(String configDir) {
-		File configFile = new File(configDir + "/" + CONFIG_FILE_NAME);
-		Preconditions.checkArgument(configFile.exists(),
-				"config file doesn't exist at: " + configFile.getAbsolutePath());
-
-		JsonFactory jsonFactory = new JsonFactory();
-		jsonFactory.enable(Feature.ALLOW_COMMENTS);
-		ObjectMapper objMapper = new ObjectMapper(jsonFactory);
-		
-		try {
-			Config config = objMapper.readValue(configFile, Config.class);
-			return config;
-		} catch (IOException e) {
-			throw new RuntimeException("Unable to read config.json.", e);
 		}
 	}
 }

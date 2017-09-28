@@ -101,7 +101,8 @@ class PluginLoader {
 
 	private TonbotPluginArgs getPluginArgs(String pluginClassName, String prefix, IDiscordClient discordClient,
 			BotUtils botUtils) {
-		File configFile = new File(configDir + "plugin_config/" + pluginClassName + ".config");
+
+		File configFile = new File(configDir + "/plugin_config/" + pluginClassName + ".config");
 
 		if (!configFile.exists()) {
 			configFile = null;
