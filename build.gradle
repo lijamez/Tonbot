@@ -40,7 +40,7 @@ dependencies {
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-statistics', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-music', version: 'master-SNAPSHOT'
 
-	compile group: 'com.github.austinv11', name: 'Discord4J', version: '2.8.4'
+	compile group: 'com.github.austinv11', name: 'Discord4J', version: '2.9'
 
 	compile group: 'com.google.inject', name: 'guice', version: '4.1.0'
 	compile group: 'com.google.guava', name: 'guava', version: '23.0'
@@ -49,9 +49,9 @@ dependencies {
 	compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
 
 	// Logging
-	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.8.2'
-	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.2'
-	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.8.2'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.9.0'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.9.0'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.9.0'
 	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
 
 	compileOnly 'org.projectlombok:lombok:1.16.18'

@@ -11,6 +11,8 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.inject.Guice;
@@ -71,7 +73,10 @@ public class Main {
 		Preconditions.checkArgument(configFile.exists(),
 				"config file doesn't exist at: " + configFile.getAbsolutePath());
 
-		ObjectMapper objMapper = new ObjectMapper();
+		JsonFactory jsonFactory = new JsonFactory();
+		jsonFactory.enable(Feature.ALLOW_COMMENTS);
+		ObjectMapper objMapper = new ObjectMapper(jsonFactory);
+		
 		try {
 			Config config = objMapper.readValue(configFile, Config.class);
 			return config;
