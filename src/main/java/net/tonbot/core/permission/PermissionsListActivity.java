@@ -84,7 +84,7 @@ class PermissionsListActivity implements Activity {
 	private String renderRoleRule(RoleRule roleRule) {
 		StringBuffer sb = new StringBuffer();
 
-		String routeStr = StringUtils.join(roleRule.getAppliesToRoute(), " ");
+		String routeStr = StringUtils.join(roleRule.getPathExp(), " ");
 		sb.append("``").append(routeStr).append("`` **");
 		if (roleRule.isAllow()) {
 			sb.append("CAN");

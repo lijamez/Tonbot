@@ -1,8 +1,5 @@
 package net.tonbot.core.permission;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
@@ -25,7 +22,7 @@ class AddRuleActivity implements Activity {
 
 	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
 			.route(ImmutableList.of("permissions", "add"))
-			.parameters(ImmutableList.of("index", "role", "allow/deny", "command"))
+			.parameters(ImmutableList.of("index", "role", "allow/deny", "route path expression"))
 			.description("Add a rule for this server.")
 			.build();
 
@@ -100,16 +97,20 @@ class AddRuleActivity implements Activity {
 			throw new TonbotBusinessException("Missing allow/deny argument.");
 		}
 
-		List<String> route;
+		PathExpression routePathExp;
 		if (tokenizer.hasNext()) {
-			String command = tokenizer.getRemainingContent();
-			route = Arrays.asList(StringUtils.split(command, " "));
+			try {
+				routePathExp = new PathExpression(tokenizer.getRemainingContent());
+			} catch (MalformedPathExpressionException e) {
+				throw new TonbotBusinessException(e.getMessage(), e);
+			}
+
 		} else {
 			throw new TonbotBusinessException("Command must not be empty.");
 		}
 
 		// Finally, we can create the rule.
-		Rule rule = new RoleRule(route, guild, role, allow);
+		Rule rule = new RoleRule(routePathExp, guild, role, allow);
 		try {
 			permissionManager.add(index, rule);
 		} catch (IndexOutOfBoundsException e) {

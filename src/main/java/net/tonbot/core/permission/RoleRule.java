@@ -16,14 +16,17 @@ import sx.blah.discord.handle.obj.IUser;
 @ToString(callSuper = true)
 class RoleRule extends Rule {
 
-	private final List<String> appliesToRoute;
+	private final PathExpression pathExp;
 	private final IRole role;
 
-	public RoleRule(List<String> appliesToRoute, IGuild guild, IRole role, boolean allow) {
+	public RoleRule(List<String> pathExpComponents, IGuild guild, IRole role, boolean allow) {
+		this(new PathExpression(pathExpComponents), guild, role, allow);
+	}
+
+	public RoleRule(PathExpression pathExp, IGuild guild, IRole role, boolean allow) {
 		super(guild, allow);
 
-		this.appliesToRoute = Preconditions.checkNotNull(appliesToRoute,
-				"appliesToRoute must be non-null.");
+		this.pathExp = Preconditions.checkNotNull(pathExp, "pathExp must be non-null.");
 		this.role = Preconditions.checkNotNull(role, "role must be non-null.");
 	}
 
@@ -32,7 +35,7 @@ class RoleRule extends Rule {
 		Preconditions.checkNotNull(route, "route must be non-null.");
 		Preconditions.checkNotNull(user, "user must be non-null.");
 
-		if (!appliesToRoute.equals(route)) {
+		if (!pathExp.matches(route)) {
 			return false;
 		}
 
