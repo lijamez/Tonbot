@@ -1,5 +1,6 @@
 package net.tonbot.core;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ class TonbotImpl implements Tonbot {
 	private final PluginLoader pluginLoader;
 	private final List<String> pluginFqns;
 	private final String prefix;
+	private final String configDir;
 	private final BotUtils botUtils;
 	private final PlayingTextSetter playingTextSetter;
 
@@ -39,12 +41,14 @@ class TonbotImpl implements Tonbot {
 			final PluginLoader pluginLoader,
 			final List<String> pluginFqns,
 			@Prefix final String prefix,
+			@ConfigDir final String configDir,
 			final BotUtils botUtils,
 			final PlayingTextSetter playingTextSetter) {
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		this.pluginLoader = Preconditions.checkNotNull(pluginLoader, "pluginLoader must be non-null.");
 		this.pluginFqns = Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
+		this.configDir = Preconditions.checkNotNull(configDir, "configDir must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.playingTextSetter = Preconditions.checkNotNull(playingTextSetter, "playingTextSetter must be non-null.");
 	}
@@ -62,6 +66,7 @@ class TonbotImpl implements Tonbot {
 							.botUtils(botUtils)
 							.prefix(prefix)
 							.discordClient(discordClient)
+							.configFile(new File(configDir + "/permissions.conf"))
 							.build());
 			plugins.add(permissionPlugin);
 

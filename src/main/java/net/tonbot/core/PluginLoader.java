@@ -104,10 +104,6 @@ class PluginLoader {
 
 		File configFile = new File(configDir + "/plugin_config/" + pluginClassName + ".config");
 
-		if (!configFile.exists()) {
-			configFile = null;
-		}
-
 		TonbotPluginArgs pluginArgs = TonbotPluginArgs.builder()
 				.discordClient(discordClient)
 				.prefix(prefix)
