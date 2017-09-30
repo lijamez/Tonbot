@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.Data;
+import lombok.NonNull;
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
 import net.tonbot.common.BotUtils;
@@ -80,30 +82,22 @@ class EventDispatcher {
 			return;
 		}
 
-		Activity bestActivity = null;
-		for (Activity activity : activities) {
-			ActivityDescriptor descriptor = activity.getDescriptor();
+		ActivityMatch matchedActivity = matchActivity(remainingTokens);
 
-			List<String> route = descriptor.getRoute();
-			if (isPrefix(route, remainingTokens)
-					&& (bestActivity == null || bestActivity.getDescriptor().getRoute().size() < route.size())) {
-				bestActivity = activity;
-			}
-		}
-
-		if (bestActivity == null) {
+		if (matchedActivity == null) {
 			return;
 		}
 
-		if (!permissionManager.checkAccessibility(bestActivity, event.getAuthor(), event.getGuild())) {
+		if (!permissionManager.checkAccessibility(matchedActivity.getMatchedActivity(), event.getAuthor(),
+				event.getGuild())) {
 			LOG.debug("Activity '{}' was denied to user '{}' in guild '{}'",
-					bestActivity.getClass(),
+					matchedActivity.getMatchedActivity().getClass(),
 					event.getAuthor(),
 					event.getGuild().getName());
 			return;
 		}
 
-		List<String> prefixAndRoute = tokens.subList(0, bestActivity.getDescriptor().getRoute().size() + 1);
+		List<String> prefixAndRoute = tokens.subList(0, matchedActivity.getMatchedRoute().size() + 1);
 		int prefixAndRouteChars = (prefixAndRoute.size() * TOKENIZATION_DELIMITER.length()) + prefixAndRoute.stream()
 				.mapToInt(String::length)
 				.sum();
@@ -116,13 +110,53 @@ class EventDispatcher {
 		}
 
 		try {
-			bestActivity.enact(event, remainingMessage);
+			matchedActivity.getMatchedActivity().enact(event, remainingMessage);
 		} catch (TonbotBusinessException e) {
 			botUtils.sendMessage(event.getChannel(), e.getMessage());
 		} catch (Exception e) {
 			botUtils.sendMessage(event.getChannel(), "Something bad happened. :confounded:");
 			LOG.error("Uncaught exception received from activity.", e);
 		}
+	}
+
+	private ActivityMatch matchActivity(List<String> remainingTokens) {
+		// Find the activity to run. We will first match by the main route.
+		ActivityMatch matchedActivity = null;
+		for (Activity activity : activities) {
+			ActivityDescriptor descriptor = activity.getDescriptor();
+
+			List<String> route = descriptor.getRoute();
+			if (isPrefix(route, remainingTokens)
+					&& (matchedActivity == null || matchedActivity.getMatchedRoute().size() < route.size())) {
+				matchedActivity = new ActivityMatch(activity, route);
+			}
+		}
+
+		if (matchedActivity == null) {
+			// Since no activity was matched, we'll fall back matching via the route
+			// aliases.
+			matchedActivity = findBestActivityByRouteAlias(remainingTokens);
+		}
+
+		return matchedActivity;
+	}
+
+	private ActivityMatch findBestActivityByRouteAlias(List<String> remainingTokens) {
+		ActivityMatch match = null;
+
+		for (Activity activity : activities) {
+			ActivityDescriptor descriptor = activity.getDescriptor();
+
+			List<List<String>> routeAliases = descriptor.getRouteAliases();
+			for (List<String> routeAlias : routeAliases) {
+				if (isPrefix(routeAlias, remainingTokens)
+						&& (match == null || match.getMatchedRoute().size() < routeAlias.size())) {
+					match = new ActivityMatch(activity, routeAlias);
+				}
+			}
+		}
+
+		return match;
 	}
 
 	/**
@@ -150,5 +184,18 @@ class EventDispatcher {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Object which represents a matched activity. The matchedRoute may be the
+	 * canonical route or an alias.
+	 */
+	@Data
+	private static class ActivityMatch {
+		@NonNull
+		private final Activity matchedActivity;
+
+		@NonNull
+		private final List<String> matchedRoute;
 	}
 }
