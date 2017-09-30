@@ -35,6 +35,8 @@ class TonbotImpl implements Tonbot {
 	private final BotUtils botUtils;
 	private final PlayingTextSetter playingTextSetter;
 
+	private List<TonbotPlugin> plugins;
+
 	@Inject
 	public TonbotImpl(
 			final IDiscordClient discordClient,
@@ -56,7 +58,7 @@ class TonbotImpl implements Tonbot {
 	public void run() {
 		try {
 			// Standard Plugins
-			List<TonbotPlugin> plugins = pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient, botUtils);
+			this.plugins = pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient, botUtils);
 
 			// System Plugins
 			// TODO: This method of creating a plugin is a little janky. Maybe let the
@@ -129,5 +131,16 @@ class TonbotImpl implements Tonbot {
 			pluginsSb.append("\n");
 		});
 		LOG.info(pluginsSb.toString());
+	}
+
+	@Override
+	public void destroy() {
+		plugins.forEach(plugin -> {
+			try {
+				plugin.destroy();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
 	}
 }

@@ -2,20 +2,21 @@ package net.tonbot.core.permission;
 
 import java.util.List;
 
-import com.google.common.base.Preconditions;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 import lombok.Data;
-import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 
+@JsonTypeInfo(use = Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "_type")
 @Data
 public abstract class Rule {
 
-	private final IGuild guild;
+	private final long guildId;
 	private final boolean allow;
 
-	public Rule(IGuild guild, boolean allow) {
-		this.guild = Preconditions.checkNotNull(guild, "guild must be non-null.");
+	public Rule(long guildId, boolean allow) {
+		this.guildId = guildId;
 		this.allow = allow;
 	}
 

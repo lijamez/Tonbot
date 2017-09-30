@@ -1,9 +1,12 @@
 package net.tonbot.core.permission;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
@@ -20,13 +23,16 @@ class PermissionControlModule extends AbstractModule {
 
 	private final BotUtils botUtils;
 	private final IDiscordClient discordClient;
+	private final File permissionsFile;
 	private final List<Activity> publicActivities;
 
 	public PermissionControlModule(
 			BotUtils botUtils,
-			IDiscordClient discordClient) {
+			IDiscordClient discordClient,
+			File permissionsFile) {
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
+		this.permissionsFile = Preconditions.checkNotNull(permissionsFile, "permissionsFile must be non-null.");
 		this.publicActivities = new ArrayList<>();
 	}
 
@@ -37,6 +43,7 @@ class PermissionControlModule extends AbstractModule {
 		bind(new TypeLiteral<List<Activity>>() {
 		}).annotatedWith(PublicActivities.class).toInstance(publicActivities);
 		bind(PermissionManager.class).to(PermissionManagerImpl.class).in(Scopes.SINGLETON);
+		bind(File.class).toInstance(permissionsFile);
 	}
 
 	@Provides
@@ -64,5 +71,14 @@ class PermissionControlModule extends AbstractModule {
 	@Singleton
 	Set<Object> eventListeners(PermissionsManagerListener listener) {
 		return ImmutableSet.of(listener);
+	}
+
+	@Provides
+	@Singleton
+	ObjectMapper objectMapper() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+		return objectMapper;
 	}
 }

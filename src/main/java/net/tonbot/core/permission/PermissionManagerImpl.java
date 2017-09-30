@@ -1,5 +1,8 @@
 package net.tonbot.core.permission;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,6 +12,8 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
@@ -19,17 +24,21 @@ import sx.blah.discord.handle.obj.IUser;
 
 class PermissionManagerImpl implements PermissionManager {
 
-	private final Map<Long, GuildConfiguration> guildConfigs;
+	private Map<Long, GuildConfiguration> guildConfigs;
 
 	private final List<Activity> publicActivities;
 	private final List<Activity> restrictedActivities;
+	private final ObjectMapper objectMapper;
+	private final File permissionsFile;
 
 	private final ReadWriteLock lock;
 
 	@Inject
 	public PermissionManagerImpl(
 			@PublicActivities List<Activity> publicActivities,
-			@RestrictedActivities List<Activity> restrictedActivities) {
+			@RestrictedActivities List<Activity> restrictedActivities,
+			File permissionsFile,
+			ObjectMapper objectMapper) {
 		this.guildConfigs = new HashMap<>();
 		// Activities that should always be accessible to everyone.
 		Preconditions.checkNotNull(publicActivities, "publicActivities must be non-null.");
@@ -38,7 +47,42 @@ class PermissionManagerImpl implements PermissionManager {
 		// Activities that should should not be accessible to everyone by default.
 		Preconditions.checkNotNull(restrictedActivities, "restrictedActivities must be non-null.");
 		this.restrictedActivities = new ArrayList<>(restrictedActivities);
+
+		this.permissionsFile = Preconditions.checkNotNull(permissionsFile, "permissionsFile must be non-null.");
+		this.objectMapper = Preconditions.checkNotNull(objectMapper, "objectMapper must be non-null.");
+
 		this.lock = new ReentrantReadWriteLock();
+
+		if (permissionsFile.exists()) {
+			load();
+		} else {
+			save();
+		}
+	}
+
+	private void load() {
+		lock.writeLock().lock();
+		try {
+			this.guildConfigs = objectMapper.readValue(
+					permissionsFile, new TypeReference<Map<Long, GuildConfiguration>>() {
+					});
+		} catch (IOException e) {
+			throw new UncheckedIOException("Unable to read permissions file.", e);
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	private void save() {
+		lock.readLock().lock();
+		try {
+			permissionsFile.createNewFile();
+			objectMapper.writeValue(permissionsFile, guildConfigs);
+		} catch (IOException e) {
+			throw new UncheckedIOException("Unable to save permissions file.", e);
+		} finally {
+			lock.readLock().unlock();
+		}
 	}
 
 	@Override
@@ -77,7 +121,7 @@ class PermissionManagerImpl implements PermissionManager {
 
 		lock.writeLock().lock();
 		try {
-			long guildId = rule.getGuild().getLongID();
+			long guildId = rule.getGuildId();
 			GuildConfiguration guildConfig = guildConfigs.computeIfAbsent(
 					guildId,
 					k -> new GuildConfiguration(new ArrayList<>(), true));
@@ -89,7 +133,7 @@ class PermissionManagerImpl implements PermissionManager {
 
 	private void addAllInternal(Collection<Rule> inputRules) {
 		for (Rule rule : inputRules) {
-			long guildId = rule.getGuild().getLongID();
+			long guildId = rule.getGuildId();
 			GuildConfiguration guildConfig = guildConfigs.computeIfAbsent(
 					guildId,
 					k -> new GuildConfiguration(new ArrayList<>(), true));
@@ -156,21 +200,36 @@ class PermissionManagerImpl implements PermissionManager {
 	public void initializeForGuild(IGuild guild) {
 		Preconditions.checkNotNull(guild, "guild must be non-null.");
 
-		List<Rule> rules = new ArrayList<>();
-
-		for (Activity publicActivity : publicActivities) {
-			List<String> route = publicActivity.getDescriptor().getRoute();
-			Rule rule = new RoleRule(route, guild, guild.getEveryoneRole(), true);
-			rules.add(rule);
+		boolean isInitialized;
+		lock.readLock().lock();
+		try {
+			isInitialized = guildConfigs.containsKey(guild.getLongID());
+		} finally {
+			lock.readLock().unlock();
 		}
 
-		for (Activity restrictedActivity : restrictedActivities) {
-			List<String> route = restrictedActivity.getDescriptor().getRoute();
-			Rule rule = new RoleRule(route, guild, guild.getEveryoneRole(), false);
-			rules.add(rule);
-		}
+		if (!isInitialized) {
+			List<Rule> rules = new ArrayList<>();
 
-		this.addAllInternal(rules);
+			for (Activity publicActivity : publicActivities) {
+				List<String> route = publicActivity.getDescriptor().getRoute();
+				Rule rule = new RoleRule(route, guild.getLongID(), guild.getEveryoneRole().getLongID(), true);
+				rules.add(rule);
+			}
+
+			for (Activity restrictedActivity : restrictedActivities) {
+				List<String> route = restrictedActivity.getDescriptor().getRoute();
+				Rule rule = new RoleRule(route, guild.getLongID(), guild.getEveryoneRole().getLongID(), false);
+				rules.add(rule);
+			}
+
+			lock.writeLock().lock();
+			try {
+				this.addAllInternal(rules);
+			} finally {
+				lock.writeLock().unlock();
+			}
+		}
 	}
 
 	@Override
@@ -218,5 +277,10 @@ class PermissionManagerImpl implements PermissionManager {
 			lock.writeLock().unlock();
 		}
 
+	}
+
+	@Override
+	public void destroy() {
+		save();
 	}
 }

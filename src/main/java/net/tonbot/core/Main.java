@@ -11,9 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Guice;
 
-import sx.blah.discord.api.ClientBuilder;
-import sx.blah.discord.api.IDiscordClient;
-
 public class Main {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Main.class);
@@ -40,23 +37,32 @@ public class Main {
 
 		Config config = configMgr.readConfig();
 
-		String token = config.getDiscordBotToken();
+		String botUserToken = config.getDiscordBotToken();
 
-		if (StringUtils.isBlank(token)) {
+		if (StringUtils.isBlank(botUserToken)) {
 			// An empty token is a sign that the bot isn't setup yet. In that case, return a
 			// friendly error message.
 			LOG.error("Tonbot is not configured! Please edit the config.json at " + configMgr.getConfigDirPath());
 			System.exit(1);
 		}
 
-		IDiscordClient discordClient = new ClientBuilder()
-				.withToken(token)
-				.build();
-
 		Tonbot bot = Guice.createInjector(
-				new TonbotModule(config.getPrefix(), config.getPluginNames(), discordClient,
+				new TonbotModule(
+						botUserToken,
+						config.getPrefix(),
+						config.getPluginNames(),
 						configMgr.getConfigDirPath()))
 				.getInstance(Tonbot.class);
+
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			LOG.info("Shutting down...");
+			try {
+				bot.destroy();
+				LOG.info("Shutdown successful.");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}));
 
 		try {
 			bot.run();

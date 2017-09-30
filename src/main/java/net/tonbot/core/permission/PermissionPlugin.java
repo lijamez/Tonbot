@@ -14,14 +14,18 @@ import net.tonbot.common.TonbotPluginArgs;
 public class PermissionPlugin extends TonbotPlugin {
 
 	private final Injector injector;
+	private final PermissionManager permissionManagerInstance;
 
 	public PermissionPlugin(
 			TonbotPluginArgs pluginArgs) {
 		super(pluginArgs);
+
 		this.injector = Guice.createInjector(
 				new PermissionControlModule(
 						pluginArgs.getBotUtils(),
-						pluginArgs.getDiscordClient()));
+						pluginArgs.getDiscordClient(),
+						pluginArgs.getConfigFile()));
+		this.permissionManagerInstance = injector.getInstance(PermissionManager.class);
 	}
 
 	@Override
@@ -47,6 +51,11 @@ public class PermissionPlugin extends TonbotPlugin {
 	}
 
 	public PermissionManager getPermissionManager() {
-		return injector.getInstance(PermissionManager.class);
+		return permissionManagerInstance;
+	}
+
+	@Override
+	public void destroy() {
+		permissionManagerInstance.destroy();
 	}
 }

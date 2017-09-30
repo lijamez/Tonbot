@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.api.client.repackaged.com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 
@@ -13,6 +15,7 @@ class PathExpression {
 	private static final String WILDCARD = "*";
 	private static final String DOUBLE_WILDCARD = "**";
 
+	@JsonProperty("pathExp")
 	private final List<String> pathExp;
 
 	/**
@@ -37,7 +40,8 @@ class PathExpression {
 	 * @param pathExp
 	 *            The path expression. Non-null.
 	 */
-	public PathExpression(List<String> pathExp) {
+	@JsonCreator
+	public PathExpression(@JsonProperty("pathExp") List<String> pathExp) {
 		Preconditions.checkNotNull(pathExp, "pathExp must be non-null.");
 
 		validate(pathExp);

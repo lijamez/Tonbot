@@ -17,6 +17,7 @@ import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IPrivateChannel;
+import sx.blah.discord.handle.obj.IRole;
 
 class PermissionsListActivity implements Activity {
 
@@ -91,7 +92,9 @@ class PermissionsListActivity implements Activity {
 		} else {
 			sb.append("CAN NOT");
 		}
-		sb.append("** be used by role **").append(roleRule.getRole().getName()).append("**");
+
+		IRole role = discordClient.getRoleByID(roleRule.getRoleId());
+		sb.append("** be used by role **").append(role.getName()).append("**");
 
 		return sb.toString();
 	}

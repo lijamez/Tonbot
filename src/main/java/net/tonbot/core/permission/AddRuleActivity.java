@@ -110,7 +110,7 @@ class AddRuleActivity implements Activity {
 		}
 
 		// Finally, we can create the rule.
-		Rule rule = new RoleRule(routePathExp, guild, role, allow);
+		Rule rule = new RoleRule(routePathExp, guild.getLongID(), role.getLongID(), allow);
 		try {
 			permissionManager.add(index, rule);
 		} catch (IndexOutOfBoundsException e) {

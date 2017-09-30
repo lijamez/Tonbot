@@ -80,7 +80,8 @@ public interface PermissionManager {
 	void setDefaultAllowForGuild(IGuild guild, boolean defaultAllow);
 
 	/**
-	 * Initializes the rules for the guild.
+	 * Initializes the rules for the guild. No-op if the guild is already
+	 * initialized.
 	 * 
 	 * @param guild
 	 *            {@link IGuild}. Non-null.
@@ -109,4 +110,9 @@ public interface PermissionManager {
 	 *            The public {@link Activity}. Non-null.
 	 */
 	void addPublicActivity(Activity publicActivity);
+
+	/**
+	 * Persists the rules.
+	 */
+	void destroy();
 }
