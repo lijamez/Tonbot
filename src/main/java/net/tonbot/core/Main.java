@@ -1,5 +1,8 @@
 package net.tonbot.core;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -17,21 +20,16 @@ public class Main {
 
 	private static final String CONFIG_DIR_OPT = "c";
 	private static final String CONFIG_DIR_LONG_OPT = "configDir";
+	private static final String LOGS_DIR_NAME = "logs";
 
 	public static void main(String[] args) {
-		Options options = new Options();
-		options.addOption(CONFIG_DIR_OPT, CONFIG_DIR_LONG_OPT, true, "specify a custom config directory");
-		CommandLineParser parser = new DefaultParser();
-		CommandLine cmd = null;
-		try {
-			cmd = parser.parse(options, args);
-		} catch (ParseException e) {
-			LOG.error("Could not parse command line arguments.", e);
-			System.exit(1);
-		}
+		CommandLine cmd = parseCommandLineArgs(args);
 
 		String configDir = cmd.getOptionValue(CONFIG_DIR_LONG_OPT);
 		ConfigManager configMgr = new ConfigManager(configDir);
+
+		Path logsDirPath = Paths.get(configMgr.getConfigDirPath().toString(), LOGS_DIR_NAME);
+		LoggerConfigurator.configureLog4j(logsDirPath);
 
 		LOG.info("The config directory is: " + configMgr.getConfigDirPath());
 
@@ -51,7 +49,7 @@ public class Main {
 						botUserToken,
 						config.getPrefix(),
 						config.getPluginNames(),
-						configMgr.getConfigDirPath()))
+						configMgr.getConfigDirPath().toString()))
 				.getInstance(Tonbot.class);
 
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -68,6 +66,17 @@ public class Main {
 			bot.run();
 		} catch (Exception e) {
 			LOG.error("Tonbot died due to an uncaught exception. RIP.", e);
+		}
+	}
+
+	private static CommandLine parseCommandLineArgs(String[] args) {
+		Options options = new Options();
+		options.addOption(CONFIG_DIR_OPT, CONFIG_DIR_LONG_OPT, true, "specify a custom config directory");
+		CommandLineParser parser = new DefaultParser();
+		try {
+			return parser.parse(options, args);
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("Could not parse command line arguments.", e);
 		}
 	}
 }

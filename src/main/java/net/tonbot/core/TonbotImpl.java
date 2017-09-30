@@ -68,7 +68,7 @@ class TonbotImpl implements Tonbot {
 							.botUtils(botUtils)
 							.prefix(prefix)
 							.discordClient(discordClient)
-							.configFile(new File(configDir + "/permissions.conf"))
+							.configFile(new File(configDir + "/permissions.config"))
 							.build());
 			plugins.add(permissionPlugin);
 

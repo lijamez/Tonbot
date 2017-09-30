@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="DEBUG">
+
+<!-- https://logging.apache.org/log4j/2.x/manual/configuration.html -->
+
+<Configuration status="INFO">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
@@ -9,8 +12,6 @@
         <Root level="debug">
             <AppenderRef ref="Console"/>
         </Root>
-        <Logger name="sx.blah.discord.Discord4J" level="warn">
-        	    <AppenderRef ref="Console"/>
-        </Logger>
+        <Logger name="sx.blah.discord.Discord4J" level="info"/>
     </Loggers>
 </Configuration>

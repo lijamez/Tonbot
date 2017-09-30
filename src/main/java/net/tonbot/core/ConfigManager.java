@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +19,7 @@ import com.google.common.io.Resources;
 class ConfigManager {
 
 	private static final String DEFAULT_CONFIG_DIR_NAME = ".tonbot";
-	private static final String CONFIG_FILE_NAME = "config.json";
+	private static final String CONFIG_FILE_NAME = "tonbot.config";
 	private static final String PLUGIN_CONFIG_DIR_NAME = "plugin_config";
 
 	private final File configDir;
@@ -103,9 +105,9 @@ class ConfigManager {
 	/**
 	 * Gets the absolute path to the config directory.
 	 * 
-	 * @return The absolute path to the config directory.
+	 * @return The path to the config directory.
 	 */
-	public String getConfigDirPath() {
-		return configDir.getAbsolutePath();
+	public Path getConfigDirPath() {
+		return Paths.get(configDir.getAbsolutePath());
 	}
 }
