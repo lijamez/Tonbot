@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 import net.tonbot.common.Activity;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.Permissions;
 
 class PermissionManagerImpl implements PermissionManager {
 
@@ -238,7 +239,13 @@ class PermissionManagerImpl implements PermissionManager {
 		Preconditions.checkNotNull(user, "user must be non-null.");
 		Preconditions.checkNotNull(guild, "guild must be non-null.");
 
-		if (user.getLongID() == guild.getOwnerLongID()) {
+		// The guild owner and the administrators can always access an activity.
+		boolean userIsAdmin = user.getLongID() == guild.getOwnerLongID()
+				|| user.getRolesForGuild(guild).stream()
+						.filter(role -> role.getPermissions().contains(Permissions.ADMINISTRATOR))
+						.findAny()
+						.isPresent();
+		if (userIsAdmin) {
 			return true;
 		}
 
