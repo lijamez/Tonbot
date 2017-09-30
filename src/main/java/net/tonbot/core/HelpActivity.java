@@ -73,16 +73,38 @@ class HelpActivity implements Activity {
 				.findFirst();
 
 		if (optActivity.isPresent()) {
-			Optional<String> usageDescription = optActivity.get().getDescriptor().getUsageDescription();
-			if (usageDescription.isPresent()) {
-				StringBuffer sb = new StringBuffer();
-				sb.append("Usage for ``").append(prefix).append(" ").append(StringUtils.join(route, " "))
-						.append("``:\n\n");
-				sb.append(usageDescription.get());
-				botUtils.sendMessage(channel, sb.toString());
-			} else {
-				botUtils.sendMessage(channel, "Sorry, there's no additional help for that command.");
+			Activity activity = optActivity.get();
+
+			StringBuffer sb = new StringBuffer();
+
+			sb.append("**Command:** ``")
+					.append(StringUtils.join(activity.getDescriptor().getRoute(), " "))
+					.append("``\n\n");
+
+			// Display route aliases, if at least one exists
+			List<List<String>> routeAliases = activity.getDescriptor().getRouteAliases();
+			if (!activity.getDescriptor().getRouteAliases().isEmpty()) {
+				sb.append("**Aliases:**\n");
+				routeAliases.forEach(alias -> {
+					sb.append("``")
+							.append(StringUtils.join(alias, " "))
+							.append("``\n");
+				});
+
+				sb.append("\n");
 			}
+
+			// Display usage description.
+			Optional<String> usageDescription = activity.getDescriptor().getUsageDescription();
+			if (usageDescription.isPresent()) {
+				sb.append(usageDescription.get());
+			} else {
+				sb.append("No additional usage information.");
+			}
+
+			String finalUsageMessage = sb.toString();
+			botUtils.sendMessage(channel, finalUsageMessage);
+
 		} else {
 			botUtils.sendMessage(channel, "Sorry, that command doesn't exist.");
 		}
