@@ -33,16 +33,19 @@ class HelpActivity implements Activity {
 	private final String prefix;
 	private final List<TonbotPlugin> plugins;
 	private final PermissionManager permissionManager;
+	private final Aliases aliases;
 
 	public HelpActivity(
 			BotUtils botUtils,
 			String prefix,
 			List<TonbotPlugin> plugins,
-			PermissionManager permissionManager) {
+			PermissionManager permissionManager,
+			Aliases aliases) {
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		this.plugins = Preconditions.checkNotNull(plugins, "plugins must be non-null.");
 		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
+		this.aliases = Preconditions.checkNotNull(aliases, "aliases must be non-null.");
 	}
 
 	@Override
@@ -67,16 +70,20 @@ class HelpActivity implements Activity {
 			return;
 		}
 
-		Optional<Activity> optActivity = plugins.stream()
+		Activity activity = plugins.stream()
 				.filter(plugin -> !plugin.isHidden())
 				.flatMap(plugin -> plugin.getActivities().stream())
-				.filter(activity -> referencedRoute.equals(activity.getDescriptor().getRoute()))
-				.filter(activity -> permissionManager.checkAccessibility(activity, user, guild))
-				.findFirst();
+				.filter(a -> referencedRoute.equals(a.getDescriptor().getRoute()))
+				.findFirst()
+				.orElse(null);
 
-		if (optActivity.isPresent()) {
-			Activity activity = optActivity.get();
+		if (activity == null) {
+			// TODO: It's possible to get usage descriptions for activities from hidden
+			// plugins and have an alias.
+			activity = aliases.getActivityAliasedBy(referencedRoute).orElse(null);
+		}
 
+		if (activity != null && permissionManager.checkAccessibility(activity, user, guild)) {
 			StringBuffer sb = new StringBuffer();
 
 			sb.append("**Command:** ``")
@@ -84,7 +91,7 @@ class HelpActivity implements Activity {
 					.append("``\n\n");
 
 			// Display route aliases, if at least one exists
-			List<Route> routeAliases = activity.getDescriptor().getRouteAliases();
+			List<Route> routeAliases = aliases.getAliasesOf(activity);
 			if (!routeAliases.isEmpty()) {
 				sb.append("**Aliases:**\n");
 				routeAliases.forEach(alias -> {

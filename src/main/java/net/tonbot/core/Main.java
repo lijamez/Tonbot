@@ -49,7 +49,8 @@ public class Main {
 						botUserToken,
 						config.getPrefix(),
 						config.getPluginNames(),
-						configMgr.getConfigDirPath().toString()))
+						configMgr.getConfigDirPath().toString(),
+						config.getAliases()))
 				.getInstance(Tonbot.class);
 
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {

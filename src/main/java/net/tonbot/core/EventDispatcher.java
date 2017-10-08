@@ -38,12 +38,14 @@ class EventDispatcher {
 	private final BotUtils botUtils;
 	private final String prefix;
 	private final Set<Activity> activities;
+	private final Aliases aliases;
 	private final PermissionManager permissionManager;
 
 	public EventDispatcher(
 			BotUtils botUtils,
 			String prefix,
 			Set<Activity> activities,
+			Aliases aliases,
 			PermissionManager permissionManager) {
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
@@ -51,6 +53,8 @@ class EventDispatcher {
 
 		Preconditions.checkNotNull(activities, "activities must be non-null.");
 		this.activities = ImmutableSet.copyOf(activities);
+
+		this.aliases = Preconditions.checkNotNull(aliases, "aliases must be non-null.");
 	}
 
 	@EventSubscriber
@@ -133,14 +137,12 @@ class EventDispatcher {
 		Route preliminaryRoute = Route.from(remainingTokens);
 		ActivityMatch match = null;
 
-		for (Activity activity : activities) {
-			ActivityDescriptor descriptor = activity.getDescriptor();
-
-			List<Route> routeAliases = descriptor.getRouteAliases();
-			for (Route routeAlias : routeAliases) {
-				if (preliminaryRoute.isPrefixedBy(routeAlias)
-						&& (match == null || match.getMatchedRoute().getPath().size() < routeAlias.getPath().size())) {
-					match = new ActivityMatch(activity, routeAlias);
+		for (Activity activity : aliases.getKnownActivities()) {
+			List<Route> aliasesOfActivity = aliases.getAliasesOf(activity);
+			for (Route alias : aliasesOfActivity) {
+				if (preliminaryRoute.isPrefixedBy(alias)
+						&& (match == null || match.getMatchedRoute().getPath().size() < alias.getPath().size())) {
+					match = new ActivityMatch(activity, alias);
 				}
 			}
 		}

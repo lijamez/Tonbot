@@ -2,5 +2,7 @@
   "prefix" : "t,",
   "discordBotToken" : "",
   "plugins" : [
-  ]
+  ],
+  "aliases" : {
+  }
 }

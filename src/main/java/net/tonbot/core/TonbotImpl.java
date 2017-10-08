@@ -3,6 +3,7 @@ package net.tonbot.core;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ class TonbotImpl implements Tonbot {
 	private final String configDir;
 	private final BotUtils botUtils;
 	private final PlayingTextSetter playingTextSetter;
+	private final Map<String, String> aliasToCanonicalRouteMap;
 
 	private List<TonbotPlugin> plugins;
 
@@ -45,7 +47,8 @@ class TonbotImpl implements Tonbot {
 			@Prefix final String prefix,
 			@ConfigDir final String configDir,
 			final BotUtils botUtils,
-			final PlayingTextSetter playingTextSetter) {
+			final PlayingTextSetter playingTextSetter,
+			final Map<String, String> aliasToCanonicalRouteMap) {
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		this.pluginLoader = Preconditions.checkNotNull(pluginLoader, "pluginLoader must be non-null.");
 		this.pluginFqns = Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
@@ -53,6 +56,8 @@ class TonbotImpl implements Tonbot {
 		this.configDir = Preconditions.checkNotNull(configDir, "configDir must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.playingTextSetter = Preconditions.checkNotNull(playingTextSetter, "playingTextSetter must be non-null.");
+		this.aliasToCanonicalRouteMap = Preconditions.checkNotNull(aliasToCanonicalRouteMap,
+				"aliasToCanonicalRouteMap must be non-null.");
 	}
 
 	public void run() {
@@ -82,11 +87,18 @@ class TonbotImpl implements Tonbot {
 					.flatMap(Collection::stream)
 					.collect(Collectors.toSet());
 
-			HelpActivity helpActivity = new HelpActivity(botUtils, prefix, plugins, permissionManager);
+			Aliases aliases = new Aliases(aliasToCanonicalRouteMap, activities);
+
+			HelpActivity helpActivity = new HelpActivity(botUtils, prefix, plugins, permissionManager, aliases);
 			permissionManager.addPublicActivity(helpActivity);
 			activities.add(helpActivity);
 
-			EventDispatcher eventDispatcher = new EventDispatcher(botUtils, prefix, activities, permissionManager);
+			// Since we just added the help activity to the list of activities, we need to
+			// updates the aliases.
+			aliases.updateWithActivities(activities);
+
+			EventDispatcher eventDispatcher = new EventDispatcher(botUtils, prefix, activities, aliases,
+					permissionManager);
 
 			discordClient.getDispatcher().registerListener(eventDispatcher);
 
