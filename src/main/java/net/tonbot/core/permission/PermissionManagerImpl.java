@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 
 import net.tonbot.common.Activity;
+import net.tonbot.common.Route;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.handle.obj.Permissions;
@@ -213,14 +214,14 @@ class PermissionManagerImpl implements PermissionManager {
 			List<Rule> rules = new ArrayList<>();
 
 			for (Activity publicActivity : publicActivities) {
-				List<String> route = publicActivity.getDescriptor().getRoute();
-				Rule rule = new RoleRule(route, guild.getLongID(), guild.getEveryoneRole().getLongID(), true);
+				Route route = publicActivity.getDescriptor().getRoute();
+				Rule rule = new RoleRule(route.getPath(), guild.getLongID(), guild.getEveryoneRole().getLongID(), true);
 				rules.add(rule);
 			}
 
 			for (Activity restrictedActivity : restrictedActivities) {
-				List<String> route = restrictedActivity.getDescriptor().getRoute();
-				Rule rule = new RoleRule(route, guild.getLongID(), guild.getEveryoneRole().getLongID(), false);
+				Route route = restrictedActivity.getDescriptor().getRoute();
+				Rule rule = new RoleRule(route.getPath(), guild.getLongID(), guild.getEveryoneRole().getLongID(), false);
 				rules.add(rule);
 			}
 
@@ -249,7 +250,7 @@ class PermissionManagerImpl implements PermissionManager {
 			return true;
 		}
 
-		List<String> route = activity.getDescriptor().getRoute();
+		Route route = activity.getDescriptor().getRoute();
 
 		lock.readLock().lock();
 		try {
@@ -259,7 +260,7 @@ class PermissionManagerImpl implements PermissionManager {
 			}
 
 			Rule bestRule = guildConfig.getRules().stream()
-					.filter(rule -> rule.appliesTo(route, user))
+					.filter(rule -> rule.appliesTo(route.getPath(), user))
 					.findFirst()
 					.orElse(null);
 

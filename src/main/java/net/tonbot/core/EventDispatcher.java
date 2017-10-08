@@ -1,7 +1,6 @@
 package net.tonbot.core;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +16,7 @@ import lombok.NonNull;
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
 import net.tonbot.common.BotUtils;
+import net.tonbot.common.Route;
 import net.tonbot.common.TonbotBusinessException;
 import net.tonbot.core.permission.PermissionManager;
 import sx.blah.discord.api.events.EventSubscriber;
@@ -50,11 +50,6 @@ class EventDispatcher {
 		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
 
 		Preconditions.checkNotNull(activities, "activities must be non-null.");
-		activities.forEach(activity -> {
-			Preconditions.checkArgument(activity.getDescriptor().getRoute().size() > 0,
-					"Activity " + activity + " must have a non-empty route.");
-		});
-
 		this.activities = ImmutableSet.copyOf(activities);
 	}
 
@@ -97,7 +92,7 @@ class EventDispatcher {
 			return;
 		}
 
-		List<String> prefixAndRoute = tokens.subList(0, matchedActivity.getMatchedRoute().size() + 1);
+		List<String> prefixAndRoute = tokens.subList(0, matchedActivity.getMatchedRoute().getPath().size() + 1);
 		int prefixAndRouteChars = (prefixAndRoute.size() * TOKENIZATION_DELIMITER.length()) + prefixAndRoute.stream()
 				.mapToInt(String::length)
 				.sum();
@@ -121,13 +116,14 @@ class EventDispatcher {
 
 	private ActivityMatch matchActivity(List<String> remainingTokens) {
 		// Find the activity to run. We will first match by the main route.
+		Route preliminaryRoute = Route.from(remainingTokens);
 		ActivityMatch matchedActivity = null;
 		for (Activity activity : activities) {
 			ActivityDescriptor descriptor = activity.getDescriptor();
 
-			List<String> route = descriptor.getRoute();
-			if (isPrefix(route, remainingTokens)
-					&& (matchedActivity == null || matchedActivity.getMatchedRoute().size() < route.size())) {
+			Route route = descriptor.getRoute();
+			if (preliminaryRoute.isPrefixedBy(route)
+					&& (matchedActivity == null || matchedActivity.getMatchedRoute().getPath().size() < route.getPath().size())) {
 				matchedActivity = new ActivityMatch(activity, route);
 			}
 		}
@@ -142,48 +138,22 @@ class EventDispatcher {
 	}
 
 	private ActivityMatch findBestActivityByRouteAlias(List<String> remainingTokens) {
+		Route preliminaryRoute = Route.from(remainingTokens);
 		ActivityMatch match = null;
 
 		for (Activity activity : activities) {
 			ActivityDescriptor descriptor = activity.getDescriptor();
 
-			List<List<String>> routeAliases = descriptor.getRouteAliases();
-			for (List<String> routeAlias : routeAliases) {
-				if (isPrefix(routeAlias, remainingTokens)
-						&& (match == null || match.getMatchedRoute().size() < routeAlias.size())) {
+			List<Route> routeAliases = descriptor.getRouteAliases();
+			for (Route routeAlias : routeAliases) {
+				if (preliminaryRoute.isPrefixedBy(routeAlias)
+						&& (match == null || match.getMatchedRoute().getPath().size() < routeAlias.getPath().size())) {
 					match = new ActivityMatch(activity, routeAlias);
 				}
 			}
 		}
 
 		return match;
-	}
-
-	/**
-	 * Checks wither if list2 is prefixed by list1.
-	 * 
-	 * @param list1
-	 *            List 1
-	 * @param list2
-	 *            List 2
-	 * @param <T>
-	 * @return True if list1 is a prefix of list2. False otherwise.
-	 */
-	private <T> boolean isPrefix(List<T> list1, List<T> list2) {
-		if (list1.size() > list2.size()) {
-			return false;
-		}
-
-		Iterator<T> list1It = list1.iterator();
-		Iterator<T> list2It = list2.iterator();
-		while (list1It.hasNext()) {
-			if (!list1It.next().equals(list2It.next())) {
-				return false;
-			}
-			;
-		}
-
-		return true;
 	}
 
 	/**
@@ -196,6 +166,6 @@ class EventDispatcher {
 		private final Activity matchedActivity;
 
 		@NonNull
-		private final List<String> matchedRoute;
+		private final Route matchedRoute;
 	}
 }

@@ -16,7 +16,7 @@ import sx.blah.discord.handle.obj.IGuild;
 class SetDefaultAllowabilityActivity implements Activity {
 
 	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
-			.route(ImmutableList.of("permissions", "setdefault"))
+			.route("permissions setdefault")
 			.parameters(ImmutableList.of("allow/deny"))
 			.description("Sets whether if commands should be allowed or denied when they don't match a rule.")
 			.build();

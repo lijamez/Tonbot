@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 
 import net.tonbot.common.Activity;
@@ -24,7 +23,7 @@ class PermissionsListActivity implements Activity {
 	private static final Logger LOG = LoggerFactory.getLogger(PermissionsListActivity.class);
 
 	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
-			.route(ImmutableList.of("permissions", "list"))
+			.route("permissions list")
 			.description("Shows permissions for this server.")
 			.build();
 

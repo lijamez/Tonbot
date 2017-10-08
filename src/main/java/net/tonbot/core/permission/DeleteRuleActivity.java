@@ -14,7 +14,7 @@ import sx.blah.discord.handle.obj.IGuild;
 class DeleteRuleActivity implements Activity {
 
 	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
-			.route(ImmutableList.of("permissions", "delete"))
+			.route("permissions delete")
 			.parameters(ImmutableList.of("index"))
 			.description("Deletes a rule for this server.")
 			.build();

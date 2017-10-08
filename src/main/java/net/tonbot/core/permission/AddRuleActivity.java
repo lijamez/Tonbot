@@ -21,7 +21,7 @@ import sx.blah.discord.util.MessageTokenizer.Token;
 class AddRuleActivity implements Activity {
 
 	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
-			.route(ImmutableList.of("permissions", "add"))
+			.route("permissions add")
 			.parameters(ImmutableList.of("index", "role", "allow/deny", "route path expression"))
 			.description("Add a rule for this server.")
 			.build();

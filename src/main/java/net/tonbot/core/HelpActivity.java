@@ -1,18 +1,20 @@
 package net.tonbot.core;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
 import net.tonbot.common.BotUtils;
+import net.tonbot.common.Route;
 import net.tonbot.common.TonbotPlugin;
 import net.tonbot.core.permission.PermissionManager;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -24,7 +26,7 @@ import sx.blah.discord.util.EmbedBuilder;
 class HelpActivity implements Activity {
 
 	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
-			.route(ImmutableList.of("help"))
+			.route("help")
 			.build();
 
 	private final BotUtils botUtils;
@@ -58,7 +60,7 @@ class HelpActivity implements Activity {
 	}
 
 	private void printCommandHelp(IUser user, IChannel channel, IGuild guild, String args) {
-		List<String> route = Arrays.asList(StringUtils.split(args, " "));
+		Route route = Route.from(args);
 
 		if (route.equals(this.getDescriptor().getRoute())) {
 			botUtils.sendMessage(channel, "Very funny. :expressionless:");
@@ -78,12 +80,12 @@ class HelpActivity implements Activity {
 			StringBuffer sb = new StringBuffer();
 
 			sb.append("**Command:** ``")
-					.append(StringUtils.join(activity.getDescriptor().getRoute(), " "))
+					.append(activity.getDescriptor().getRoute())
 					.append("``\n\n");
 
 			// Display route aliases, if at least one exists
-			List<List<String>> routeAliases = activity.getDescriptor().getRouteAliases();
-			if (!activity.getDescriptor().getRouteAliases().isEmpty()) {
+			List<Route> routeAliases = activity.getDescriptor().getRouteAliases();
+			if (!routeAliases.isEmpty()) {
 				sb.append("**Aliases:**\n");
 				routeAliases.forEach(alias -> {
 					sb.append("``")
@@ -97,7 +99,8 @@ class HelpActivity implements Activity {
 			// Display usage description.
 			Optional<String> usageDescription = activity.getDescriptor().getUsageDescription();
 			if (usageDescription.isPresent()) {
-				sb.append(usageDescription.get());
+				String usageDescriptionForDisplay = substitutePlaceholders(usageDescription.get(), activity.getDescriptor().getRoute());
+				sb.append(usageDescriptionForDisplay);
 			} else {
 				sb.append("No additional usage information.");
 			}
@@ -108,6 +111,15 @@ class HelpActivity implements Activity {
 		} else {
 			botUtils.sendMessage(channel, "Sorry, that command doesn't exist.");
 		}
+	}
+	
+	private String substitutePlaceholders(String descWithPlaceholders, Route route) {
+		
+		Map<String, String> valueMap = new HashMap<>();
+		valueMap.put("routeName", route.toString());
+		
+		String result = StrSubstitutor.replace(descWithPlaceholders, valueMap);
+		return result;
 	}
 
 	private void printCommands(IUser user, IChannel channel, IGuild guild) {
