@@ -116,7 +116,7 @@ class HelpActivity implements Activity {
 	private String substitutePlaceholders(String descWithPlaceholders, Route referencedRoute) {
 
 		Map<String, Object> valueMap = new HashMap<>();
-		valueMap.put("absoluteReferencedRoute", prefix + " " + referencedRoute);
+		valueMap.put("absoluteReferencedRoute", prefix + referencedRoute);
 
 		String result = StrSubstitutor.replace(descWithPlaceholders, valueMap);
 		return result;
@@ -136,7 +136,6 @@ class HelpActivity implements Activity {
 							.forEach(activity -> {
 								sb.append("``");
 								sb.append(prefix);
-								sb.append(" ");
 								sb.append(StringUtils.join(activity.getRoute(), " "));
 								sb.append(" ");
 

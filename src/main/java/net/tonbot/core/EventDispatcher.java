@@ -57,27 +57,18 @@ class EventDispatcher {
 	public void onMessageReceived(MessageReceivedEvent event) {
 		String messageString = event.getMessage().getContent();
 
-		List<String> tokens = Arrays.asList(messageString.split(TOKENIZATION_DELIMITER));
-
-		if (tokens.size() == 0) {
+		if (!StringUtils.startsWith(messageString, prefix)) {
 			return;
 		}
 
-		String firstToken = tokens.get(0);
-		if (!StringUtils.equals(firstToken, prefix)) {
+		String messageWithoutPrefix = messageString.substring(prefix.length(), messageString.length()).trim();
+		List<String> tokens = Arrays.asList(messageWithoutPrefix.split(TOKENIZATION_DELIMITER));
+
+		if (tokens.isEmpty()) {
 			return;
 		}
 
-		List<String> remainingTokens = tokens.subList(1, tokens.size());
-
-		if (remainingTokens.isEmpty()) {
-			// Only the prefix. Maybe display help or something?
-			// TODO: But for now, do nothing.
-
-			return;
-		}
-
-		ActivityMatch matchedActivity = matchActivity(remainingTokens);
+		ActivityMatch matchedActivity = matchActivity(tokens);
 
 		if (matchedActivity == null) {
 			return;
@@ -92,16 +83,16 @@ class EventDispatcher {
 			return;
 		}
 
-		List<String> prefixAndRoute = tokens.subList(0, matchedActivity.getMatchedRoute().getPath().size() + 1);
-		int prefixAndRouteChars = (prefixAndRoute.size() * TOKENIZATION_DELIMITER.length()) + prefixAndRoute.stream()
+		List<String> routePath = tokens.subList(0, matchedActivity.getMatchedRoute().getPath().size());
+		int routeChars = (routePath.size() * TOKENIZATION_DELIMITER.length()) + routePath.stream()
 				.mapToInt(String::length)
 				.sum();
 		// The part of the message that doesn't contain the prefix or route.
 		String remainingMessage;
-		if (prefixAndRouteChars > messageString.length()) {
+		if (routeChars > messageWithoutPrefix.length()) {
 			remainingMessage = "";
 		} else {
-			remainingMessage = messageString.substring(prefixAndRouteChars, messageString.length());
+			remainingMessage = messageWithoutPrefix.substring(routeChars, messageWithoutPrefix.length());
 		}
 
 		try {

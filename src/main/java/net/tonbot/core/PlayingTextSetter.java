@@ -26,6 +26,6 @@ class PlayingTextSetter extends PeriodicTask {
 	protected void performTask() {
 		IDiscordClient discordClient = this.getDiscordClient();
 
-		discordClient.changePlayingText("say: " + prefix + " help");
+		discordClient.changePlayingText("say: " + prefix + "help");
 	}
 }
