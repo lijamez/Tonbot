@@ -60,9 +60,9 @@ class HelpActivity implements Activity {
 	}
 
 	private void printCommandHelp(IUser user, IChannel channel, IGuild guild, String args) {
-		Route route = Route.from(args);
+		Route referencedRoute = Route.from(args);
 
-		if (route.equals(this.getDescriptor().getRoute())) {
+		if (referencedRoute.equals(this.getDescriptor().getRoute())) {
 			botUtils.sendMessage(channel, "Very funny. :expressionless:");
 			return;
 		}
@@ -70,7 +70,7 @@ class HelpActivity implements Activity {
 		Optional<Activity> optActivity = plugins.stream()
 				.filter(plugin -> !plugin.isHidden())
 				.flatMap(plugin -> plugin.getActivities().stream())
-				.filter(activity -> route.equals(activity.getDescriptor().getRoute()))
+				.filter(activity -> referencedRoute.equals(activity.getDescriptor().getRoute()))
 				.filter(activity -> permissionManager.checkAccessibility(activity, user, guild))
 				.findFirst();
 
@@ -99,7 +99,7 @@ class HelpActivity implements Activity {
 			// Display usage description.
 			Optional<String> usageDescription = activity.getDescriptor().getUsageDescription();
 			if (usageDescription.isPresent()) {
-				String usageDescriptionForDisplay = substitutePlaceholders(usageDescription.get(), activity.getDescriptor().getRoute());
+				String usageDescriptionForDisplay = substitutePlaceholders(usageDescription.get(), referencedRoute);
 				sb.append(usageDescriptionForDisplay);
 			} else {
 				sb.append("No additional usage information.");
@@ -112,12 +112,12 @@ class HelpActivity implements Activity {
 			botUtils.sendMessage(channel, "Sorry, that command doesn't exist.");
 		}
 	}
-	
-	private String substitutePlaceholders(String descWithPlaceholders, Route route) {
-		
-		Map<String, String> valueMap = new HashMap<>();
-		valueMap.put("routeName", route.toString());
-		
+
+	private String substitutePlaceholders(String descWithPlaceholders, Route referencedRoute) {
+
+		Map<String, Object> valueMap = new HashMap<>();
+		valueMap.put("absoluteReferencedRoute", prefix + " " + referencedRoute);
+
 		String result = StrSubstitutor.replace(descWithPlaceholders, valueMap);
 		return result;
 	}

@@ -221,7 +221,8 @@ class PermissionManagerImpl implements PermissionManager {
 
 			for (Activity restrictedActivity : restrictedActivities) {
 				Route route = restrictedActivity.getDescriptor().getRoute();
-				Rule rule = new RoleRule(route.getPath(), guild.getLongID(), guild.getEveryoneRole().getLongID(), false);
+				Rule rule = new RoleRule(route.getPath(), guild.getLongID(), guild.getEveryoneRole().getLongID(),
+						false);
 				rules.add(rule);
 			}
 

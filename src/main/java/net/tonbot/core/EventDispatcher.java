@@ -123,7 +123,8 @@ class EventDispatcher {
 
 			Route route = descriptor.getRoute();
 			if (preliminaryRoute.isPrefixedBy(route)
-					&& (matchedActivity == null || matchedActivity.getMatchedRoute().getPath().size() < route.getPath().size())) {
+					&& (matchedActivity == null
+							|| matchedActivity.getMatchedRoute().getPath().size() < route.getPath().size())) {
 				matchedActivity = new ActivityMatch(activity, route);
 			}
 		}
