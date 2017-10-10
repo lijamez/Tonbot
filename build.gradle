@@ -13,10 +13,28 @@ configurations.all {
 }
 
 run {
-	// Pass all of the system properties to the application
-	systemProperties System.getProperties()
+    // Pass all of the system properties to the application
+    systemProperties System.getProperties()
 
-	args project.findProperty('runArgs') ?: ''
+    args project.findProperty('runArgs') ?: ''
+    
+    applicationDefaultJvmArgs = [
+        "-Xmx1024m",
+        "-Xms1024m"]
+
+    if (System.getProperty('debug', 'false') == 'true') {
+        applicationDefaultJvmArgs += [
+            "-agentlib:jdwp=transport=dt_socket,server=y,address=8000,suspend=n",
+            "-Dcom.sun.management.jmxremote",
+            "-Dcom.sun.management.jmxremote.port=9000",
+            "-Dcom.sun.management.jmxremote.authenticate=false",
+            "-Dcom.sun.management.jmxremote.ssl=false"]
+        
+        def rmiHostname = System.getProperty('rmiHostname', '')
+        if (rmiHostname != '') {
+            applicationDefaultJvmArgs += ["-Djava.rmi.server.hostname=" + rmiHostname]
+        }
+    }
 }
 
 repositories {
