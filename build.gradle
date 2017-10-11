@@ -90,7 +90,7 @@ configurations.all {
 			if (details.requested.group == 'com.fasterxml.jackson.core'
 				|| details.requested.group == 'com.fasterxml.jackson.datatype'
 				|| details.requested.group == 'com.fasterxml.jackson.module') {
-				details.useVersion "2.9.0"
+				details.useVersion "2.9.1"
 			}
 		}
 	}
