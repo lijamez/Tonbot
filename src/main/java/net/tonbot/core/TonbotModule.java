@@ -64,6 +64,8 @@ class TonbotModule extends AbstractModule {
 	IDiscordClient discordClient() {
 		IDiscordClient discordClient = new ClientBuilder()
 				.withToken(botUserToken)
+				.withRecommendedShardCount()
+				.setMaxReconnectAttempts(100)
 				.setDaemon(true)
 				.build();
 
