@@ -1,6 +1,7 @@
 {
   "prefix" : "t,",
   "discordBotToken" : "",
+  "color" : "f1c40f",
   "plugins" : [
   ],
   "aliases" : {
