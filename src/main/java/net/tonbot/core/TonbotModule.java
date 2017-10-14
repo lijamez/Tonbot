@@ -1,5 +1,6 @@
 package net.tonbot.core;
 
+import java.awt.Color;
 import java.util.List;
 import java.util.Map;
 
@@ -22,19 +23,22 @@ class TonbotModule extends AbstractModule {
 	private final List<String> pluginFqns;
 	private final String configDir;
 	private final Map<String, String> aliasToCanonicalRoutes;
+	private final Color color;
 
 	public TonbotModule(
 			String botUserToken,
 			String prefix,
 			List<String> pluginFqns,
 			String configDir,
-			Map<String, String> aliasToCanonicalRoutes) {
+			Map<String, String> aliasToCanonicalRoutes,
+			Color color) {
 		this.botUserToken = Preconditions.checkNotNull(botUserToken, "botUserToken must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		this.pluginFqns = Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
 		this.configDir = Preconditions.checkNotNull(configDir, "configDir must be non-null.");
 		this.aliasToCanonicalRoutes = Preconditions.checkNotNull(aliasToCanonicalRoutes,
 				"aliasToCanonicalRoutes must be non-null.");
+		this.color = Preconditions.checkNotNull(color, "color must be non-null.");
 	}
 
 	public void configure() {
@@ -42,8 +46,8 @@ class TonbotModule extends AbstractModule {
 		bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
 		bind(String.class).annotatedWith(ConfigDir.class).toInstance(configDir);
 		bind(BotUtils.class).to(BotUtilsImpl.class).in(Scopes.SINGLETON);
-		bind(new TypeLiteral<Map<String, String>>() {
-		}).toInstance(aliasToCanonicalRoutes);
+		bind(new TypeLiteral<Map<String, String>>() {}).toInstance(aliasToCanonicalRoutes);
+		bind(Color.class).toInstance(color);
 	}
 
 	@Provides

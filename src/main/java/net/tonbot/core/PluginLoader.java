@@ -1,5 +1,6 @@
 package net.tonbot.core;
 
+import java.awt.Color;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -49,12 +50,14 @@ class PluginLoader {
 			List<String> pluginFqns,
 			String prefix,
 			IDiscordClient discordClient,
-			BotUtils botUtils) {
+			BotUtils botUtils,
+			Color color) {
 
 		Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
 		Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
+		Preconditions.checkNotNull(color, "color must be non-null.");
 
 		return pluginFqns.stream()
 				.map(String::trim)
@@ -83,7 +86,7 @@ class PluginLoader {
 						return null;
 					}
 
-					TonbotPluginArgs pluginArgs = getPluginArgs(pluginClassName, prefix, discordClient, botUtils);
+					TonbotPluginArgs pluginArgs = getPluginArgs(pluginClassName, prefix, discordClient, botUtils, color);
 
 					TonbotPlugin plugin;
 					try {
@@ -99,8 +102,12 @@ class PluginLoader {
 				.collect(Collectors.toList());
 	}
 
-	private TonbotPluginArgs getPluginArgs(String pluginClassName, String prefix, IDiscordClient discordClient,
-			BotUtils botUtils) {
+	private TonbotPluginArgs getPluginArgs(
+			String pluginClassName, 
+			String prefix, 
+			IDiscordClient discordClient,
+			BotUtils botUtils,
+			Color color) {
 
 		File configFile = new File(configDir + "/plugin_config/" + pluginClassName + ".config");
 
@@ -109,6 +116,7 @@ class PluginLoader {
 				.prefix(prefix)
 				.configFile(configFile)
 				.botUtils(botUtils)
+				.color(color)
 				.build();
 
 		return pluginArgs;

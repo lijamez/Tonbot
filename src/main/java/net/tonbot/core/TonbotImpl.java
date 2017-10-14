@@ -1,5 +1,6 @@
 package net.tonbot.core;
 
+import java.awt.Color;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
@@ -36,6 +37,7 @@ class TonbotImpl implements Tonbot {
 	private final BotUtils botUtils;
 	private final PlayingTextSetter playingTextSetter;
 	private final Map<String, String> aliasToCanonicalRouteMap;
+	private final Color color;
 
 	private List<TonbotPlugin> plugins;
 
@@ -48,7 +50,8 @@ class TonbotImpl implements Tonbot {
 			@ConfigDir final String configDir,
 			final BotUtils botUtils,
 			final PlayingTextSetter playingTextSetter,
-			final Map<String, String> aliasToCanonicalRouteMap) {
+			final Map<String, String> aliasToCanonicalRouteMap,
+			final Color color) {
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		this.pluginLoader = Preconditions.checkNotNull(pluginLoader, "pluginLoader must be non-null.");
 		this.pluginFqns = Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
@@ -58,12 +61,13 @@ class TonbotImpl implements Tonbot {
 		this.playingTextSetter = Preconditions.checkNotNull(playingTextSetter, "playingTextSetter must be non-null.");
 		this.aliasToCanonicalRouteMap = Preconditions.checkNotNull(aliasToCanonicalRouteMap,
 				"aliasToCanonicalRouteMap must be non-null.");
+		this.color = Preconditions.checkNotNull(color, "color must be non-null.");
 	}
 
 	public void run() {
 		try {
 			// Standard Plugins
-			this.plugins = pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient, botUtils);
+			this.plugins = pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient, botUtils, color);
 
 			// System Plugins
 			// TODO: This method of creating a plugin is a little janky. Maybe let the
@@ -74,6 +78,7 @@ class TonbotImpl implements Tonbot {
 							.prefix(prefix)
 							.discordClient(discordClient)
 							.configFile(new File(configDir + "/permissions.config"))
+							.color(color)
 							.build());
 			plugins.add(permissionPlugin);
 

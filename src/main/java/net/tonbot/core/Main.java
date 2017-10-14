@@ -43,14 +43,15 @@ public class Main {
 			LOG.error("Tonbot is not configured! Please edit the config.json at " + configMgr.getConfigDirPath());
 			System.exit(1);
 		}
-
+		
 		Tonbot bot = Guice.createInjector(
 				new TonbotModule(
 						botUserToken,
 						config.getPrefix(),
 						config.getPluginNames(),
 						configMgr.getConfigDirPath().toString(),
-						config.getAliases()))
+						config.getAliases(),
+						config.getColor()))
 				.getInstance(Tonbot.class);
 
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
