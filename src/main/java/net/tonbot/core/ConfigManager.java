@@ -36,14 +36,12 @@ class ConfigManager {
 	 * dir is null or blank, it will default to a ".tonbot" directory in the user's
 	 * home directory.<br/>
 	 * 
-	 * Regardless of what config directory is used, the config directory will be
-	 * created if it doesn't exist and necessary files and directories will be added
-	 * to the config dir if they are not present.
+	 * The config directory is not created immediately upon {@link ConfigManager}
+	 * construction. The {@link #initConfigDir()} method must be called for
+	 * initialization.
 	 * 
 	 * @param configDir
 	 *            Configuration directory. Nullable.
-	 * @throws UncheckedIOException
-	 *             if config directory initialization failed.
 	 */
 	public ConfigManager(String configDirStr) {
 		if (StringUtils.isBlank(configDirStr)) {
