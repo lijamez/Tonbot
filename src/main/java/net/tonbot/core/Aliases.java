@@ -31,7 +31,7 @@ class Aliases {
 		Preconditions.checkNotNull(activities, "activities must be non-null.");
 
 		this.knownActivities = ImmutableList.copyOf(activities);
-		this.updateWithActivities(knownActivities);
+		this.update(knownActivities);
 	}
 
 	/**
@@ -41,7 +41,7 @@ class Aliases {
 	 * @param activities
 	 *            Collection of activities. Non-null.
 	 */
-	public void updateWithActivities(Collection<Activity> activities) {
+	public void update(Collection<Activity> activities) {
 		Preconditions.checkNotNull(activities, "activities must be non-null.");
 
 		this.aliasToActivityMap = createAliasToActivityMap(aliasToCanonicalRouteMap, activities);

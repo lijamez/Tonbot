@@ -81,7 +81,8 @@ class PluginLoader {
 					try {
 						constructor = (Constructor<TonbotPlugin>) pluginClass.getConstructor(TonbotPluginArgs.class);
 					} catch (NoSuchMethodException e) {
-						LOG.error("Plugin '{}' must have a single argument constuctor that accepts a TonbotPluginArgs.",
+						LOG.warn(
+								"Plugin '{}' is not valid. It must have a single argument constuctor that accepts a TonbotPluginArgs.",
 								pluginClassName);
 						return null;
 					}
@@ -93,10 +94,11 @@ class PluginLoader {
 					try {
 						plugin = constructor.newInstance(pluginArgs);
 					} catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
-						LOG.error("Unable to create an instance of plugin '{}'.", pluginClassName, e);
+						LOG.warn("Unable to create an instance of plugin '{}'.", pluginClassName, e);
 						return null;
 					}
 
+					LOG.info("Loaded plugin: {}", plugin.getClass().getName());
 					return plugin;
 				})
 				.filter(plugin -> plugin != null)
