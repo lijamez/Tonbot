@@ -86,7 +86,8 @@ class PluginLoader {
 						return null;
 					}
 
-					TonbotPluginArgs pluginArgs = getPluginArgs(pluginClassName, prefix, discordClient, botUtils, color);
+					TonbotPluginArgs pluginArgs = getPluginArgs(pluginClassName, prefix, discordClient, botUtils,
+							color);
 
 					TonbotPlugin plugin;
 					try {
@@ -103,8 +104,8 @@ class PluginLoader {
 	}
 
 	private TonbotPluginArgs getPluginArgs(
-			String pluginClassName, 
-			String prefix, 
+			String pluginClassName,
+			String prefix,
 			IDiscordClient discordClient,
 			BotUtils botUtils,
 			Color color) {

@@ -25,6 +25,25 @@ class TonbotModule extends AbstractModule {
 	private final Map<String, String> aliasToCanonicalRoutes;
 	private final Color color;
 
+	/**
+	 * Constructor.
+	 * 
+	 * @param botUserToken
+	 *            The Discord bot token. Non-null.
+	 * @param prefix
+	 *            The message prefix. Messages sent with this prefix to a channel
+	 *            that Tonbot can read will be sent to the {@link EventDispatcher}.
+	 *            Non-null.
+	 * @param pluginFqns
+	 *            A list of fully qualified plugin class names to be loaded.
+	 *            Non-null.
+	 * @param configDir
+	 *            The configuration directory. Non-null.
+	 * @param aliasToCanonicalRoutes
+	 *            A map of command alias routes to canonical routes. Non-null.
+	 * @param color
+	 *            A color to be used by the plugins. Non-null.
+	 */
 	public TonbotModule(
 			String botUserToken,
 			String prefix,
@@ -46,7 +65,8 @@ class TonbotModule extends AbstractModule {
 		bind(String.class).annotatedWith(Prefix.class).toInstance(prefix);
 		bind(String.class).annotatedWith(ConfigDir.class).toInstance(configDir);
 		bind(BotUtils.class).to(BotUtilsImpl.class).in(Scopes.SINGLETON);
-		bind(new TypeLiteral<Map<String, String>>() {}).toInstance(aliasToCanonicalRoutes);
+		bind(new TypeLiteral<Map<String, String>>() {
+		}).toInstance(aliasToCanonicalRoutes);
 		bind(Color.class).toInstance(color);
 	}
 

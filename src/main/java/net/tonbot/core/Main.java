@@ -31,7 +31,10 @@ public class Main {
 		Path logsDirPath = Paths.get(configMgr.getConfigDirPath().toString(), LOGS_DIR_NAME);
 		LoggerConfigurator.configureLog4j(logsDirPath);
 
-		LOG.info("The config directory is: " + configMgr.getConfigDirPath());
+		LOG.info("Tonbot initializing...");
+
+		LOG.info("Reading config from {}", configMgr.getConfigDirPath().toString());
+		configMgr.initConfigDir();
 
 		Config config = configMgr.readConfig();
 
@@ -39,11 +42,11 @@ public class Main {
 
 		if (StringUtils.isBlank(botUserToken)) {
 			// An empty token is a sign that the bot isn't setup yet. In that case, return a
-			// friendly error message.
+			// friendly error message and then terminate normally.
 			LOG.error("Tonbot is not configured! Please edit the config.json at " + configMgr.getConfigDirPath());
-			System.exit(1);
+			System.exit(0);
 		}
-		
+
 		Tonbot bot = Guice.createInjector(
 				new TonbotModule(
 						botUserToken,

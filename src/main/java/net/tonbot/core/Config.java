@@ -53,7 +53,7 @@ class Config {
 
 		Preconditions.checkNotNull(aliases, "aliases must be non-null.");
 		this.aliases = ImmutableMap.copyOf(aliases);
-		
+
 		Preconditions.checkNotNull(rgb, "rgb must be non-null.");
 		this.color = parseColorRgb(rgb);
 	}
@@ -73,7 +73,7 @@ class Config {
 			if (r > 255 || g > 255 || b > 255) {
 				throw new IllegalArgumentException("Invalid color.");
 			}
-			
+
 			return new Color(r, g, b);
 		} catch (NumberFormatException e) {
 			throw new IllegalArgumentException("Invalid color.");
