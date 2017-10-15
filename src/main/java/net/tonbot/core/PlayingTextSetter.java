@@ -14,18 +14,17 @@ import sx.blah.discord.api.IDiscordClient;
 class PlayingTextSetter extends PeriodicTask {
 
 	private final String prefix;
+	private final IDiscordClient discordClient;
 
 	@Inject
 	public PlayingTextSetter(IDiscordClient discordClient, long periodMs, @Prefix String prefix) {
-		super(discordClient, periodMs);
-
+		super(periodMs);
+		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 	}
 
 	@Override
 	protected void performTask() {
-		IDiscordClient discordClient = this.getDiscordClient();
-
 		discordClient.changePlayingText("say: " + prefix + "help");
 	}
 }
