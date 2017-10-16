@@ -53,6 +53,24 @@ NOTE: At this time, I can't guarantee that future commits will be backwards comp
 ### Invite your instance of Tonbot into a server. 
 Go to ``https://discordapp.com/oauth2/authorize?client_id={YOUR BOT CLIENT ID HERE}&scope=bot&permissions=0``
 
+## Usage
+### Show Help
+The following command shows the available commands based on the plugins you have loaded.
+```
+t, help
+```
+
+You can get more information about a command by supplying some arguments. For example, to get more information about the ``t, music play`` command, say:
+
+```
+t, help music play
+```
+
+### Set up permissions
+Maybe you don't want everyone to be able to access all commands. You can set up permission controls right from the server. 
+
+TODO
+
 ## Concept
 Tonbot reacts to messages that:
 1. Start with the configured prefix
