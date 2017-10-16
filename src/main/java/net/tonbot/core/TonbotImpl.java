@@ -85,6 +85,9 @@ class TonbotImpl implements Tonbot {
 				.flatMap(Collection::stream)
 				.collect(Collectors.toSet());
 
+		InfoActivity infoActivity = new InfoActivity(discordClient, botUtils, color);
+		activities.add(infoActivity);
+
 		Aliases aliases = new Aliases(aliasToCanonicalRouteMap, activities);
 
 		HelpActivity helpActivity = new HelpActivity(botUtils, prefix, plugins, permissionManager, aliases);
