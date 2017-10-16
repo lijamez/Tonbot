@@ -14,6 +14,7 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
 import net.tonbot.common.BotUtils;
+import net.tonbot.common.PluginSetupException;
 import net.tonbot.common.TonbotPlugin;
 import net.tonbot.common.TonbotPluginArgs;
 import sx.blah.discord.api.IDiscordClient;
@@ -93,7 +94,17 @@ class PluginLoader {
 					TonbotPlugin plugin;
 					try {
 						plugin = constructor.newInstance(pluginArgs);
-					} catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+					} catch (InvocationTargetException e) {
+						Throwable cause = e.getCause();
+						if (cause instanceof PluginSetupException) {
+							LOG.warn("Plugin {} is not set up or is set up incorrectly.",
+									pluginClassName, cause);
+							return null;
+						} else {
+							LOG.warn("Unable to create an instance of plugin '{}'.", pluginClassName, e);
+							return null;
+						}
+					} catch (InstantiationException | IllegalAccessException e) {
 						LOG.warn("Unable to create an instance of plugin '{}'.", pluginClassName, e);
 						return null;
 					}
