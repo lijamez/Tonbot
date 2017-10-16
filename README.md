@@ -20,12 +20,12 @@ Plays text adventure games. Many games in Z-code format (except .z6) work.
 
 Looks up Movie and TV info from TMDb. (TMDb API Key Required)
 
-## [Time Info](https://github.com/lijamez/tonbot-plugin-time)
+### [Time Info](https://github.com/lijamez/tonbot-plugin-time)
 ``net.tonbot.plugin.time.TimePlugin``
 
 Gets time information from WolframAlpha. Use this to ask for time conversions, current time, etc. (WolframAlpha API Key Required)
 
-## [Decision Maker](https://github.com/lijamez/tonbot-plugin-decisionmaker)
+### [Decision Maker](https://github.com/lijamez/tonbot-plugin-decisionmaker)
 ``net.tonbot.plugin.decisionmaker.DecisionMakerPlugin``
 
 Flips coins, shuffles items, picks a random number. Only for the most important decisions.
