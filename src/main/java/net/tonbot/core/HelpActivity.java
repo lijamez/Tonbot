@@ -166,7 +166,7 @@ class HelpActivity implements Activity {
 				});
 
 		embedBuilder
-				.withFooterText("You can also say '" + prefix + " help <command>' to get more help for that command.");
+				.withFooterText("You can also say '" + prefix + "help <command>' to get more help for that command.");
 		botUtils.sendEmbed(channel, embedBuilder.build());
 	}
 }
