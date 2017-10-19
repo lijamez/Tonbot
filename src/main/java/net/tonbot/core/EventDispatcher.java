@@ -3,6 +3,7 @@ package net.tonbot.core;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -66,8 +67,10 @@ class EventDispatcher {
 		}
 
 		String messageWithoutPrefix = messageString.substring(prefix.length(), messageString.length()).trim();
-		List<String> tokens = Arrays.asList(messageWithoutPrefix.split(TOKENIZATION_DELIMITER));
-
+		List<String> tokens = Arrays.asList(messageWithoutPrefix.split(TOKENIZATION_DELIMITER)).stream()
+				.filter(token -> !StringUtils.isBlank(token))
+				.collect(Collectors.toList());
+		
 		if (tokens.isEmpty()) {
 			return;
 		}
