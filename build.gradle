@@ -56,7 +56,7 @@ dependencies {
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-pet', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-statistics', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-music', version: 'master-SNAPSHOT'
-	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-joke', version: 'master-SNAPSHOT'
+	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-jokes', version: 'master-SNAPSHOT'
 	
 
 	implementation group: 'com.github.austinv11', name: 'Discord4J', version: '2.9.1'
