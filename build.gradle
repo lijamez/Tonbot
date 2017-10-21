@@ -18,9 +18,7 @@ run {
 
     args project.findProperty('runArgs') ?: ''
     
-    applicationDefaultJvmArgs = [
-        "-Xmx1024m",
-        "-Xms1024m"]
+    applicationDefaultJvmArgs = []
 
     if (System.getProperty('debug', 'false') == 'true') {
         applicationDefaultJvmArgs += [
