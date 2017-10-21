@@ -24,7 +24,7 @@ class ConfigManager {
 
 	private static final String DEFAULT_CONFIG_DIR_NAME = ".tonbot";
 	private static final String CONFIG_FILE_NAME = "tonbot.config";
-	private static final String PLUGIN_CONFIG_DIR_NAME = "plugin_config";
+	private static final String PLUGIN_CONFIG_DIR_NAME = "plugins";
 
 	private static final String INITIAL_CONFIG_FILE_NAME = "initial_config.json";
 

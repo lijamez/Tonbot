@@ -70,7 +70,7 @@ class EventDispatcher {
 		List<String> tokens = Arrays.asList(messageWithoutPrefix.split(TOKENIZATION_DELIMITER)).stream()
 				.filter(token -> !StringUtils.isBlank(token))
 				.collect(Collectors.toList());
-		
+
 		if (tokens.isEmpty()) {
 			return;
 		}

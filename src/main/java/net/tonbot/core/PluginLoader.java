@@ -123,12 +123,14 @@ class PluginLoader {
 			BotUtils botUtils,
 			Color color) {
 
-		File configFile = new File(configDir + "/plugin_config/" + pluginClassName + ".config");
+		File configFile = new File(configDir + "/plugins/" + pluginClassName + "/config.json");
+		File pluginDataDir = new File(configDir + "/plugins/" + pluginClassName + "/data");
 
 		TonbotPluginArgs pluginArgs = TonbotPluginArgs.builder()
 				.discordClient(discordClient)
 				.prefix(prefix)
 				.configFile(configFile)
+				.pluginDataDir(pluginDataDir)
 				.botUtils(botUtils)
 				.color(color)
 				.build();
