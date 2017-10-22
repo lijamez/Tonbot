@@ -60,12 +60,13 @@ class InfoActivity implements Activity {
 		// System Vitals
 		eb.appendField("Number of Processors", RUNTIME.availableProcessors() + "", true);
 
+		long maxMiB = RUNTIME.maxMemory() / BYTES_IN_MIB;
 		long totalMiB = RUNTIME.totalMemory() / BYTES_IN_MIB;
 		long freeMiB = RUNTIME.freeMemory() / BYTES_IN_MIB;
 		long usedMiB = totalMiB - freeMiB;
 
-		String mem = String.format("%d MiB out of %d MiB (%.0f%%)", usedMiB, totalMiB,
-				(((double) usedMiB) / totalMiB) * 100);
+		String mem = String.format("%d MiB / %d MiB (%.0f%%)\n%d MiB Max", usedMiB, totalMiB,
+				(((double) usedMiB) / totalMiB) * 100, maxMiB);
 		eb.appendField("Memory Usage", mem, true);
 
 		// Discord Stats
