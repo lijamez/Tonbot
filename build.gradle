@@ -17,8 +17,10 @@ run {
     systemProperties System.getProperties()
 
     args project.findProperty('runArgs') ?: ''
-    
-    applicationDefaultJvmArgs = []
+	
+	// Additional JVM args can be passed via the "-DjvmArgs" argument to gradle.
+	// Example: ./gradlew run -DjvmArgs="-Xmx512m -Xms256m"
+	applicationDefaultJvmArgs += (System.getProperty('jvmArgs', ' ').split('\\s+') as List);
 
     if (System.getProperty('debug', 'false') == 'true') {
         applicationDefaultJvmArgs += [
