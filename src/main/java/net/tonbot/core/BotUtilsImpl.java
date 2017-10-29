@@ -1,5 +1,6 @@
 package net.tonbot.core;
 
+import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -65,6 +66,23 @@ class BotUtilsImpl implements BotUtils {
 				.setAsync(true)
 				.doAction(() -> {
 					channel.sendMessage(embedObj);
+					return true;
+				})
+				.execute();
+	}
+
+	@Override
+	public void sendEmbed(IChannel channel, EmbedObject embedObj, InputStream imageFileStream, String fileName) {
+		Preconditions.checkNotNull(channel, "channel must be non-null.");
+		Preconditions.checkNotNull(embedObj, "embedObj must be non-null.");
+		Preconditions.checkNotNull(imageFileStream, "imageFileStream must be non-null.");
+		Preconditions.checkNotNull(fileName, "fileName must be non-null.");
+
+		new RequestBuilder(discordClient)
+				.shouldBufferRequests(true)
+				.setAsync(true)
+				.doAction(() -> {
+					channel.sendFile(embedObj, imageFileStream, fileName);
 					return true;
 				})
 				.execute();
