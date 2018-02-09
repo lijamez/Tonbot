@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.api.client.util.Preconditions;
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
 import net.tonbot.common.ActivityDescriptor;
