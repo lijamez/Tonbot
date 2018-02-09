@@ -20,13 +20,16 @@ class DeleteRuleActivity implements Activity {
 			.build();
 
 	private final PermissionManager permissionManager;
+	private final RulesPrinter rulesPrinter;
 	private final BotUtils botUtils;
 
 	@Inject
 	public DeleteRuleActivity(
 			PermissionManager permissionManager,
+			RulesPrinter rulesPrinter,
 			BotUtils botUtils) {
 		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
+		this.rulesPrinter = Preconditions.checkNotNull(rulesPrinter, "rulesPrinter must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 	}
 
@@ -46,7 +49,12 @@ class DeleteRuleActivity implements Activity {
 			throw new TonbotBusinessException("The index is invalid.", e);
 		}
 
-		botUtils.sendMessage(event.getChannel(), "Rule was successfully removed.");
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("Rule was successfully removed.\n\n");
+		sb.append(rulesPrinter.getPrettyRulesOf(guild));
+		
+		botUtils.sendMessage(event.getChannel(), sb.toString());
 	}
 
 }

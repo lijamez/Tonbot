@@ -1,5 +1,7 @@
 package net.tonbot.core.permission;
 
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
@@ -20,6 +22,8 @@ import sx.blah.discord.util.MessageTokenizer.Token;
 
 class AddRuleActivity implements Activity {
 
+	private static final Pattern EVERYONE_PATTERN = Pattern.compile("@everyone");
+	
 	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
 			.route("permissions add")
 			.parameters(ImmutableList.of("index", "role", "allow/deny", "route path expression"))
@@ -27,15 +31,18 @@ class AddRuleActivity implements Activity {
 			.build();
 
 	private final PermissionManager permissionManager;
+	private final RulesPrinter rulesPrinter;
 	private final IDiscordClient discordClient;
 	private final BotUtils botUtils;
 
 	@Inject
 	public AddRuleActivity(
 			PermissionManager permissionManager,
+			RulesPrinter rulesPrinter,
 			IDiscordClient discordClient,
 			BotUtils botUtils) {
 		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
+		this.rulesPrinter = Preconditions.checkNotNull(rulesPrinter, "rulesPrinter must be non-null.");
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 	}
@@ -78,6 +85,9 @@ class AddRuleActivity implements Activity {
 				throw new TonbotBusinessException("Second argument must be a role mention.");
 			}
 			role = ((RoleMentionToken) maybeRoleToken).getMentionObject();
+		} else if (tokenizer.hasNextWord() && tokenizer.hasNextRegex(EVERYONE_PATTERN)) {
+			tokenizer.nextRegex(EVERYONE_PATTERN);
+			role = guild.getEveryoneRole();
 		} else {
 			throw new TonbotBusinessException("Missing role argument.");
 		}
@@ -116,8 +126,13 @@ class AddRuleActivity implements Activity {
 		} catch (IndexOutOfBoundsException e) {
 			throw new TonbotBusinessException("Index was not valid.");
 		}
-
-		botUtils.sendMessage(event.getChannel(), "Rule was added successfully.");
+		
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("Rule was successfully added.\n\n");
+		sb.append(rulesPrinter.getPrettyRulesOf(guild));
+		
+		botUtils.sendMessage(event.getChannel(), sb.toString());
 	}
 
 }
