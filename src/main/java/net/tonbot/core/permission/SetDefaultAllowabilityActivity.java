@@ -8,8 +8,8 @@ import com.google.inject.Inject;
 
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
+import net.tonbot.common.ActivityUsageException;
 import net.tonbot.common.BotUtils;
-import net.tonbot.common.TonbotBusinessException;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IGuild;
 
@@ -47,7 +47,7 @@ class SetDefaultAllowabilityActivity implements Activity {
 		} else if (StringUtils.equalsIgnoreCase(args, "deny")) {
 			defaultAllow = false;
 		} else {
-			throw new TonbotBusinessException("Argument must be 'allow' or 'deny'.");
+			throw new ActivityUsageException("Argument must be 'allow' or 'deny'.");
 		}
 
 		permissionManager.setDefaultAllowForGuild(guild, defaultAllow);

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
@@ -29,6 +28,7 @@ class HelpActivity implements Activity {
 			.route("help")
 			.build();
 
+	private final ActivityPrinter activityPrinter;
 	private final BotUtils botUtils;
 	private final String prefix;
 	private final List<TonbotPlugin> plugins;
@@ -36,11 +36,13 @@ class HelpActivity implements Activity {
 	private final Aliases aliases;
 
 	public HelpActivity(
+			ActivityPrinter activityPrinter,
 			BotUtils botUtils,
 			String prefix,
 			List<TonbotPlugin> plugins,
 			PermissionManager permissionManager,
 			Aliases aliases) {
+		this.activityPrinter = Preconditions.checkNotNull(activityPrinter, "activityPrinter must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		this.plugins = Preconditions.checkNotNull(plugins, "plugins must be non-null.");
@@ -141,20 +143,9 @@ class HelpActivity implements Activity {
 							.filter(activity -> permissionManager.checkAccessibility(activity, user, guild))
 							.map(Activity::getDescriptor)
 							.forEach(activity -> {
-								sb.append("``");
-								sb.append(prefix);
-								sb.append(StringUtils.join(activity.getRoute(), " "));
-								sb.append(" ");
-
-								List<String> formattedParams = activity.getParameters().stream()
-										.map(param -> "<" + param + ">")
-										.collect(Collectors.toList());
-
-								sb.append(StringUtils.join(formattedParams, " "));
-
-								sb.append("``");
-								sb.append("    ");
-								sb.append(activity.getDescription());
+								String basicUsage = activityPrinter.getBasicUsage(activity);
+								
+								sb.append(basicUsage);
 								sb.append("\n");
 							});
 

@@ -16,6 +16,7 @@ import lombok.Data;
 import lombok.NonNull;
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
+import net.tonbot.common.ActivityUsageException;
 import net.tonbot.common.BotUtils;
 import net.tonbot.common.Route;
 import net.tonbot.common.TonbotBusinessException;
@@ -41,16 +42,19 @@ class EventDispatcher {
 	private final Set<Activity> activities;
 	private final Aliases aliases;
 	private final PermissionManager permissionManager;
+	private final ActivityPrinter activityPrinter;
 
 	public EventDispatcher(
 			BotUtils botUtils,
 			String prefix,
 			Set<Activity> activities,
 			Aliases aliases,
-			PermissionManager permissionManager) {
+			PermissionManager permissionManager,
+			ActivityPrinter activityPrinter) {
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
+		this.activityPrinter = Preconditions.checkNotNull(activityPrinter, "activityPrinter must be non-null.");
 
 		Preconditions.checkNotNull(activities, "activities must be non-null.");
 		this.activities = ImmutableSet.copyOf(activities);
@@ -75,22 +79,22 @@ class EventDispatcher {
 			return;
 		}
 
-		ActivityMatch matchedActivity = matchActivity(tokens);
+		ActivityMatch activityMatch = matchActivity(tokens);
 
-		if (matchedActivity == null) {
+		if (activityMatch == null) {
 			return;
 		}
 
-		if (!permissionManager.checkAccessibility(matchedActivity.getMatchedActivity(), event.getAuthor(),
+		if (!permissionManager.checkAccessibility(activityMatch.getMatchedActivity(), event.getAuthor(),
 				event.getGuild())) {
 			LOG.debug("Activity '{}' was denied to user '{}' in guild '{}'",
-					matchedActivity.getMatchedActivity().getClass(),
+					activityMatch.getMatchedActivity().getClass(),
 					event.getAuthor(),
 					event.getGuild().getName());
 			return;
 		}
 
-		List<String> routePath = tokens.subList(0, matchedActivity.getMatchedRoute().getPath().size());
+		List<String> routePath = tokens.subList(0, activityMatch.getMatchedRoute().getPath().size());
 		int routeChars = (routePath.size() * TOKENIZATION_DELIMITER.length()) + routePath.stream()
 				.mapToInt(String::length)
 				.sum();
@@ -103,7 +107,18 @@ class EventDispatcher {
 		}
 
 		try {
-			matchedActivity.getMatchedActivity().enact(event, remainingMessage);
+			activityMatch.getMatchedActivity().enact(event, remainingMessage);
+		} catch (ActivityUsageException e) {
+			String usageMessage = new StringBuilder()
+				.append(e.getMessage())
+				.append("\n\n")
+				.append("Usage:\n")
+				.append(activityPrinter.getBasicUsage(
+						activityMatch.getMatchedRoute(), 
+						activityMatch.getMatchedActivity().getDescriptor()))
+				.toString();
+			
+			botUtils.sendMessage(event.getChannel(), usageMessage);
 		} catch (TonbotBusinessException e) {
 			botUtils.sendMessage(event.getChannel(), e.getMessage());
 		} catch (Exception e) {

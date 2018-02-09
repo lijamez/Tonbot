@@ -10,8 +10,8 @@ import com.google.inject.Inject;
 
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
+import net.tonbot.common.ActivityUsageException;
 import net.tonbot.common.BotUtils;
-import net.tonbot.common.TonbotBusinessException;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IGuild;
@@ -57,7 +57,7 @@ class AddRuleActivity implements Activity {
 		IGuild guild = event.getGuild();
 
 		if (StringUtils.isEmpty(args)) {
-			throw new TonbotBusinessException("No arguments present.");
+			throw new ActivityUsageException("No arguments present.");
 		}
 
 		MessageTokenizer tokenizer = new MessageTokenizer(discordClient, args);
@@ -68,13 +68,13 @@ class AddRuleActivity implements Activity {
 			try {
 				index = Integer.parseInt(indexToken.getContent()) - 1;
 				if (index < 0) {
-					throw new TonbotBusinessException("The index argument is not valid.");
+					throw new ActivityUsageException("The index argument is not valid.");
 				}
 			} catch (IllegalArgumentException e) {
-				throw new TonbotBusinessException("The index argument isn't an integer.");
+				throw new ActivityUsageException("The index argument isn't an integer.");
 			}
 		} else {
-			throw new TonbotBusinessException("Missing index argument.");
+			throw new ActivityUsageException("Missing index argument.");
 		}
 
 		// FIXME: This doesn't work if the role is not mentionable.
@@ -82,14 +82,14 @@ class AddRuleActivity implements Activity {
 		if (tokenizer.hasNextMention()) {
 			Token maybeRoleToken = tokenizer.nextMention();
 			if (!(maybeRoleToken instanceof RoleMentionToken)) {
-				throw new TonbotBusinessException("Second argument must be a role mention.");
+				throw new ActivityUsageException("Second argument must be a role mention.");
 			}
 			role = ((RoleMentionToken) maybeRoleToken).getMentionObject();
 		} else if (tokenizer.hasNextWord() && tokenizer.hasNextRegex(EVERYONE_PATTERN)) {
 			tokenizer.nextRegex(EVERYONE_PATTERN);
 			role = guild.getEveryoneRole();
 		} else {
-			throw new TonbotBusinessException("Missing role argument.");
+			throw new ActivityUsageException("Missing role argument.");
 		}
 
 		boolean allow;
@@ -101,10 +101,10 @@ class AddRuleActivity implements Activity {
 			} else if (StringUtils.equalsIgnoreCase(allowOrDenyToken.getContent(), "deny")) {
 				allow = false;
 			} else {
-				throw new TonbotBusinessException("The allow/deny argument must be the values 'allow' or 'deny'.");
+				throw new ActivityUsageException("The allow/deny argument must be the values 'allow' or 'deny'.");
 			}
 		} else {
-			throw new TonbotBusinessException("Missing allow/deny argument.");
+			throw new ActivityUsageException("Missing allow/deny argument.");
 		}
 
 		PathExpression routePathExp;
@@ -112,11 +112,11 @@ class AddRuleActivity implements Activity {
 			try {
 				routePathExp = new PathExpression(tokenizer.getRemainingContent());
 			} catch (MalformedPathExpressionException e) {
-				throw new TonbotBusinessException(e.getMessage(), e);
+				throw new ActivityUsageException(e.getMessage(), e);
 			}
 
 		} else {
-			throw new TonbotBusinessException("Command must not be empty.");
+			throw new ActivityUsageException("Command must not be empty.");
 		}
 
 		// Finally, we can create the rule.
@@ -124,7 +124,7 @@ class AddRuleActivity implements Activity {
 		try {
 			permissionManager.add(index, rule);
 		} catch (IndexOutOfBoundsException e) {
-			throw new TonbotBusinessException("Index was not valid.");
+			throw new ActivityUsageException("Index was not valid.");
 		}
 		
 		StringBuilder sb = new StringBuilder();
