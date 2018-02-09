@@ -52,13 +52,14 @@ class RulesPrinter {
 			sb.append("\n");
 		}
 
-		sb.append("\nIf none of the above rules match, then the user **");
+		sb.append("\nRules are evaluated from top to bottom. If none of the above rules match, then the user **");
 		if (permissionManager.getDefaultAllowForGuild(guild)) {
 			sb.append("WILL");
 		} else {
 			sb.append("WILL NOT");
 		}
-		sb.append("** be able to use the command.");
+		sb.append("** be able to use the command.\n");
+		sb.append("The server owner and users in an Administrator role can always use any commmand.");
 
 		String result = sb.toString();
 		
