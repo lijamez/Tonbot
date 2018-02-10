@@ -33,7 +33,6 @@ class ActivityPrinter {
 		sb.append("``");
 		sb.append(prefix);
 		sb.append(StringUtils.join(route, " "));
-		sb.append(" ");
 
 		List<String> formattedParams = activityDescriptor.getParameters().stream()
 				.map(param -> {
