@@ -19,7 +19,8 @@ class DeleteRuleActivity implements Activity {
 			.route("permissions delete")
 			.parameters(ImmutableList.of("index"))
 			.description("Deletes a rule for this server.")
-			.usageDescription("Use the ``permissions list`` command to see all the rules and then pick a rule to delete with ``permissions delete``.")
+			.usageDescription(
+					"Use the ``permissions list`` command to see all the rules and then pick a rule to delete with ``permissions delete``.")
 			.build();
 
 	private final PermissionManager permissionManager;
@@ -48,7 +49,7 @@ class DeleteRuleActivity implements Activity {
 		if (StringUtils.isBlank(args)) {
 			throw new ActivityUsageException("You need to specify an index.");
 		}
-		
+
 		try {
 			int index = Integer.parseInt(args) - 1;
 			permissionManager.remove(guild, index);
@@ -57,10 +58,10 @@ class DeleteRuleActivity implements Activity {
 		}
 
 		StringBuilder sb = new StringBuilder();
-		
+
 		sb.append("Rule was successfully removed.\n\n");
 		sb.append(rulesPrinter.getPrettyRulesOf(guild));
-		
+
 		botUtils.sendMessage(event.getChannel(), sb.toString());
 	}
 

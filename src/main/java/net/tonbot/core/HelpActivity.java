@@ -144,7 +144,7 @@ class HelpActivity implements Activity {
 							.map(Activity::getDescriptor)
 							.forEach(activity -> {
 								String basicUsage = activityPrinter.getBasicUsage(activity);
-								
+
 								sb.append(basicUsage);
 								sb.append("\n");
 							});

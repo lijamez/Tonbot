@@ -110,14 +110,14 @@ class EventDispatcher {
 			activityMatch.getMatchedActivity().enact(event, remainingMessage);
 		} catch (ActivityUsageException e) {
 			String usageMessage = new StringBuilder()
-				.append(e.getMessage())
-				.append("\n\n")
-				.append("Usage:\n")
-				.append(activityPrinter.getBasicUsage(
-						activityMatch.getMatchedRoute(), 
-						activityMatch.getMatchedActivity().getDescriptor()))
-				.toString();
-			
+					.append(e.getMessage())
+					.append("\n\n")
+					.append("Usage:\n")
+					.append(activityPrinter.getBasicUsage(
+							activityMatch.getMatchedRoute(),
+							activityMatch.getMatchedActivity().getDescriptor()))
+					.toString();
+
 			botUtils.sendMessage(event.getChannel(), usageMessage);
 		} catch (TonbotBusinessException e) {
 			botUtils.sendMessage(event.getChannel(), e.getMessage());

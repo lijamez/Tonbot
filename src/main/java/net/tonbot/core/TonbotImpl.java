@@ -93,7 +93,8 @@ class TonbotImpl implements Tonbot {
 
 		Aliases aliases = new Aliases(aliasToCanonicalRouteMap, activities);
 
-		HelpActivity helpActivity = new HelpActivity(activityPrinter, botUtils, prefix, plugins, permissionManager, aliases);
+		HelpActivity helpActivity = new HelpActivity(activityPrinter, botUtils, prefix, plugins, permissionManager,
+				aliases);
 		permissionManager.addPublicActivity(helpActivity);
 		activities.add(helpActivity);
 

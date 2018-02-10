@@ -23,7 +23,7 @@ import sx.blah.discord.util.MessageTokenizer.Token;
 class AddRuleActivity implements Activity {
 
 	private static final Pattern EVERYONE_PATTERN = Pattern.compile("@everyone");
-	
+
 	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
 			.route("permissions add")
 			.parameters(ImmutableList.of("index", "role", "allow/deny", "route path expression"))
@@ -126,12 +126,12 @@ class AddRuleActivity implements Activity {
 		} catch (IndexOutOfBoundsException e) {
 			throw new ActivityUsageException("Index was not valid.");
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
-		
+
 		sb.append("Rule was successfully added.\n\n");
 		sb.append(rulesPrinter.getPrettyRulesOf(guild));
-		
+
 		botUtils.sendMessage(event.getChannel(), sb.toString());
 	}
 

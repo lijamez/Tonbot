@@ -37,8 +37,8 @@ class PermissionsListActivity implements Activity {
 		IGuild guild = event.getGuild();
 
 		String prettyRules = rulesPrinter.getPrettyRulesOf(guild);
-		
+
 		botUtils.sendMessage(event.getChannel(), prettyRules);
-		
+
 	}
 }

@@ -14,12 +14,12 @@ import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 
 class RulesPrinter {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(RulesPrinter.class);
 
 	private final PermissionManager permissionManager;
 	private final IDiscordClient discordClient;
-	
+
 	@Inject
 	public RulesPrinter(
 			PermissionManager permissionManager,
@@ -27,17 +27,19 @@ class RulesPrinter {
 		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 	}
-	
+
 	/**
 	 * Prettily prints the rules of a given guild.
-	 * @param guild {@link IGuild}. Non-null.
+	 * 
+	 * @param guild
+	 *            {@link IGuild}. Non-null.
 	 * @return A pretty string describing the guild's rules.
 	 */
 	public String getPrettyRulesOf(IGuild guild) {
 		Preconditions.checkNotNull(guild, "guild must be non-null.");
-		
+
 		List<Rule> rules = permissionManager.getRulesForGuild(guild);
-		
+
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < rules.size(); i++) {
@@ -62,10 +64,10 @@ class RulesPrinter {
 		sb.append("The server owner and users in an Administrator role can always use any commmand.");
 
 		String result = sb.toString();
-		
+
 		return result;
 	}
-	
+
 	private String renderRoleRule(RoleRule roleRule) {
 		StringBuffer sb = new StringBuffer();
 
