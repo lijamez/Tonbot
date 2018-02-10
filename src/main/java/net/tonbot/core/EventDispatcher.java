@@ -106,8 +106,33 @@ class EventDispatcher {
 			remainingMessage = messageWithoutPrefix.substring(routeChars, messageWithoutPrefix.length());
 		}
 
+		LOG.info("Activity enacted by message.\n"
+				+ "Author: {} (ID {})\n"
+				+ "Guild: {} (ID {})\n"
+				+ "Message: {} (ID: {})\n"
+				+ "Matched Activity: {}",
+				event.getAuthor().getName(),
+				event.getAuthor().getLongID(),
+				event.getGuild().getName(),
+				event.getGuild().getLongID(),
+				event.getMessage().getContent(),
+				event.getMessage().getLongID(),
+				activityMatch.getMatchedActivity().getClass().getName());
+
+		enactActivity(activityMatch, event, remainingMessage);
+	}
+
+	private void enactActivity(ActivityMatch activityMatch, MessageReceivedEvent event, String args) {
+
+		long latency = Long.MIN_VALUE;
+
 		try {
-			activityMatch.getMatchedActivity().enact(event, remainingMessage);
+			long start = System.nanoTime();
+			try {
+				activityMatch.getMatchedActivity().enact(event, args);
+			} finally {
+				latency = System.nanoTime() - start;
+			}
 		} catch (ActivityUsageException e) {
 			String usageMessage = new StringBuilder()
 					.append(e.getMessage())
@@ -124,6 +149,10 @@ class EventDispatcher {
 		} catch (Exception e) {
 			botUtils.sendMessage(event.getChannel(), "Something bad happened. :confounded:");
 			LOG.error("Uncaught exception received from activity.", e);
+		} finally {
+			LOG.info("Activity {} latency: {} ms",
+					activityMatch.getMatchedActivity().getClass().getName(),
+					latency / 1_000_000);
 		}
 	}
 
