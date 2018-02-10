@@ -64,6 +64,12 @@ class EventDispatcher {
 
 	@EventSubscriber
 	public void onMessageReceived(MessageReceivedEvent event) {
+		
+		// Ignore bots
+		if (event.getAuthor().isBot()) {
+			return;
+		}
+		
 		String messageString = event.getMessage().getContent();
 
 		if (!StringUtils.startsWith(messageString, prefix)) {
