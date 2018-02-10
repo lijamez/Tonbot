@@ -50,9 +50,6 @@ class PathExpression {
 	}
 
 	private void validate(List<String> pathExp) {
-		if (pathExp.isEmpty()) {
-			throw new MalformedPathExpressionException("Path expression must contain at least one component.");
-		}
 
 		// All path components other than the last component must NOT be the double
 		// wildcard.
@@ -61,6 +58,10 @@ class PathExpression {
 
 			if (component == null) {
 				throw new MalformedPathExpressionException("Path expressions must not contain null components.");
+			}
+
+			if (StringUtils.isBlank(component)) {
+				throw new MalformedPathExpressionException("Path expressions must not contain blank components.");
 			}
 
 			if (i != pathExp.size() - 1 && StringUtils.equals(component, DOUBLE_WILDCARD)) {
@@ -89,6 +90,10 @@ class PathExpression {
 	 */
 	public boolean matches(List<String> path) {
 		Preconditions.checkNotNull(path, "path must be non-null.");
+
+		if (this.pathExp.isEmpty()) {
+			return path.isEmpty();
+		}
 
 		boolean doubleWildcarded = false;
 		List<String> effectivePathExp;

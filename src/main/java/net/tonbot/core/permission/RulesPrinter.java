@@ -71,8 +71,9 @@ class RulesPrinter {
 	private String renderRoleRule(RoleRule roleRule) {
 		StringBuffer sb = new StringBuffer();
 
-		String routeStr = StringUtils.join(roleRule.getPathExp(), " ");
-		sb.append("``").append(routeStr).append("`` **");
+		String routeStr = roleRule.getPathExp().toString();
+
+		sb.append("``").append(StringUtils.isEmpty(routeStr) ? "<empty>" : routeStr).append("`` **");
 		if (roleRule.isAllow()) {
 			sb.append("CAN");
 		} else {

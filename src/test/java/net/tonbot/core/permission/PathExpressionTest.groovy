@@ -15,9 +15,9 @@ class PathExpressionTest extends Specification {
 		pathExpression | _
 		"a ** b"       | _  
 		"** **"        | _
-		""             | _
 		["a", null]    | _
-		[]             | _
+		["a", ""]      | _
+		["a", "  "]    | _
 	}
 	
 	def "path expression matching"(String pathExpression, String testPath, boolean expectedMatch) {
@@ -61,6 +61,10 @@ class PathExpressionTest extends Specification {
 		"* bar **"   | "x bar"          || true
 		"* bar **"   | "x bar baz z"    || true
 		"* * **"     | "foo bar baz"    || true
+		// The empty path expression
+		""           | ""               || true
+		""           | "foo"            || false
+		""           | "foo bar"        || false
 	}
 	
 }

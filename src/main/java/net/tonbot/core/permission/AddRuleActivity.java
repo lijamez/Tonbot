@@ -116,7 +116,7 @@ class AddRuleActivity implements Activity {
 			}
 
 		} else {
-			throw new ActivityUsageException("Command must not be empty.");
+			routePathExp = new PathExpression("");
 		}
 
 		// Finally, we can create the rule.
