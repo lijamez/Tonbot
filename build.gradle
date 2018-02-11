@@ -51,7 +51,7 @@ dependencies {
 	// Tonbot Plugins
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-ifplayer', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-tmdb', version: 'master-SNAPSHOT'
-	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-time', version: 'master-SNAPSHOT'
+	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-wolframalpha', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-decisionmaker', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-pet', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-statistics', version: 'master-SNAPSHOT'
