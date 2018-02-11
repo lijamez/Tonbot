@@ -26,8 +26,24 @@ class AddRuleActivity implements Activity {
 
 	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
 			.route("permissions add")
-			.parameters(ImmutableList.of("index", "role", "allow/deny", "route path expression"))
+			.parameters(ImmutableList.of("<index>", "<role>", "<allow/deny>", "[route path expression]"))
 			.description("Add a rule for this server.")
+			.usageDescription(
+					"Adds a rule at the given ``index`` which allows or denies the ``role`` to use command(s) "
+							+ "that satisfy a ``route path expression``.\n\n"
+							+ "**Arguments**:\n\n"
+							+ "``index`` - The index to insert the rule at as shown by the ``permissions list`` command.\n"
+							+ "``role`` - A role mention.\n"
+							+ "``allow/deny`` - Must be either 'allow' or 'deny'\n"
+							+ "``route path expression`` - The command name or some expression to allow or deny for the given role. This route "
+							+ "must be the natural route, not an alias. A path expression may contain wildcards ``*`` or ``**``.\n\n"
+							+ "**Examples:**\n\n"
+							+ "```${absoluteReferencedRoute} 1 @somerole deny permissions **```\n"
+							+ "This would deny all users in ``@somerole`` from being able to use commands that *start with* ``permissions``\n\n"
+							+ "```${absoluteReferencedRoute} 1 @somerole allow help```\n"
+							+ "This would allow all users in ``@somerole`` to use the ``help`` command. "
+							+ "Note that this rule says nothing about whether if the role can access other commands that start with ``help``, "
+							+ "such as ``help foo bar``.\n")
 			.build();
 
 	private final PermissionManager permissionManager;
