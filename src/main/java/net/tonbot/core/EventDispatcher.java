@@ -64,12 +64,12 @@ class EventDispatcher {
 
 	@EventSubscriber
 	public void onMessageReceived(MessageReceivedEvent event) {
-		
+
 		// Ignore bots
 		if (event.getAuthor().isBot()) {
 			return;
 		}
-		
+
 		String messageString = event.getMessage().getContent();
 
 		if (!StringUtils.startsWith(messageString, prefix)) {
@@ -165,29 +165,20 @@ class EventDispatcher {
 	private ActivityMatch matchActivity(List<String> remainingTokens) {
 		// Find the activity to run. We will first match by the main route.
 		Route preliminaryRoute = Route.from(remainingTokens);
-		ActivityMatch matchedActivity = null;
-		for (Activity activity : activities) {
-			ActivityDescriptor descriptor = activity.getDescriptor();
 
-			Route route = descriptor.getRoute();
-			if (preliminaryRoute.isPrefixedBy(route)
-					&& (matchedActivity == null
-							|| matchedActivity.getMatchedRoute().getPath().size() < route.getPath().size())) {
-				matchedActivity = new ActivityMatch(activity, route);
-			}
-		}
+		// Route alias matching takes precedence of natrual route matching.
+		ActivityMatch matchedActivity = findBestActivityByRouteAlias(preliminaryRoute);
 
 		if (matchedActivity == null) {
-			// Since no activity was matched, we'll fall back matching via the route
-			// aliases.
-			matchedActivity = findBestActivityByRouteAlias(remainingTokens);
+			// Since no activity was matched, we'll fall back matching via the natural
+			// routes.
+			matchedActivity = findBestActivityByNaturalRoute(preliminaryRoute);
 		}
 
 		return matchedActivity;
 	}
 
-	private ActivityMatch findBestActivityByRouteAlias(List<String> remainingTokens) {
-		Route preliminaryRoute = Route.from(remainingTokens);
+	private ActivityMatch findBestActivityByRouteAlias(Route preliminaryRoute) {
 		ActivityMatch match = null;
 
 		for (Activity activity : aliases.getKnownActivities()) {
@@ -201,6 +192,23 @@ class EventDispatcher {
 		}
 
 		return match;
+	}
+
+	private ActivityMatch findBestActivityByNaturalRoute(Route preliminaryRoute) {
+		ActivityMatch matchedActivity = null;
+
+		for (Activity activity : activities) {
+			ActivityDescriptor descriptor = activity.getDescriptor();
+
+			Route route = descriptor.getRoute();
+			if (preliminaryRoute.isPrefixedBy(route)
+					&& (matchedActivity == null
+							|| matchedActivity.getMatchedRoute().getPath().size() < route.getPath().size())) {
+				matchedActivity = new ActivityMatch(activity, route);
+			}
+		}
+
+		return matchedActivity;
 	}
 
 	/**
