@@ -93,8 +93,14 @@ class TonbotImpl implements Tonbot {
 
 		Aliases aliases = new Aliases(aliasToCanonicalRouteMap, activities);
 
-		HelpActivity helpActivity = new HelpActivity(activityPrinter, botUtils, prefix, plugins, permissionManager,
-				aliases);
+		HelpActivity helpActivity = new HelpActivity(
+				activityPrinter,
+				botUtils,
+				prefix,
+				plugins,
+				permissionManager,
+				aliases,
+				color);
 		permissionManager.addPublicActivity(helpActivity);
 		activities.add(helpActivity);
 
@@ -104,8 +110,13 @@ class TonbotImpl implements Tonbot {
 
 		activities.forEach(a -> LOG.debug("Registered {}", a.getClass().getName()));
 
-		EventDispatcher eventDispatcher = new EventDispatcher(botUtils, prefix, activities, aliases,
-				permissionManager, activityPrinter);
+		EventDispatcher eventDispatcher = new EventDispatcher(
+				botUtils,
+				prefix,
+				activities,
+				aliases,
+				permissionManager,
+				activityPrinter);
 
 		discordClient.getDispatcher().registerListener(eventDispatcher);
 

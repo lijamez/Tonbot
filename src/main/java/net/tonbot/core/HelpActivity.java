@@ -1,5 +1,6 @@
 package net.tonbot.core;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ class HelpActivity implements Activity {
 	private final List<TonbotPlugin> plugins;
 	private final PermissionManager permissionManager;
 	private final Aliases aliases;
+	private final Color color;
 
 	public HelpActivity(
 			ActivityPrinter activityPrinter,
@@ -41,13 +43,15 @@ class HelpActivity implements Activity {
 			String prefix,
 			List<TonbotPlugin> plugins,
 			PermissionManager permissionManager,
-			Aliases aliases) {
+			Aliases aliases,
+			Color color) {
 		this.activityPrinter = Preconditions.checkNotNull(activityPrinter, "activityPrinter must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		this.plugins = Preconditions.checkNotNull(plugins, "plugins must be non-null.");
 		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
 		this.aliases = Preconditions.checkNotNull(aliases, "aliases must be non-null.");
+		this.color = Preconditions.checkNotNull(color, "color must be non-null.");
 	}
 
 	@Override
@@ -133,6 +137,7 @@ class HelpActivity implements Activity {
 
 	private void printCommands(IUser user, IChannel channel, IGuild guild) {
 		EmbedBuilder embedBuilder = new EmbedBuilder();
+		embedBuilder.withColor(color);
 		embedBuilder.withDesc("Here's what I can do...");
 
 		plugins.stream()
