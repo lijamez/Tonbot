@@ -85,12 +85,19 @@ class TonbotModule extends AbstractModule {
 
 	@Provides
 	@Singleton
-	IDiscordClient discordClient() {
+	IDiscordClient discordClient(RejectedExecutionHandlerImpl rejectedExecHandler) {
+
+		// Creates what is basically a fixed thread pool with this number of threads.
+		int threadCount = Runtime.getRuntime().availableProcessors() * 4;
+
 		IDiscordClient discordClient = new ClientBuilder()
 				.withToken(botUserToken)
 				.withRecommendedShardCount()
 				.setMaxReconnectAttempts(100)
-				.setDaemon(true)
+				.withMinimumDispatchThreads(threadCount)
+				.withMaximumDispatchThreads(threadCount)
+				.withEventOverflowCapacity(20)
+				.withEventBackpressureHandler(rejectedExecHandler)
 				.build();
 
 		return discordClient;
