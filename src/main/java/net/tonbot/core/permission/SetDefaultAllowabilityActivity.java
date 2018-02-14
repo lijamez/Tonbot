@@ -1,15 +1,13 @@
 package net.tonbot.core.permission;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
-import net.tonbot.common.ActivityUsageException;
 import net.tonbot.common.BotUtils;
+import net.tonbot.common.Enactable;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IGuild;
 
@@ -37,23 +35,16 @@ class SetDefaultAllowabilityActivity implements Activity {
 		return ACTIVITY_DESCRIPTOR;
 	}
 
-	@Override
-	public void enact(MessageReceivedEvent event, String args) {
+	@Enactable
+	public void enact(MessageReceivedEvent event, SetDefaultAllowabilityRequest request) {
 		IGuild guild = event.getGuild();
 
-		boolean defaultAllow;
-		if (StringUtils.equalsIgnoreCase(args, "allow")) {
-			defaultAllow = true;
-		} else if (StringUtils.equalsIgnoreCase(args, "deny")) {
-			defaultAllow = false;
-		} else {
-			throw new ActivityUsageException("Argument must be 'allow' or 'deny'.");
-		}
+		boolean defaultAllow = request.getAllowability() == Allowability.ALLOW;
 
 		permissionManager.setDefaultAllowForGuild(guild, defaultAllow);
 
 		botUtils.sendMessage(event.getChannel(),
-				"The default allowability has been set to **" + (defaultAllow ? "ALLOW" : "DENY") + "**.");
+				"The default allowability has been set to **" + request.getAllowability() + "**.");
 	}
 
 }

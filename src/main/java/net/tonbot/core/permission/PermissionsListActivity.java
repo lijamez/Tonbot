@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
 import net.tonbot.common.BotUtils;
+import net.tonbot.common.Enactable;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
 import sx.blah.discord.handle.obj.IGuild;
 
@@ -32,13 +33,12 @@ class PermissionsListActivity implements Activity {
 		return ACTIVITY_DESCRIPTOR;
 	}
 
-	@Override
-	public void enact(MessageReceivedEvent event, String args) {
+	@Enactable
+	public void enact(MessageReceivedEvent event) {
 		IGuild guild = event.getGuild();
 
 		String prettyRules = rulesPrinter.getPrettyRulesOf(guild);
 
 		botUtils.sendMessage(event.getChannel(), prettyRules);
-
 	}
 }

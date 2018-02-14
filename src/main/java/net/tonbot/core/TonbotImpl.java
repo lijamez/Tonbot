@@ -22,6 +22,7 @@ import net.tonbot.common.TonbotPlugin;
 import net.tonbot.common.TonbotTechnicalFault;
 import net.tonbot.core.permission.PermissionManager;
 import net.tonbot.core.permission.PermissionPlugin;
+import net.tonbot.core.request.RequestMapper;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.util.DiscordException;
 
@@ -38,6 +39,7 @@ class TonbotImpl implements Tonbot {
 	private final Map<String, String> aliasToCanonicalRouteMap;
 	private final Color color;
 	private final ActivityPrinter activityPrinter;
+	private final RequestMapper requestMapper;
 
 	private List<TonbotPlugin> plugins;
 
@@ -51,7 +53,8 @@ class TonbotImpl implements Tonbot {
 			final PlayingTextSetter playingTextSetter,
 			final Map<String, String> aliasToCanonicalRouteMap,
 			final Color color,
-			final ActivityPrinter activityPrinter) {
+			final ActivityPrinter activityPrinter,
+			final RequestMapper requestMapper) {
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		this.pluginLoader = Preconditions.checkNotNull(pluginLoader, "pluginLoader must be non-null.");
 		this.pluginFqns = Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
@@ -62,6 +65,7 @@ class TonbotImpl implements Tonbot {
 				"aliasToCanonicalRouteMap must be non-null.");
 		this.color = Preconditions.checkNotNull(color, "color must be non-null.");
 		this.activityPrinter = Preconditions.checkNotNull(activityPrinter, "activityPrinter must be non-null.");
+		this.requestMapper = Preconditions.checkNotNull(requestMapper, "requestMapper must be non-null.");
 	}
 
 	public void run() {
@@ -116,7 +120,8 @@ class TonbotImpl implements Tonbot {
 				activities,
 				aliases,
 				permissionManager,
-				activityPrinter);
+				activityPrinter,
+				requestMapper);
 
 		discordClient.getDispatcher().registerListener(eventDispatcher);
 

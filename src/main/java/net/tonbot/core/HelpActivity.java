@@ -14,6 +14,7 @@ import com.google.common.base.Preconditions;
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
 import net.tonbot.common.BotUtils;
+import net.tonbot.common.Enactable;
 import net.tonbot.common.Route;
 import net.tonbot.common.TonbotPlugin;
 import net.tonbot.core.permission.PermissionManager;
@@ -59,12 +60,12 @@ class HelpActivity implements Activity {
 		return ACTIVITY_DESCRIPTOR;
 	}
 
-	@Override
-	public void enact(MessageReceivedEvent event, String args) {
-		if (StringUtils.isBlank(args)) {
+	@Enactable
+	public void enact(MessageReceivedEvent event, HelpRequest request) {
+		if (StringUtils.isBlank(request.getRoute())) {
 			printCommands(event.getAuthor(), event.getChannel(), event.getGuild());
 		} else {
-			printCommandHelp(event.getAuthor(), event.getChannel(), event.getGuild(), args);
+			printCommandHelp(event.getAuthor(), event.getChannel(), event.getGuild(), request.getRoute());
 		}
 	}
 

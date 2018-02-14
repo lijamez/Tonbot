@@ -13,6 +13,7 @@ import com.google.inject.TypeLiteral;
 
 import net.tonbot.common.BotUtils;
 import net.tonbot.common.Prefix;
+import net.tonbot.core.request.parsing.ParserModule;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 
@@ -68,6 +69,8 @@ class TonbotModule extends AbstractModule {
 		bind(new TypeLiteral<Map<String, String>>() {
 		}).toInstance(aliasToCanonicalRoutes);
 		bind(Color.class).toInstance(color);
+
+		install(new ParserModule());
 	}
 
 	@Provides
