@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
 import lombok.Data;
+import net.tonbot.common.Param;
 import net.tonbot.core.request.parsing.LineParser;
 import net.tonbot.core.request.parsing.ParseException;
 
@@ -87,7 +89,18 @@ public class RequestMapper {
 				Object parsedValue = parsedValues.get(i);
 
 				if (parsedValue == null && !pi.isNullable()) {
-					throw new RequestMappingException("Parameter '" + pi.getParam().name() + "' is required.");
+					StringBuilder sb = new StringBuilder();
+					sb.append("Missing argument ``")
+						.append(pi.getParam().name())
+						.append("``");
+					
+					if (!StringUtils.isBlank(pi.getParam().description())) {
+						sb.append(": ")
+							.append(pi.getParam().description());
+					} else {
+						sb.append(".");
+					}
+					throw new RequestMappingException(sb.toString());
 				}
 
 				try {

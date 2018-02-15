@@ -3,7 +3,7 @@ package net.tonbot.core;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import net.tonbot.core.request.Param;
+import net.tonbot.common.Param;
 
 @ToString
 @EqualsAndHashCode
