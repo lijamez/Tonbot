@@ -7,9 +7,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
@@ -17,11 +14,10 @@ import net.tonbot.common.BotUtils;
 import net.tonbot.common.PluginSetupException;
 import net.tonbot.common.TonbotPlugin;
 import net.tonbot.common.TonbotPluginArgs;
+import net.tonbot.common.TonbotTechnicalFault;
 import sx.blah.discord.api.IDiscordClient;
 
 class PluginLoader {
-
-	private static final Logger LOG = LoggerFactory.getLogger(PluginLoader.class);
 
 	private final String configDir;
 
@@ -32,21 +28,19 @@ class PluginLoader {
 
 	/**
 	 * Instantiates plugins based on the fully qualified names of their
-	 * {@link TonbotPlugin}. Names of factories that do not exist in the classpath
-	 * will be ignored. Any factories that return a null {@link PluginResources}
-	 * will be ignored.
+	 * {@link TonbotPlugin}.
 	 *
 	 * @param pluginFqns
-	 *            List of fully qualified {@link TonbotPlugin} class names.
+	 *            List of fully qualified {@link TonbotPlugin} class names. Non-null.
 	 * @param prefix
 	 *            The prefix. Non-null.
 	 * @param discordClient
 	 *            The discord client. Non-null.
 	 * @param botUtils
 	 *            {@link BotUtils}. Non-null.
-	 * @return A list of {@link PluginResources}s.
+	 * @return A list of {@link TonbotPlugin}s.
+	 * @throws TonbotTechnicalFault if a plugin could not be instantiated.
 	 */
-	@SuppressWarnings("unchecked")
 	public List<TonbotPlugin> instantiatePlugins(
 			List<String> pluginFqns,
 			String prefix,
@@ -62,58 +56,74 @@ class PluginLoader {
 
 		return pluginFqns.stream()
 				.map(String::trim)
-				.map(pluginClassName -> {
-					Class<?> pluginClass;
-					try {
-						pluginClass = Class.forName(pluginClassName);
-					} catch (ClassNotFoundException e) {
-						LOG.warn("Plugin '{}' could not be loaded because it was not found on the classpath.",
-								pluginClassName);
-						return null;
-					}
-
-					if (!TonbotPlugin.class.isAssignableFrom(pluginClass)) {
-						LOG.warn("PluginResources '{}' could not be loaded because it is not a TonbotPlugin.",
-								pluginClass);
-						return null;
-					}
-
-					Constructor<TonbotPlugin> constructor;
-					try {
-						constructor = (Constructor<TonbotPlugin>) pluginClass.getConstructor(TonbotPluginArgs.class);
-					} catch (NoSuchMethodException e) {
-						LOG.warn(
-								"Plugin '{}' is not valid. It must have a single argument constuctor that accepts a TonbotPluginArgs.",
-								pluginClassName);
-						return null;
-					}
-
-					TonbotPluginArgs pluginArgs = getPluginArgs(pluginClassName, prefix, discordClient, botUtils,
-							color);
-
-					TonbotPlugin plugin;
-					try {
-						plugin = constructor.newInstance(pluginArgs);
-					} catch (InvocationTargetException e) {
-						Throwable cause = e.getCause();
-						if (cause instanceof PluginSetupException) {
-							LOG.warn("Plugin {} is not set up or is set up incorrectly.",
-									pluginClassName, cause);
-							return null;
-						} else {
-							LOG.warn("Unable to create an instance of plugin '{}'.", pluginClassName, e);
-							return null;
-						}
-					} catch (InstantiationException | IllegalAccessException e) {
-						LOG.warn("Unable to create an instance of plugin '{}'.", pluginClassName, e);
-						return null;
-					}
-
-					LOG.info("Loaded plugin: {}", plugin.getClass().getName());
-					return plugin;
-				})
+				.map(pluginClassName -> instantiatePlugin(pluginClassName, prefix, discordClient, botUtils, color))
 				.filter(plugin -> plugin != null)
 				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Instantiates a plugin based on its fully qualified name. 
+	 *
+	 * @param pluginClassName
+	 *            The fully qualified {@link TonbotPlugin} class name. Non-null.
+	 * @param prefix
+	 *            The prefix. Non-null.
+	 * @param discordClient
+	 *            The discord client. Non-null.
+	 * @param botUtils
+	 *            {@link BotUtils}. Non-null.
+	 * @return The instantiated {@link TonbotPlugin}. Null if it failed.
+	 * @throws TonbotTechnicalFault if the plugin could not be instantiated.
+	 */
+	@SuppressWarnings("unchecked")
+	public TonbotPlugin instantiatePlugin(
+			String pluginClassName, 
+			String prefix,
+			IDiscordClient discordClient,
+			BotUtils botUtils,
+			Color color) {
+		Preconditions.checkNotNull(pluginClassName, "pluginClassName must be non-null.");
+		Preconditions.checkNotNull(prefix, "prefix must be non-null.");
+		Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
+		Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
+		Preconditions.checkNotNull(color, "color must be non-null.");
+		
+		Class<?> pluginClass;
+		try {
+			pluginClass = Class.forName(pluginClassName);
+		} catch (ClassNotFoundException e) {
+			throw new TonbotTechnicalFault("Plugin '" + pluginClassName + "' could not be loaded because it was not found on the classpath.", e);
+		}
+
+		if (!TonbotPlugin.class.isAssignableFrom(pluginClass)) {
+			throw new TonbotTechnicalFault("PluginResources '" + pluginClass + "' could not be loaded because it is not a TonbotPlugin.");
+		}
+
+		Constructor<TonbotPlugin> constructor;
+		try {
+			constructor = (Constructor<TonbotPlugin>) pluginClass.getConstructor(TonbotPluginArgs.class);
+		} catch (NoSuchMethodException e) {
+			throw new TonbotTechnicalFault("Plugin '" + pluginClassName + "' is not valid. It must have a single argument constuctor that accepts a TonbotPluginArgs.");
+		}
+
+		TonbotPluginArgs pluginArgs = getPluginArgs(pluginClassName, prefix, discordClient, botUtils,
+				color);
+
+		TonbotPlugin plugin;
+		try {
+			plugin = constructor.newInstance(pluginArgs);
+		} catch (InvocationTargetException e) {
+			Throwable cause = e.getCause();
+			if (cause instanceof PluginSetupException) {
+				throw new TonbotTechnicalFault("Plugin '" + pluginClassName + "' is not set up or is set up incorrectly.", cause);
+			} else {
+				throw new TonbotTechnicalFault("Unable to create an instance of plugin '" + pluginClassName + "'.", cause);
+			}
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new TonbotTechnicalFault("Unable to create an instance of plugin '" + pluginClassName + "'.", e);
+		}
+
+		return plugin;
 	}
 
 	private TonbotPluginArgs getPluginArgs(

@@ -5,10 +5,12 @@ import java.awt.Color;
 import org.apache.commons.lang3.SystemUtils;
 
 import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
 
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
 import net.tonbot.common.BotUtils;
+import net.tonbot.common.Enactable;
 import sx.blah.discord.Discord4J;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
@@ -28,6 +30,7 @@ class InfoActivity implements Activity {
 	private final BotUtils botUtils;
 	private final Color color;
 
+	@Inject
 	public InfoActivity(
 			IDiscordClient discordClient,
 			BotUtils botUtils,
@@ -42,8 +45,8 @@ class InfoActivity implements Activity {
 		return ACTIVITY_DESCRIPTOR;
 	}
 
-	@Override
-	public void enact(MessageReceivedEvent event, String args) {
+	@Enactable
+	public void enact(MessageReceivedEvent event) {
 		EmbedBuilder eb = new EmbedBuilder();
 
 		eb.withTitle("Tonbot");

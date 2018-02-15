@@ -1,23 +1,40 @@
 package net.tonbot.core;
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 
+import net.tonbot.common.Activity;
 import net.tonbot.common.BotUtils;
 import net.tonbot.common.Prefix;
+import net.tonbot.common.TonbotPlugin;
+import net.tonbot.core.permission.PermissionManager;
+import net.tonbot.core.permission.PermissionPlugin;
+import net.tonbot.core.request.parsing.ParserModule;
 import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 
 class TonbotModule extends AbstractModule {
-
+	
+	private static final Logger LOG = LoggerFactory.getLogger(TonbotModule.class);
+	
 	private final String botUserToken;
 	private final String prefix;
 	private final List<String> pluginFqns;
@@ -68,6 +85,9 @@ class TonbotModule extends AbstractModule {
 		bind(new TypeLiteral<Map<String, String>>() {
 		}).toInstance(aliasToCanonicalRoutes);
 		bind(Color.class).toInstance(color);
+		bind(Aliases.class).to(AliasesImpl.class).in(Scopes.SINGLETON);
+
+		install(new ParserModule());
 	}
 
 	@Provides
@@ -101,5 +121,101 @@ class TonbotModule extends AbstractModule {
 				.build();
 
 		return discordClient;
+	}
+
+	@Provides
+	@Singleton
+	PermissionPlugin permissionPlugin(PluginLoader pluginLoader, IDiscordClient discordClient, BotUtils botUtils) {
+
+		PermissionPlugin permissionPlugin = (PermissionPlugin) pluginLoader.instantiatePlugin(
+				PermissionPlugin.class.getName(), prefix, discordClient, botUtils, color);
+
+		return permissionPlugin;
+	}
+
+	@Provides
+	@Singleton
+	PermissionManager permissionManager(PermissionPlugin permissionPlugin) {
+		return permissionPlugin.getPermissionManager();
+	}
+
+	@Provides
+	@Singleton
+	List<TonbotPlugin> plugins(
+			PluginLoader pluginLoader, 
+			IDiscordClient discordClient, 
+			BotUtils botUtils,
+			PermissionPlugin permissionPlugin) {
+
+		List<TonbotPlugin> plugins = ImmutableList.<TonbotPlugin>builder()
+			.add(permissionPlugin)
+			.addAll(pluginLoader.instantiatePlugins(
+					pluginFqns, 
+					prefix, 
+					discordClient, 
+					botUtils,
+					color))
+			.build();
+
+		List<String> pluginNames = plugins.stream()
+				.map(p -> p.getClass().getName())
+				.collect(Collectors.toList());
+		LOG.info("Loaded {} plugins:\n{}", plugins.size(), StringUtils.join(pluginNames, "\n"));
+
+		return plugins;
+	}
+
+	@Provides
+	@Singleton
+	Set<Activity> activities(
+			ActivityPrinter activityPrinter,
+			BotUtils botUtils,
+			String prefix,
+			List<TonbotPlugin> plugins,
+			PermissionManager permissionManager,
+			Provider<Aliases> aliasesProvider,
+			Color color,
+			InfoActivity infoActivity,
+			HelpActivity helpActivity) {
+		
+		Set<Activity> activities = plugins.stream()
+				.map(TonbotPlugin::getActivities)
+				.flatMap(Collection::stream)
+				.collect(Collectors.toSet());
+		
+		activities.add(infoActivity);
+		activities.add(helpActivity);
+
+		List<String> activityNames = activities.stream()
+				.map(p -> p.getClass().getName())
+				.collect(Collectors.toList());
+		LOG.info("Loaded {} activities:\n{}", activities.size(), StringUtils.join(activityNames, "\n"));
+		
+		return ImmutableSet.copyOf(activities);
+	}
+	
+	@Provides
+	@Singleton
+	HelpActivity helpActivity(
+			ActivityPrinter activityPrinter,
+			BotUtils botUtils,
+			String prefix,
+			List<TonbotPlugin> plugins,
+			PermissionManager permissionManager,
+			Provider<Aliases> aliasesProvider,
+			Color color) {
+
+		HelpActivity helpActivity = new HelpActivity(
+				activityPrinter,
+				botUtils,
+				prefix,
+				plugins,
+				permissionManager,
+				aliasesProvider,
+				color);
+
+		permissionManager.addPublicActivity(helpActivity);
+		
+		return helpActivity;
 	}
 }

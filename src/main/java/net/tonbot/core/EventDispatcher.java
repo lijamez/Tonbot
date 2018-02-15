@@ -1,28 +1,35 @@
 package net.tonbot.core;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
 
-import lombok.Data;
-import lombok.NonNull;
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
 import net.tonbot.common.ActivityUsageException;
 import net.tonbot.common.BotUtils;
+import net.tonbot.common.Enactable;
+import net.tonbot.common.Prefix;
 import net.tonbot.common.Route;
 import net.tonbot.common.TonbotBusinessException;
 import net.tonbot.core.permission.PermissionManager;
+import net.tonbot.core.request.Context;
+import net.tonbot.core.request.RequestMapper;
+import net.tonbot.core.request.RequestMappingException;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
+import sx.blah.discord.handle.obj.IChannel;
 
 /**
  * Responsible for dispatching actions based on a message event and contents. A
@@ -39,27 +46,28 @@ class EventDispatcher {
 
 	private final BotUtils botUtils;
 	private final String prefix;
-	private final Set<Activity> activities;
-	private final Aliases aliases;
+
 	private final PermissionManager permissionManager;
 	private final ActivityPrinter activityPrinter;
+	private final RequestMapper requestMapper;
+	private final ActivityMatcher activityMatcher;
 
+	@Inject
 	public EventDispatcher(
 			BotUtils botUtils,
-			String prefix,
+			@Prefix String prefix,
 			Set<Activity> activities,
 			Aliases aliases,
 			PermissionManager permissionManager,
-			ActivityPrinter activityPrinter) {
+			ActivityPrinter activityPrinter,
+			RequestMapper requestMapper,
+			ActivityMatcher activityMatcher) {
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
 		this.activityPrinter = Preconditions.checkNotNull(activityPrinter, "activityPrinter must be non-null.");
-
-		Preconditions.checkNotNull(activities, "activities must be non-null.");
-		this.activities = ImmutableSet.copyOf(activities);
-
-		this.aliases = Preconditions.checkNotNull(aliases, "aliases must be non-null.");
+		this.requestMapper = Preconditions.checkNotNull(requestMapper, "requestMapper must be non-null.");
+		this.activityMatcher = Preconditions.checkNotNull(activityMatcher, "activityMatcher must be non-null.");
 	}
 
 	@EventSubscriber
@@ -85,7 +93,8 @@ class EventDispatcher {
 			return;
 		}
 
-		ActivityMatch activityMatch = matchActivity(tokens);
+		ActivityMatch activityMatch = activityMatcher.matchActivity(tokens)
+				.orElse(null);
 
 		if (activityMatch == null) {
 			return;
@@ -104,7 +113,8 @@ class EventDispatcher {
 		int routeChars = (routePath.size() * TOKENIZATION_DELIMITER.length()) + routePath.stream()
 				.mapToInt(String::length)
 				.sum();
-		// The part of the message that doesn't contain the prefix or route.
+		
+		// remainingMessage is the part of the message that doesn't contain the prefix or route.
 		String remainingMessage;
 		if (routeChars > messageWithoutPrefix.length()) {
 			remainingMessage = "";
@@ -130,26 +140,19 @@ class EventDispatcher {
 
 	private void enactActivity(ActivityMatch activityMatch, MessageReceivedEvent event, String args) {
 
-		long latency = Long.MIN_VALUE;
+		Long latency = Long.MIN_VALUE;
 
 		try {
 			long start = System.nanoTime();
 			try {
-				activityMatch.getMatchedActivity().enact(event, args);
+				Runnable runnable = getEnactableMethod(activityMatch.getMatchedActivity(), event, args);
+				runnable.run();
 			} finally {
 				latency = System.nanoTime() - start;
 			}
 		} catch (ActivityUsageException e) {
-			String usageMessage = new StringBuilder()
-					.append(e.getMessage())
-					.append("\n\n")
-					.append("Usage:\n")
-					.append(activityPrinter.getBasicUsage(
-							activityMatch.getMatchedRoute(),
-							activityMatch.getMatchedActivity().getDescriptor()))
-					.toString();
-
-			botUtils.sendMessage(event.getChannel(), usageMessage);
+			sendUsageMessage(e.getMessage(), activityMatch.getMatchedRoute(),
+					activityMatch.getMatchedActivity().getDescriptor(), event.getChannel());
 		} catch (TonbotBusinessException e) {
 			botUtils.sendMessage(event.getChannel(), e.getMessage());
 		} catch (Exception e) {
@@ -162,65 +165,96 @@ class EventDispatcher {
 		}
 	}
 
-	private ActivityMatch matchActivity(List<String> remainingTokens) {
-		// Find the activity to run. We will first match by the main route.
-		Route preliminaryRoute = Route.from(remainingTokens);
+	private Runnable getEnactableMethod(Activity activity, MessageReceivedEvent event, String args) {
 
-		// Route alias matching takes precedence of natrual route matching.
-		ActivityMatch matchedActivity = findBestActivityByRouteAlias(preliminaryRoute);
+		Runnable enactableMethod = getShinyEnactableMethod(activity, event, args);
 
-		if (matchedActivity == null) {
-			// Since no activity was matched, we'll fall back matching via the natural
-			// routes.
-			matchedActivity = findBestActivityByNaturalRoute(preliminaryRoute);
+		if (enactableMethod == null) {
+			return getLegacyEnactableMethod(activity, event, args);
+		} else {
+			return enactableMethod;
 		}
-
-		return matchedActivity;
 	}
 
-	private ActivityMatch findBestActivityByRouteAlias(Route preliminaryRoute) {
-		ActivityMatch match = null;
+	private Runnable getLegacyEnactableMethod(Activity activity, MessageReceivedEvent event, String args) {
+		LOG.info("Args: {}", args);
+		
+		return () -> {
+			activity.enact(event, args);
+		};
+	}
 
-		for (Activity activity : aliases.getKnownActivities()) {
-			List<Route> aliasesOfActivity = aliases.getAliasesOf(activity);
-			for (Route alias : aliasesOfActivity) {
-				if (preliminaryRoute.isPrefixedBy(alias)
-						&& (match == null || match.getMatchedRoute().getPath().size() < alias.getPath().size())) {
-					match = new ActivityMatch(activity, alias);
+	private Runnable getShinyEnactableMethod(Activity activity, MessageReceivedEvent event, String args) {
+
+		List<Method> enactableMethods = MethodUtils.getMethodsListWithAnnotation(activity.getClass(), Enactable.class);
+		if (enactableMethods.size() > 1) {
+			throw new IllegalStateException(
+					"Activity " + activity.getClass() + " must have at most 1 method with @Enactable annotation.");
+		}
+
+		if (enactableMethods.isEmpty()) {
+			return null;
+		}
+
+		Method enactableMethod = enactableMethods.get(0);
+		// Check that this method takes in two arguments: MessageReceivedEvent and some
+		// Object
+		Class<?>[] parameterTypes = enactableMethod.getParameterTypes();
+		if (parameterTypes.length < 1 || parameterTypes.length > 2) {
+			throw new IllegalStateException("Activity " + activity.getClass()
+					+ " method annotated with @Enactable must have 1 or 2 parameters. The first being a MessageReceivedEvent (required) and the second being any mappable object (if applicable).");
+		}
+
+		if (!(MessageReceivedEvent.class.isAssignableFrom(parameterTypes[0]))) {
+			throw new IllegalStateException("Activity " + activity.getClass()
+					+ " method annotated with @Enactable must have the first parameter be a MessageReceivedEvent.");
+		}
+
+		Object requestObj;
+
+		if (parameterTypes.length == 2) {
+			Context context = new Context(event.getGuild());
+			Class<?> requestType = parameterTypes[1];
+
+			try {
+				requestObj = requestMapper.map(args, requestType, context);
+				LOG.info("Request: {}", requestObj);
+			} catch (RequestMappingException e) {
+				throw new ActivityUsageException(e.getMessage(), e);
+			}
+
+		} else {
+			requestObj = null;
+		}
+
+		enactableMethod.setAccessible(true);
+
+		return () -> {
+			try {
+				if (requestObj == null) {
+					enactableMethod.invoke(activity, event);
+				} else {
+					enactableMethod.invoke(activity, event, requestObj);
 				}
-			}
-		}
 
-		return match;
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				throw new RuntimeException(
+						"Unable to invoke Enactable method " + enactableMethod + " of class " + activity.getClass(),
+						e);
+			}
+		};
 	}
 
-	private ActivityMatch findBestActivityByNaturalRoute(Route preliminaryRoute) {
-		ActivityMatch matchedActivity = null;
+	private void sendUsageMessage(String errorMessage, Route route, ActivityDescriptor descriptor, IChannel channel) {
+		String usageMessage = new StringBuilder()
+				.append(errorMessage)
+				.append("\n\n")
+				.append("Usage:\n")
+				.append(activityPrinter.getBasicUsage(
+						route,
+						descriptor))
+				.toString();
 
-		for (Activity activity : activities) {
-			ActivityDescriptor descriptor = activity.getDescriptor();
-
-			Route route = descriptor.getRoute();
-			if (preliminaryRoute.isPrefixedBy(route)
-					&& (matchedActivity == null
-							|| matchedActivity.getMatchedRoute().getPath().size() < route.getPath().size())) {
-				matchedActivity = new ActivityMatch(activity, route);
-			}
-		}
-
-		return matchedActivity;
-	}
-
-	/**
-	 * Object which represents a matched activity. The matchedRoute may be the
-	 * canonical route or an alias.
-	 */
-	@Data
-	private static class ActivityMatch {
-		@NonNull
-		private final Activity matchedActivity;
-
-		@NonNull
-		private final Route matchedRoute;
+		botUtils.sendMessage(channel, usageMessage);
 	}
 }
