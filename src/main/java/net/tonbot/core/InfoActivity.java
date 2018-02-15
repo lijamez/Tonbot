@@ -5,6 +5,7 @@ import java.awt.Color;
 import org.apache.commons.lang3.SystemUtils;
 
 import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
 
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
@@ -29,6 +30,7 @@ class InfoActivity implements Activity {
 	private final BotUtils botUtils;
 	private final Color color;
 
+	@Inject
 	public InfoActivity(
 			IDiscordClient discordClient,
 			BotUtils botUtils,

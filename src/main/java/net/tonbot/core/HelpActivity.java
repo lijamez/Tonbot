@@ -10,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
 
 import com.google.common.base.Preconditions;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
@@ -35,16 +37,17 @@ class HelpActivity implements Activity {
 	private final String prefix;
 	private final List<TonbotPlugin> plugins;
 	private final PermissionManager permissionManager;
-	private final Aliases aliases;
+	private final Provider<Aliases> aliases;
 	private final Color color;
 
+	@Inject
 	public HelpActivity(
 			ActivityPrinter activityPrinter,
 			BotUtils botUtils,
 			String prefix,
 			List<TonbotPlugin> plugins,
 			PermissionManager permissionManager,
-			Aliases aliases,
+			Provider<Aliases> aliases,
 			Color color) {
 		this.activityPrinter = Preconditions.checkNotNull(activityPrinter, "activityPrinter must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
@@ -87,7 +90,7 @@ class HelpActivity implements Activity {
 		if (activity == null) {
 			// TODO: It's possible to get usage descriptions for activities from hidden
 			// plugins and have an alias.
-			activity = aliases.getActivityAliasedBy(referencedRoute).orElse(null);
+			activity = aliases.get().getActivityAliasedBy(referencedRoute).orElse(null);
 		}
 
 		if (activity != null && permissionManager.checkAccessibility(activity, user, guild)) {
@@ -98,7 +101,7 @@ class HelpActivity implements Activity {
 					.append("``\n\n");
 
 			// Display route aliases, if at least one exists
-			List<Route> routeAliases = aliases.getAliasesOf(activity);
+			List<Route> routeAliases = aliases.get().getAliasesOf(activity);
 			if (!routeAliases.isEmpty()) {
 				sb.append("**Aliases:**\n");
 				routeAliases.forEach(alias -> {

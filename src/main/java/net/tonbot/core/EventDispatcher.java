@@ -13,15 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
 
-import lombok.Data;
-import lombok.NonNull;
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
 import net.tonbot.common.ActivityUsageException;
 import net.tonbot.common.BotUtils;
 import net.tonbot.common.Enactable;
+import net.tonbot.common.Prefix;
 import net.tonbot.common.Route;
 import net.tonbot.common.TonbotBusinessException;
 import net.tonbot.core.permission.PermissionManager;
@@ -47,30 +46,28 @@ class EventDispatcher {
 
 	private final BotUtils botUtils;
 	private final String prefix;
-	private final Set<Activity> activities;
-	private final Aliases aliases;
+
 	private final PermissionManager permissionManager;
 	private final ActivityPrinter activityPrinter;
 	private final RequestMapper requestMapper;
+	private final ActivityMatcher activityMatcher;
 
+	@Inject
 	public EventDispatcher(
 			BotUtils botUtils,
-			String prefix,
+			@Prefix String prefix,
 			Set<Activity> activities,
 			Aliases aliases,
 			PermissionManager permissionManager,
 			ActivityPrinter activityPrinter,
-			RequestMapper requestMapper) {
+			RequestMapper requestMapper,
+			ActivityMatcher activityMatcher) {
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
 		this.activityPrinter = Preconditions.checkNotNull(activityPrinter, "activityPrinter must be non-null.");
 		this.requestMapper = Preconditions.checkNotNull(requestMapper, "requestMapper must be non-null.");
-
-		Preconditions.checkNotNull(activities, "activities must be non-null.");
-		this.activities = ImmutableSet.copyOf(activities);
-
-		this.aliases = Preconditions.checkNotNull(aliases, "aliases must be non-null.");
+		this.activityMatcher = Preconditions.checkNotNull(activityMatcher, "activityMatcher must be non-null.");
 	}
 
 	@EventSubscriber
@@ -96,7 +93,8 @@ class EventDispatcher {
 			return;
 		}
 
-		ActivityMatch activityMatch = matchActivity(tokens);
+		ActivityMatch activityMatch = activityMatcher.matchActivity(tokens)
+				.orElse(null);
 
 		if (activityMatch == null) {
 			return;
@@ -115,7 +113,8 @@ class EventDispatcher {
 		int routeChars = (routePath.size() * TOKENIZATION_DELIMITER.length()) + routePath.stream()
 				.mapToInt(String::length)
 				.sum();
-		// The part of the message that doesn't contain the prefix or route.
+		
+		// remainingMessage is the part of the message that doesn't contain the prefix or route.
 		String remainingMessage;
 		if (routeChars > messageWithoutPrefix.length()) {
 			remainingMessage = "";
@@ -146,7 +145,7 @@ class EventDispatcher {
 		try {
 			long start = System.nanoTime();
 			try {
-				Runnable runnable = getEnactableMethod(activityMatch, event, args);
+				Runnable runnable = getEnactableMethod(activityMatch.getMatchedActivity(), event, args);
 				runnable.run();
 			} finally {
 				latency = System.nanoTime() - start;
@@ -166,27 +165,26 @@ class EventDispatcher {
 		}
 	}
 
-	private Runnable getEnactableMethod(ActivityMatch activityMatch, MessageReceivedEvent event, String args) {
+	private Runnable getEnactableMethod(Activity activity, MessageReceivedEvent event, String args) {
 
-		Runnable enactableMethod = getShinyEnactableMethod(activityMatch, event, args);
+		Runnable enactableMethod = getShinyEnactableMethod(activity, event, args);
 
 		if (enactableMethod == null) {
-			return getLegacyEnactableMethod(activityMatch, event, args);
+			return getLegacyEnactableMethod(activity, event, args);
 		} else {
 			return enactableMethod;
 		}
 	}
 
-	private Runnable getLegacyEnactableMethod(ActivityMatch activityMatch, MessageReceivedEvent event, String args) {
-		Activity activity = activityMatch.getMatchedActivity();
-
+	private Runnable getLegacyEnactableMethod(Activity activity, MessageReceivedEvent event, String args) {
+		LOG.info("Args: {}", args);
+		
 		return () -> {
 			activity.enact(event, args);
 		};
 	}
 
-	private Runnable getShinyEnactableMethod(ActivityMatch activityMatch, MessageReceivedEvent event, String args) {
-		Activity activity = activityMatch.getMatchedActivity();
+	private Runnable getShinyEnactableMethod(Activity activity, MessageReceivedEvent event, String args) {
 
 		List<Method> enactableMethods = MethodUtils.getMethodsListWithAnnotation(activity.getClass(), Enactable.class);
 		if (enactableMethods.size() > 1) {
@@ -220,6 +218,7 @@ class EventDispatcher {
 
 			try {
 				requestObj = requestMapper.map(args, requestType, context);
+				LOG.info("Request: {}", requestObj);
 			} catch (RequestMappingException e) {
 				throw new ActivityUsageException(e.getMessage(), e);
 			}
@@ -246,55 +245,6 @@ class EventDispatcher {
 		};
 	}
 
-	private ActivityMatch matchActivity(List<String> remainingTokens) {
-		// Find the activity to run. We will first match by the main route.
-		Route preliminaryRoute = Route.from(remainingTokens);
-
-		// Route alias matching takes precedence of natural route matching.
-		ActivityMatch matchedActivity = findBestActivityByRouteAlias(preliminaryRoute);
-
-		if (matchedActivity == null) {
-			// Since no activity was matched, we'll fall back matching via the natural
-			// routes.
-			matchedActivity = findBestActivityByNaturalRoute(preliminaryRoute);
-		}
-
-		return matchedActivity;
-	}
-
-	private ActivityMatch findBestActivityByRouteAlias(Route preliminaryRoute) {
-		ActivityMatch match = null;
-
-		for (Activity activity : aliases.getKnownActivities()) {
-			List<Route> aliasesOfActivity = aliases.getAliasesOf(activity);
-			for (Route alias : aliasesOfActivity) {
-				if (preliminaryRoute.isPrefixedBy(alias)
-						&& (match == null || match.getMatchedRoute().getPath().size() < alias.getPath().size())) {
-					match = new ActivityMatch(activity, alias);
-				}
-			}
-		}
-
-		return match;
-	}
-
-	private ActivityMatch findBestActivityByNaturalRoute(Route preliminaryRoute) {
-		ActivityMatch matchedActivity = null;
-
-		for (Activity activity : activities) {
-			ActivityDescriptor descriptor = activity.getDescriptor();
-
-			Route route = descriptor.getRoute();
-			if (preliminaryRoute.isPrefixedBy(route)
-					&& (matchedActivity == null
-							|| matchedActivity.getMatchedRoute().getPath().size() < route.getPath().size())) {
-				matchedActivity = new ActivityMatch(activity, route);
-			}
-		}
-
-		return matchedActivity;
-	}
-
 	private void sendUsageMessage(String errorMessage, Route route, ActivityDescriptor descriptor, IChannel channel) {
 		String usageMessage = new StringBuilder()
 				.append(errorMessage)
@@ -306,18 +256,5 @@ class EventDispatcher {
 				.toString();
 
 		botUtils.sendMessage(channel, usageMessage);
-	}
-
-	/**
-	 * Object which represents a matched activity. The matchedRoute may be the
-	 * canonical route or an alias.
-	 */
-	@Data
-	private static class ActivityMatch {
-		@NonNull
-		private final Activity matchedActivity;
-
-		@NonNull
-		private final Route matchedRoute;
 	}
 }
