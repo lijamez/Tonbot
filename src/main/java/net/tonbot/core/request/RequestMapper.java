@@ -57,7 +57,6 @@ public class RequestMapper {
 	 *             if the arguments couldn't be parsed according to the target's
 	 *             params.
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> T map(String args, Class<T> target, Context context) {
 		Preconditions.checkNotNull(args, "args must be non-null.");
 		Preconditions.checkNotNull(target, "target must be non-null.");
@@ -75,7 +74,7 @@ public class RequestMapper {
 			ParamInfo lastParamInfo = paramInfos.get(paramInfos.size() - 1);
 
 			List<Class<?>> argTypes = paramInfos.stream()
-					.map(pi -> pi.getType())
+					.map(pi -> (Class<?>) pi.getType())
 					.collect(Collectors.toList());
 
 			List<Object> parsedValues = lineParser.parse(
