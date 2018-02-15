@@ -75,7 +75,7 @@ public class RequestMapper {
 			ParamInfo lastParamInfo = paramInfos.get(paramInfos.size() - 1);
 
 			List<Class<?>> argTypes = paramInfos.stream()
-					.map(pi -> pi.getType())
+					.map(pi -> (Class<?>) pi.getType())
 					.collect(Collectors.toList());
 
 			List<Object> parsedValues = lineParser.parse(
