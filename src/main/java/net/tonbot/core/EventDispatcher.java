@@ -23,6 +23,7 @@ import net.tonbot.common.Enactable;
 import net.tonbot.common.Prefix;
 import net.tonbot.common.Route;
 import net.tonbot.common.TonbotBusinessException;
+import net.tonbot.common.TonbotException;
 import net.tonbot.core.permission.PermissionManager;
 import net.tonbot.core.request.Context;
 import net.tonbot.core.request.RequestMapper;
@@ -237,10 +238,19 @@ class EventDispatcher {
 					enactableMethod.invoke(activity, event, requestObj);
 				}
 
-			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			} catch (IllegalAccessException | IllegalArgumentException e) {
 				throw new RuntimeException(
 						"Unable to invoke Enactable method " + enactableMethod + " of class " + activity.getClass(),
 						e);
+			} catch (InvocationTargetException e) {
+				Throwable cause = e.getCause();
+				if (cause instanceof TonbotException) {
+					throw (TonbotException) cause;
+				} else {
+					throw new RuntimeException(
+							"Unable to invoke Enactable method " + enactableMethod + " of class " + activity.getClass(),
+							e);
+				}
 			}
 		};
 	}
