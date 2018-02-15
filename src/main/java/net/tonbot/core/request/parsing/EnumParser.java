@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.api.client.util.Preconditions;
+import com.google.common.base.Preconditions;
 
 import net.tonbot.core.request.Context;
 

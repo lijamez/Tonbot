@@ -3,7 +3,7 @@ package net.tonbot.core.request.parsing;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.api.client.util.Preconditions;
+import com.google.common.base.Preconditions;
 
 import net.tonbot.core.request.Context;
 
