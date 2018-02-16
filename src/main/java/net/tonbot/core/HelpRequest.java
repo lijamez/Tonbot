@@ -7,7 +7,7 @@ import net.tonbot.common.Param;
 
 @ToString
 @EqualsAndHashCode
-public class HelpRequest {
+class HelpRequest {
 
 	@Getter
 	@Param(name = "route", ordinal = 0, captureRemaining = true)

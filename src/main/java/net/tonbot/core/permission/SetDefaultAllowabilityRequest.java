@@ -9,7 +9,7 @@ import net.tonbot.common.Param;
 
 @ToString
 @EqualsAndHashCode
-public class SetDefaultAllowabilityRequest {
+class SetDefaultAllowabilityRequest {
 
 	@Getter
 	@Param(name = "allow/deny", ordinal = 0, description = "Must be 'allow' or 'deny'.")

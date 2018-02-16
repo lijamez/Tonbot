@@ -11,7 +11,7 @@ import net.tonbot.common.Param;
 
 @ToString
 @EqualsAndHashCode
-public class DeleteRuleRequest {
+class DeleteRuleRequest {
 
 	@Getter
 	private int displayIndex;

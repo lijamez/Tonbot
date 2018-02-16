@@ -12,7 +12,7 @@ import sx.blah.discord.handle.obj.IRole;
 
 @ToString
 @EqualsAndHashCode
-public class AddRuleRequest {
+class AddRuleRequest {
 
 	@Getter
 	private int displayIndex;
