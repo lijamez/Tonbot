@@ -1,5 +1,6 @@
 package net.tonbot.core.request;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class RequestMapper {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RequestMapper.class);
 
-	private final Map<Class<?>, List<ParamInfo>> cachedParamInfosMap = new ConcurrentHashMap<>();
+	private final Map<Class<?>, List<ParamInfo>> cachedParamInfos = new ConcurrentHashMap<>();
 	private final LineParser lineParser;
 
 	@Inject
@@ -66,7 +67,7 @@ public class RequestMapper {
 		List<ParamInfo> paramInfos = getAndCacheParamInfos(target);
 
 		try {
-			T targetObj = target.newInstance();
+			T targetObj = instantiate(target);
 
 			if (paramInfos.isEmpty()) {
 				return targetObj;
@@ -105,16 +106,44 @@ public class RequestMapper {
 
 			return targetObj;
 
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new IllegalArgumentException("Could not instantiate target class " + target
-					+ ". Make sure it is concrete and has a public zero-argument constructor.", e);
 		} catch (ParseException e) {
 			throw new RequestMappingException("Incorrect usage.", e);
 		}
 	}
 
+	/**
+	 * Instantiates the given class using its default constructor. Works even if the
+	 * constructor isn't normally accessible.
+	 * 
+	 * @param targetObjClass
+	 *            The class to instantiate.
+	 * @return The instantiated class.
+	 */
+	private <T> T instantiate(Class<T> targetObjClass) {
+
+		Constructor<T> zeroArgConstructor;
+		try {
+			zeroArgConstructor = targetObjClass.getDeclaredConstructor(new Class<?>[0]);
+		} catch (NoSuchMethodException e) {
+			throw new IllegalArgumentException(
+					"The class " + targetObjClass + " must have a zero-argument constructor.", e);
+		}
+
+		zeroArgConstructor.setAccessible(true);
+
+		T targetObj;
+		try {
+			targetObj = zeroArgConstructor.newInstance();
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			throw new IllegalStateException(
+					"An error occurred during construction of the class " + targetObjClass + ".", e);
+		}
+
+		return targetObj;
+	}
+
 	private List<ParamInfo> getAndCacheParamInfos(Class<?> target) {
-		return cachedParamInfosMap.computeIfAbsent(target, t -> {
+		return cachedParamInfos.computeIfAbsent(target, t -> {
 			List<ParamInfo> paramInfos = extractParamInfos(t);
 			paramInfos = validate(paramInfos);
 
@@ -123,10 +152,12 @@ public class RequestMapper {
 	}
 
 	/**
-	 * Checks that ParamInfos go contiguously from 0 to paramInfos.size() - 1
-	 * 
-	 * Param where captureRemaining == true is only on the last param and that Param
-	 * must be on a {@link CharSequence}.
+	 * Checks that:
+	 * <ul>
+	 * <li>ParamInfos go contiguously from 0 to {@code paramInfos.size() - 1}</li>
+	 * <li>Param where captureRemaining == true is only on the last param and that
+	 * Param must be on a {@link CharSequence}.</li>
+	 * </ul>
 	 * 
 	 * @param paramInfos
 	 *            The list of {@link ParamInfos} to validate.
@@ -148,12 +179,14 @@ public class RequestMapper {
 			if (param.ordinal() != sortedParamInfos.size() - 1 && param.captureRemaining()
 					&& !CharSequence.class.isAssignableFrom(paramInfo.getType())) {
 				throw new IllegalArgumentException(
-						"captureRemaining must only be true on the @Param with the highest ordinal and must be on a String type");
+						"captureRemaining must only be true on the @Param with the highest ordinal and must be on a CharSequence type");
 			}
 
 			ParamInfo prevParamInfo = sortedParamInfos.set(param.ordinal(), paramInfo);
 			if (prevParamInfo != null) {
-				throw new IllegalArgumentException("Param indices duplication detected.");
+				throw new IllegalArgumentException(
+						"Param ordinals must be unique. There is at least 2 @Params with ordinal of "
+								+ param.ordinal());
 			}
 		}
 
@@ -212,6 +245,8 @@ public class RequestMapper {
 					Parameter methodParameter = method.getParameters()[0];
 					boolean nullable = methodParameter.getAnnotation(Nonnull.class) == null;
 
+					method.setAccessible(true);
+					
 					return new ParamInfo<>(paramAnnotation, methodParameter.getType(), (obj, val) -> {
 						try {
 							method.invoke(obj, val);
