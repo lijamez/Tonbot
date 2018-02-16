@@ -106,8 +106,7 @@ class ConfigManager {
 	 */
 	public Config readConfig() {
 		File configFile = new File(configDir.getAbsolutePath() + "/" + CONFIG_FILE_NAME);
-		Preconditions.checkState(configFile.exists(),
-				"config file doesn't exist at: " + configFile.getAbsolutePath());
+		Preconditions.checkState(configFile.exists(), "config file doesn't exist at: " + configFile.getAbsolutePath());
 
 		try {
 			Config config = objMapper.readValue(configFile, Config.class);

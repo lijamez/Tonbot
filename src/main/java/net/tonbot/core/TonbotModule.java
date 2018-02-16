@@ -32,9 +32,9 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 
 class TonbotModule extends AbstractModule {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(TonbotModule.class);
-	
+
 	private final String botUserToken;
 	private final String prefix;
 	private final List<String> pluginFqns;
@@ -61,13 +61,8 @@ class TonbotModule extends AbstractModule {
 	 * @param color
 	 *            A color to be used by the plugins. Non-null.
 	 */
-	public TonbotModule(
-			String botUserToken,
-			String prefix,
-			List<String> pluginFqns,
-			String configDir,
-			Map<String, String> aliasToCanonicalRoutes,
-			Color color) {
+	public TonbotModule(String botUserToken, String prefix, List<String> pluginFqns, String configDir,
+			Map<String, String> aliasToCanonicalRoutes, Color color) {
 		this.botUserToken = Preconditions.checkNotNull(botUserToken, "botUserToken must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		this.pluginFqns = Preconditions.checkNotNull(pluginFqns, "pluginFqns must be non-null.");
@@ -110,15 +105,10 @@ class TonbotModule extends AbstractModule {
 		// Creates what is basically a fixed thread pool with this number of threads.
 		int threadCount = Runtime.getRuntime().availableProcessors() * 4;
 
-		IDiscordClient discordClient = new ClientBuilder()
-				.withToken(botUserToken)
-				.withRecommendedShardCount()
-				.setMaxReconnectAttempts(100)
-				.withMinimumDispatchThreads(threadCount)
-				.withMaximumDispatchThreads(threadCount)
-				.withEventOverflowCapacity(20)
-				.withEventBackpressureHandler(rejectedExecHandler)
-				.build();
+		IDiscordClient discordClient = new ClientBuilder().withToken(botUserToken).withRecommendedShardCount()
+				.setMaxReconnectAttempts(100).withMinimumDispatchThreads(threadCount)
+				.withMaximumDispatchThreads(threadCount).withEventOverflowCapacity(20)
+				.withEventBackpressureHandler(rejectedExecHandler).build();
 
 		return discordClient;
 	}
@@ -127,8 +117,8 @@ class TonbotModule extends AbstractModule {
 	@Singleton
 	PermissionPlugin permissionPlugin(PluginLoader pluginLoader, IDiscordClient discordClient, BotUtils botUtils) {
 
-		PermissionPlugin permissionPlugin = (PermissionPlugin) pluginLoader.instantiatePlugin(
-				PermissionPlugin.class.getName(), prefix, discordClient, botUtils, color);
+		PermissionPlugin permissionPlugin = (PermissionPlugin) pluginLoader
+				.instantiatePlugin(PermissionPlugin.class.getName(), prefix, discordClient, botUtils, color);
 
 		return permissionPlugin;
 	}
@@ -141,25 +131,13 @@ class TonbotModule extends AbstractModule {
 
 	@Provides
 	@Singleton
-	List<TonbotPlugin> plugins(
-			PluginLoader pluginLoader, 
-			IDiscordClient discordClient, 
-			BotUtils botUtils,
+	List<TonbotPlugin> plugins(PluginLoader pluginLoader, IDiscordClient discordClient, BotUtils botUtils,
 			PermissionPlugin permissionPlugin) {
 
-		List<TonbotPlugin> plugins = ImmutableList.<TonbotPlugin>builder()
-			.add(permissionPlugin)
-			.addAll(pluginLoader.instantiatePlugins(
-					pluginFqns, 
-					prefix, 
-					discordClient, 
-					botUtils,
-					color))
-			.build();
+		List<TonbotPlugin> plugins = ImmutableList.<TonbotPlugin>builder().add(permissionPlugin)
+				.addAll(pluginLoader.instantiatePlugins(pluginFqns, prefix, discordClient, botUtils, color)).build();
 
-		List<String> pluginNames = plugins.stream()
-				.map(p -> p.getClass().getName())
-				.collect(Collectors.toList());
+		List<String> pluginNames = plugins.stream().map(p -> p.getClass().getName()).collect(Collectors.toList());
 		LOG.info("Loaded {} plugins:\n{}", plugins.size(), StringUtils.join(pluginNames, "\n"));
 
 		return plugins;
@@ -167,55 +145,33 @@ class TonbotModule extends AbstractModule {
 
 	@Provides
 	@Singleton
-	Set<Activity> activities(
-			ActivityPrinter activityPrinter,
-			BotUtils botUtils,
-			String prefix,
-			List<TonbotPlugin> plugins,
-			PermissionManager permissionManager,
-			Provider<Aliases> aliasesProvider,
-			Color color,
-			InfoActivity infoActivity,
-			HelpActivity helpActivity) {
-		
-		Set<Activity> activities = plugins.stream()
-				.map(TonbotPlugin::getActivities)
-				.flatMap(Collection::stream)
+	Set<Activity> activities(ActivityPrinter activityPrinter, BotUtils botUtils, String prefix,
+			List<TonbotPlugin> plugins, PermissionManager permissionManager, Provider<Aliases> aliasesProvider,
+			Color color, InfoActivity infoActivity, HelpActivity helpActivity) {
+
+		Set<Activity> activities = plugins.stream().map(TonbotPlugin::getActivities).flatMap(Collection::stream)
 				.collect(Collectors.toSet());
-		
+
 		activities.add(infoActivity);
 		activities.add(helpActivity);
 
-		List<String> activityNames = activities.stream()
-				.map(p -> p.getClass().getName())
-				.collect(Collectors.toList());
+		List<String> activityNames = activities.stream().map(p -> p.getClass().getName()).collect(Collectors.toList());
 		LOG.info("Loaded {} activities:\n{}", activities.size(), StringUtils.join(activityNames, "\n"));
-		
+
 		return ImmutableSet.copyOf(activities);
 	}
-	
+
 	@Provides
 	@Singleton
-	HelpActivity helpActivity(
-			ActivityPrinter activityPrinter,
-			BotUtils botUtils,
-			String prefix,
-			List<TonbotPlugin> plugins,
-			PermissionManager permissionManager,
-			Provider<Aliases> aliasesProvider,
+	HelpActivity helpActivity(ActivityPrinter activityPrinter, BotUtils botUtils, String prefix,
+			List<TonbotPlugin> plugins, PermissionManager permissionManager, Provider<Aliases> aliasesProvider,
 			Color color) {
 
-		HelpActivity helpActivity = new HelpActivity(
-				activityPrinter,
-				botUtils,
-				prefix,
-				plugins,
-				permissionManager,
-				aliasesProvider,
-				color);
+		HelpActivity helpActivity = new HelpActivity(activityPrinter, botUtils, prefix, plugins, permissionManager,
+				aliasesProvider, color);
 
 		permissionManager.addPublicActivity(helpActivity);
-		
+
 		return helpActivity;
 	}
 }

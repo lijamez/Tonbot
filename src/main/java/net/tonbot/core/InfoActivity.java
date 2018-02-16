@@ -18,10 +18,8 @@ import sx.blah.discord.util.EmbedBuilder;
 
 class InfoActivity implements Activity {
 
-	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
-			.route("info")
-			.description("Gets information about Tonbot.")
-			.build();
+	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder().route("info")
+			.description("Gets information about Tonbot.").build();
 
 	private static final Runtime RUNTIME = Runtime.getRuntime();
 	private static final long BYTES_IN_MIB = 1048576;
@@ -31,10 +29,7 @@ class InfoActivity implements Activity {
 	private final Color color;
 
 	@Inject
-	public InfoActivity(
-			IDiscordClient discordClient,
-			BotUtils botUtils,
-			Color color) {
+	public InfoActivity(IDiscordClient discordClient, BotUtils botUtils, Color color) {
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.color = Preconditions.checkNotNull(color, "color must be non-null.");

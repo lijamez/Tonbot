@@ -47,14 +47,9 @@ public class Main {
 			System.exit(0);
 		}
 
-		Tonbot bot = Guice.createInjector(
-				new TonbotModule(
-						botUserToken,
-						config.getPrefix(),
-						config.getPluginNames(),
-						configMgr.getConfigDirPath().toString(),
-						config.getAliases(),
-						config.getColor()))
+		Tonbot bot = Guice
+				.createInjector(new TonbotModule(botUserToken, config.getPrefix(), config.getPluginNames(),
+						configMgr.getConfigDirPath().toString(), config.getAliases(), config.getColor()))
 				.getInstance(Tonbot.class);
 
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {

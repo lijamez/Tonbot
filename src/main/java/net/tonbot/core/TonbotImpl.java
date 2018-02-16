@@ -24,11 +24,8 @@ class TonbotImpl implements Tonbot {
 	private final EventDispatcher eventDispatcher;
 
 	@Inject
-	public TonbotImpl(
-			final IDiscordClient discordClient,
-			final PlayingTextSetter playingTextSetter,
-			final List<TonbotPlugin> plugins,
-			final EventDispatcher eventDispatcher) {
+	public TonbotImpl(final IDiscordClient discordClient, final PlayingTextSetter playingTextSetter,
+			final List<TonbotPlugin> plugins, final EventDispatcher eventDispatcher) {
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		this.playingTextSetter = Preconditions.checkNotNull(playingTextSetter, "playingTextSetter must be non-null.");
 		this.plugins = Preconditions.checkNotNull(plugins, "plugins must be non-null.");
@@ -36,17 +33,14 @@ class TonbotImpl implements Tonbot {
 	}
 
 	public void run() {
-		
+
 		discordClient.getDispatcher().registerListener(eventDispatcher);
 
 		// Raw Listeners
-		plugins.stream()
-				.map(TonbotPlugin::getRawEventListeners)
-				.flatMap(Collection::stream)
-				.forEach(eventListener -> {
-					LOG.debug("Registering raw listener {}", eventListener.getClass().getName());
-					discordClient.getDispatcher().registerListener(eventListener);
-				});
+		plugins.stream().map(TonbotPlugin::getRawEventListeners).flatMap(Collection::stream).forEach(eventListener -> {
+			LOG.debug("Registering raw listener {}", eventListener.getClass().getName());
+			discordClient.getDispatcher().registerListener(eventListener);
+		});
 
 		try {
 			discordClient.login();
@@ -58,13 +52,10 @@ class TonbotImpl implements Tonbot {
 
 			LOG.info("Discord API is ready.");
 
-			plugins.stream()
-					.map(TonbotPlugin::getPeriodicTasks)
-					.flatMap(Collection::stream)
-					.forEach(periodicTask -> {
-						periodicTask.start();
-						LOG.info("Periodic task '{}' has started.", periodicTask.getClass().getName());
-					});
+			plugins.stream().map(TonbotPlugin::getPeriodicTasks).flatMap(Collection::stream).forEach(periodicTask -> {
+				periodicTask.start();
+				LOG.info("Periodic task '{}' has started.", periodicTask.getClass().getName());
+			});
 
 			playingTextSetter.start();
 

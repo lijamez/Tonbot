@@ -15,9 +15,7 @@ class GuildConfiguration {
 	private boolean defaultAllow;
 
 	@JsonCreator
-	GuildConfiguration(
-			@JsonProperty("rules") List<Rule> rules,
-			@JsonProperty("defaultAllow") boolean defaultAllow) {
+	GuildConfiguration(@JsonProperty("rules") List<Rule> rules, @JsonProperty("defaultAllow") boolean defaultAllow) {
 		this.rules = Preconditions.checkNotNull(rules, "rules must be non-null.");
 		this.defaultAllow = defaultAllow;
 	}

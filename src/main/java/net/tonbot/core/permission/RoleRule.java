@@ -22,20 +22,13 @@ class RoleRule extends Rule {
 	private final PathExpression pathExp;
 	private final long roleId;
 
-	public RoleRule(
-			List<String> pathExpComponents,
-			long guildId,
-			long roleId,
-			boolean allow) {
+	public RoleRule(List<String> pathExpComponents, long guildId, long roleId, boolean allow) {
 		this(new PathExpression(pathExpComponents), guildId, roleId, allow);
 	}
 
 	@JsonCreator
-	public RoleRule(
-			@JsonProperty("pathExp") PathExpression pathExp,
-			@JsonProperty("guildId") long guildId,
-			@JsonProperty("roleId") long roleId,
-			@JsonProperty("allow") boolean allow) {
+	public RoleRule(@JsonProperty("pathExp") PathExpression pathExp, @JsonProperty("guildId") long guildId,
+			@JsonProperty("roleId") long roleId, @JsonProperty("allow") boolean allow) {
 		super(guildId, allow);
 
 		this.pathExp = Preconditions.checkNotNull(pathExp, "pathExp must be non-null.");
@@ -57,10 +50,7 @@ class RoleRule extends Rule {
 
 		List<IRole> roles = user.getRolesForGuild(guild);
 
-		return roles.stream()
-				.map(role -> role.getLongID())
-				.filter(userRoleId -> userRoleId == roleId)
-				.findAny()
+		return roles.stream().map(role -> role.getLongID()).filter(userRoleId -> userRoleId == roleId).findAny()
 				.isPresent();
 	}
 }

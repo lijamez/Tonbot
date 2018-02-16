@@ -24,13 +24,10 @@ class StringParser implements Parser {
 	public ParseResult parse(String content, Class<?> targetType, Context context) {
 		Preconditions.checkNotNull(content, "content must be non-null.");
 
-		List<Matcher> matchers = ImmutableList.of(
-				QUOTED_STRING_PATTERN.matcher(content),
+		List<Matcher> matchers = ImmutableList.of(QUOTED_STRING_PATTERN.matcher(content),
 				SINGLE_WORD_PATTERN.matcher(content));
 
-		Matcher matchedMatcher = matchers.stream()
-				.filter(matcher -> matcher.find())
-				.findFirst()
+		Matcher matchedMatcher = matchers.stream().filter(matcher -> matcher.find()).findFirst()
 				.orElseThrow(() -> new ParseException(
 						"Line parser encountered unexpected input which could not be parsed as a string."));
 

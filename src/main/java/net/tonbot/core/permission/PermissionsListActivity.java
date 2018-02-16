@@ -12,18 +12,14 @@ import sx.blah.discord.handle.obj.IGuild;
 
 class PermissionsListActivity implements Activity {
 
-	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
-			.route("permissions list")
-			.description("Shows permissions for this server.")
-			.build();
+	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder().route("permissions list")
+			.description("Shows permissions for this server.").build();
 
 	private final RulesPrinter rulesPrinter;
 	private final BotUtils botUtils;
 
 	@Inject
-	public PermissionsListActivity(
-			RulesPrinter rulesPrinter,
-			BotUtils botUtils) {
+	public PermissionsListActivity(RulesPrinter rulesPrinter, BotUtils botUtils) {
 		this.rulesPrinter = Preconditions.checkNotNull(rulesPrinter, "rulesPrinter must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 	}

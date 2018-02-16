@@ -74,9 +74,7 @@ class AliasesImpl implements Aliases {
 			Route to = Route.from(aliasMapping.getValue());
 
 			Activity targetActivity = activities.stream()
-					.filter(activity -> activity.getDescriptor().getRoute().equals(to))
-					.findFirst()
-					.orElse(null);
+					.filter(activity -> activity.getDescriptor().getRoute().equals(to)).findFirst().orElse(null);
 
 			if (targetActivity != null) {
 				aliasToActivityMap.put(from, targetActivity);

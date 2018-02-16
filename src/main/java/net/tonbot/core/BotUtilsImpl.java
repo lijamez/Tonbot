@@ -30,14 +30,10 @@ class BotUtilsImpl implements BotUtils {
 		Preconditions.checkNotNull(channel, "channel must be non-null.");
 		Preconditions.checkNotNull(message, "message must be non-null.");
 
-		new RequestBuilder(discordClient)
-				.shouldBufferRequests(true)
-				.setAsync(true)
-				.doAction(() -> {
-					channel.sendMessage(message);
-					return true;
-				})
-				.execute();
+		new RequestBuilder(discordClient).shouldBufferRequests(true).setAsync(true).doAction(() -> {
+			channel.sendMessage(message);
+			return true;
+		}).execute();
 	}
 
 	@Override
@@ -61,14 +57,10 @@ class BotUtilsImpl implements BotUtils {
 		Preconditions.checkNotNull(channel, "channel must be non-null.");
 		Preconditions.checkNotNull(embedObj, "embedObj must be non-null.");
 
-		new RequestBuilder(discordClient)
-				.shouldBufferRequests(true)
-				.setAsync(true)
-				.doAction(() -> {
-					channel.sendMessage(embedObj);
-					return true;
-				})
-				.execute();
+		new RequestBuilder(discordClient).shouldBufferRequests(true).setAsync(true).doAction(() -> {
+			channel.sendMessage(embedObj);
+			return true;
+		}).execute();
 	}
 
 	@Override
@@ -78,13 +70,9 @@ class BotUtilsImpl implements BotUtils {
 		Preconditions.checkNotNull(imageFileStream, "imageFileStream must be non-null.");
 		Preconditions.checkNotNull(fileName, "fileName must be non-null.");
 
-		new RequestBuilder(discordClient)
-				.shouldBufferRequests(true)
-				.setAsync(true)
-				.doAction(() -> {
-					channel.sendFile(embedObj, imageFileStream, fileName);
-					return true;
-				})
-				.execute();
+		new RequestBuilder(discordClient).shouldBufferRequests(true).setAsync(true).doAction(() -> {
+			channel.sendFile(embedObj, imageFileStream, fileName);
+			return true;
+		}).execute();
 	}
 }

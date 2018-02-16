@@ -26,10 +26,7 @@ class PermissionControlModule extends AbstractModule {
 	private final File permissionsFile;
 	private final List<Activity> publicActivities;
 
-	public PermissionControlModule(
-			BotUtils botUtils,
-			IDiscordClient discordClient,
-			File permissionsFile) {
+	public PermissionControlModule(BotUtils botUtils, IDiscordClient discordClient, File permissionsFile) {
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 		this.permissionsFile = Preconditions.checkNotNull(permissionsFile, "permissionsFile must be non-null.");
@@ -58,11 +55,8 @@ class PermissionControlModule extends AbstractModule {
 
 	@Provides
 	@Singleton
-	Set<Activity> activities(
-			PermissionsListActivity permissionsListActivity,
-			AddRuleActivity addRuleActivity,
-			DeleteRuleActivity deleteRuleActivity,
-			SetDefaultAllowabilityActivity setDefaultAllowabilityActivity) {
+	Set<Activity> activities(PermissionsListActivity permissionsListActivity, AddRuleActivity addRuleActivity,
+			DeleteRuleActivity deleteRuleActivity, SetDefaultAllowabilityActivity setDefaultAllowabilityActivity) {
 		return ImmutableSet.of(permissionsListActivity, addRuleActivity, deleteRuleActivity,
 				setDefaultAllowabilityActivity);
 	}

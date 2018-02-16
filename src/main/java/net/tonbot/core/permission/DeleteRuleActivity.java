@@ -15,8 +15,7 @@ import sx.blah.discord.handle.obj.IGuild;
 class DeleteRuleActivity implements Activity {
 
 	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
-			.route("permissions delete")
-			.parameters(ImmutableList.of("index"))
+			.route("permissions delete").parameters(ImmutableList.of("index"))
 			.description("Deletes a rule for this server.")
 			.usageDescription(
 					"Use the ``permissions list`` command to see all the rules and then pick a rule to delete with ``permissions delete``.")
@@ -27,10 +26,7 @@ class DeleteRuleActivity implements Activity {
 	private final BotUtils botUtils;
 
 	@Inject
-	public DeleteRuleActivity(
-			PermissionManager permissionManager,
-			RulesPrinter rulesPrinter,
-			BotUtils botUtils) {
+	public DeleteRuleActivity(PermissionManager permissionManager, RulesPrinter rulesPrinter, BotUtils botUtils) {
 		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
 		this.rulesPrinter = Preconditions.checkNotNull(rulesPrinter, "rulesPrinter must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");

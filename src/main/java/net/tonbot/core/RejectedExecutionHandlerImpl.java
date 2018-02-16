@@ -15,13 +15,11 @@ class RejectedExecutionHandlerImpl implements RejectedExecutionHandler {
 	public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
 		BlockingQueue<Runnable> queue = executor.getQueue();
 
-		LOG.error("Unable to handle event because thread pool is full.\n"
-				+ "Core pool size: {}, Maximum: {}, Current: {}, Active: {}, Queue size: {}/{}",
-				executor.getCorePoolSize(),
-				executor.getMaximumPoolSize(),
-				executor.getPoolSize(),
-				executor.getActiveCount(),
-				queue.size(), queue.size() + queue.remainingCapacity());
+		LOG.error(
+				"Unable to handle event because thread pool is full.\n"
+						+ "Core pool size: {}, Maximum: {}, Current: {}, Active: {}, Queue size: {}/{}",
+				executor.getCorePoolSize(), executor.getMaximumPoolSize(), executor.getPoolSize(),
+				executor.getActiveCount(), queue.size(), queue.size() + queue.remainingCapacity());
 	}
 
 }

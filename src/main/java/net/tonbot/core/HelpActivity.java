@@ -28,9 +28,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 class HelpActivity implements Activity {
 
-	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
-			.route("help")
-			.build();
+	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder().route("help").build();
 
 	private final ActivityPrinter activityPrinter;
 	private final BotUtils botUtils;
@@ -41,14 +39,8 @@ class HelpActivity implements Activity {
 	private final Color color;
 
 	@Inject
-	public HelpActivity(
-			ActivityPrinter activityPrinter,
-			BotUtils botUtils,
-			String prefix,
-			List<TonbotPlugin> plugins,
-			PermissionManager permissionManager,
-			Provider<Aliases> aliases,
-			Color color) {
+	public HelpActivity(ActivityPrinter activityPrinter, BotUtils botUtils, String prefix, List<TonbotPlugin> plugins,
+			PermissionManager permissionManager, Provider<Aliases> aliases, Color color) {
 		this.activityPrinter = Preconditions.checkNotNull(activityPrinter, "activityPrinter must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
@@ -80,12 +72,9 @@ class HelpActivity implements Activity {
 			return;
 		}
 
-		Activity activity = plugins.stream()
-				.filter(plugin -> !plugin.isHidden())
+		Activity activity = plugins.stream().filter(plugin -> !plugin.isHidden())
 				.flatMap(plugin -> plugin.getActivities().stream())
-				.filter(a -> referencedRoute.equals(a.getDescriptor().getRoute()))
-				.findFirst()
-				.orElse(null);
+				.filter(a -> referencedRoute.equals(a.getDescriptor().getRoute())).findFirst().orElse(null);
 
 		if (activity == null) {
 			// TODO: It's possible to get usage descriptions for activities from hidden
@@ -96,18 +85,14 @@ class HelpActivity implements Activity {
 		if (activity != null && permissionManager.checkAccessibility(activity, user, guild)) {
 			StringBuffer sb = new StringBuffer();
 
-			sb.append("**Command:** ``")
-					.append(activity.getDescriptor().getRoute())
-					.append("``\n\n");
+			sb.append("**Command:** ``").append(activity.getDescriptor().getRoute()).append("``\n\n");
 
 			// Display route aliases, if at least one exists
 			List<Route> routeAliases = aliases.get().getAliasesOf(activity);
 			if (!routeAliases.isEmpty()) {
 				sb.append("**Aliases:**\n");
 				routeAliases.forEach(alias -> {
-					sb.append("``")
-							.append(StringUtils.join(alias, " "))
-							.append("``\n");
+					sb.append("``").append(StringUtils.join(alias, " ")).append("``\n");
 				});
 
 				sb.append("\n");
@@ -144,26 +129,23 @@ class HelpActivity implements Activity {
 		embedBuilder.withColor(color);
 		embedBuilder.withDesc("Here's what I can do...");
 
-		plugins.stream()
-				.filter(plugin -> !plugin.isHidden())
-				.forEach(plugin -> {
-					StringBuffer sb = new StringBuffer();
-					plugin.getActivities().stream()
-							.filter(activity -> permissionManager.checkAccessibility(activity, user, guild))
-							.map(Activity::getDescriptor)
-							.forEach(activity -> {
-								String basicUsage = activityPrinter.getBasicUsage(activity);
+		plugins.stream().filter(plugin -> !plugin.isHidden()).forEach(plugin -> {
+			StringBuffer sb = new StringBuffer();
+			plugin.getActivities().stream()
+					.filter(activity -> permissionManager.checkAccessibility(activity, user, guild))
+					.map(Activity::getDescriptor).forEach(activity -> {
+						String basicUsage = activityPrinter.getBasicUsage(activity);
 
-								sb.append(basicUsage);
-								sb.append("\n");
-							});
+						sb.append(basicUsage);
+						sb.append("\n");
+					});
 
-					String description = sb.toString();
+			String description = sb.toString();
 
-					if (!description.isEmpty()) {
-						embedBuilder.appendField(plugin.getActionDescription(), sb.toString(), false);
-					}
-				});
+			if (!description.isEmpty()) {
+				embedBuilder.appendField(plugin.getActionDescription(), sb.toString(), false);
+			}
+		});
 
 		embedBuilder
 				.withFooterText("You can also say '" + prefix + "help <command>' to get more help for that command.");

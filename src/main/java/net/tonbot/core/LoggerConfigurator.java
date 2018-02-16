@@ -29,20 +29,13 @@ class LoggerConfigurator {
 
 		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 		Configuration config = ctx.getConfiguration();
-		PatternLayout layout = PatternLayout.newBuilder()
-				.withPattern(PatternLayout.SIMPLE_CONVERSION_PATTERN)
-				.withConfiguration(config)
-				.build();
+		PatternLayout layout = PatternLayout.newBuilder().withPattern(PatternLayout.SIMPLE_CONVERSION_PATTERN)
+				.withConfiguration(config).build();
 
 		Path applicationLogPath = Paths.get(logRootPath.toString(), APPLICATION_LOG_NAME);
 
-		FileAppender appender = FileAppender.newBuilder()
-				.withFileName(applicationLogPath.toString())
-				.withImmediateFlush(true)
-				.withLayout(layout)
-				.withAppend(true)
-				.withName("File Appender")
-				.build();
+		FileAppender appender = FileAppender.newBuilder().withFileName(applicationLogPath.toString())
+				.withImmediateFlush(true).withLayout(layout).withAppend(true).withName("File Appender").build();
 		appender.start();
 		config.addAppender(appender);
 		ctx.getRootLogger().addAppender(appender);

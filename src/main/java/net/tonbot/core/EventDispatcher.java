@@ -2,11 +2,13 @@ package net.tonbot.core;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 import org.slf4j.Logger;
@@ -54,14 +56,8 @@ class EventDispatcher {
 	private final ActivityMatcher activityMatcher;
 
 	@Inject
-	public EventDispatcher(
-			BotUtils botUtils,
-			@Prefix String prefix,
-			Set<Activity> activities,
-			Aliases aliases,
-			PermissionManager permissionManager,
-			ActivityPrinter activityPrinter,
-			RequestMapper requestMapper,
+	public EventDispatcher(BotUtils botUtils, @Prefix String prefix, Set<Activity> activities, Aliases aliases,
+			PermissionManager permissionManager, ActivityPrinter activityPrinter, RequestMapper requestMapper,
 			ActivityMatcher activityMatcher) {
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
@@ -87,15 +83,13 @@ class EventDispatcher {
 
 		String messageWithoutPrefix = messageString.substring(prefix.length(), messageString.length()).trim();
 		List<String> tokens = Arrays.asList(messageWithoutPrefix.split(TOKENIZATION_DELIMITER)).stream()
-				.filter(token -> !StringUtils.isBlank(token))
-				.collect(Collectors.toList());
+				.filter(token -> !StringUtils.isBlank(token)).collect(Collectors.toList());
 
 		if (tokens.isEmpty()) {
 			return;
 		}
 
-		ActivityMatch activityMatch = activityMatcher.matchActivity(tokens)
-				.orElse(null);
+		ActivityMatch activityMatch = activityMatcher.matchActivity(tokens).orElse(null);
 
 		if (activityMatch == null) {
 			return;
@@ -104,18 +98,16 @@ class EventDispatcher {
 		if (!permissionManager.checkAccessibility(activityMatch.getMatchedActivity(), event.getAuthor(),
 				event.getGuild())) {
 			LOG.debug("Activity '{}' was denied to user '{}' in guild '{}'",
-					activityMatch.getMatchedActivity().getClass(),
-					event.getAuthor(),
-					event.getGuild().getName());
+					activityMatch.getMatchedActivity().getClass(), event.getAuthor(), event.getGuild().getName());
 			return;
 		}
 
 		List<String> routePath = tokens.subList(0, activityMatch.getMatchedRoute().getPath().size());
-		int routeChars = (routePath.size() * TOKENIZATION_DELIMITER.length()) + routePath.stream()
-				.mapToInt(String::length)
-				.sum();
-		
-		// remainingMessage is the part of the message that doesn't contain the prefix or route.
+		int routeChars = (routePath.size() * TOKENIZATION_DELIMITER.length())
+				+ routePath.stream().mapToInt(String::length).sum();
+
+		// remainingMessage is the part of the message that doesn't contain the prefix
+		// or route.
 		String remainingMessage;
 		if (routeChars > messageWithoutPrefix.length()) {
 			remainingMessage = "";
@@ -123,17 +115,11 @@ class EventDispatcher {
 			remainingMessage = messageWithoutPrefix.substring(routeChars, messageWithoutPrefix.length());
 		}
 
-		LOG.info("Activity enacted by message.\n"
-				+ "Author: {} (ID {})\n"
-				+ "Guild: {} (ID {})\n"
-				+ "Message: {} (ID: {})\n"
-				+ "Matched Activity: {}",
-				event.getAuthor().getName(),
-				event.getAuthor().getLongID(),
-				event.getGuild().getName(),
-				event.getGuild().getLongID(),
-				event.getMessage().getContent(),
-				event.getMessage().getLongID(),
+		LOG.info(
+				"Activity enacted by message.\n" + "Author: {} (ID {})\n" + "Guild: {} (ID {})\n"
+						+ "Message: {} (ID: {})\n" + "Matched Activity: {}",
+				event.getAuthor().getName(), event.getAuthor().getLongID(), event.getGuild().getName(),
+				event.getGuild().getLongID(), event.getMessage().getContent(), event.getMessage().getLongID(),
 				activityMatch.getMatchedActivity().getClass().getName());
 
 		enactActivity(activityMatch, event, remainingMessage);
@@ -160,41 +146,17 @@ class EventDispatcher {
 			botUtils.sendMessage(event.getChannel(), "Something bad happened. :confounded:");
 			LOG.error("Uncaught exception received from activity.", e);
 		} finally {
-			LOG.info("Activity {} latency: {} ms",
-					activityMatch.getMatchedActivity().getClass().getName(),
+			LOG.info("Activity {} latency: {} ms", activityMatch.getMatchedActivity().getClass().getName(),
 					latency / 1_000_000);
 		}
 	}
 
 	private Runnable getEnactableMethod(Activity activity, MessageReceivedEvent event, String args) {
 
-		Runnable enactableMethod = getShinyEnactableMethod(activity, event, args);
-
-		if (enactableMethod == null) {
-			return getLegacyEnactableMethod(activity, event, args);
-		} else {
-			return enactableMethod;
-		}
-	}
-
-	private Runnable getLegacyEnactableMethod(Activity activity, MessageReceivedEvent event, String args) {
-		LOG.info("Args: {}", args);
-		
-		return () -> {
-			activity.enact(event, args);
-		};
-	}
-
-	private Runnable getShinyEnactableMethod(Activity activity, MessageReceivedEvent event, String args) {
-
 		List<Method> enactableMethods = MethodUtils.getMethodsListWithAnnotation(activity.getClass(), Enactable.class);
-		if (enactableMethods.size() > 1) {
+		if (enactableMethods.size() != 1) {
 			throw new IllegalStateException(
-					"Activity " + activity.getClass() + " must have at most 1 method with @Enactable annotation.");
-		}
-
-		if (enactableMethods.isEmpty()) {
-			return null;
+					"Activity " + activity.getClass() + " must have exactly 1 method with @Enactable annotation.");
 		}
 
 		Method enactableMethod = enactableMethods.get(0);
@@ -214,11 +176,24 @@ class EventDispatcher {
 		Object requestObj;
 
 		if (parameterTypes.length == 2) {
+			Type requestType = enactableMethod.getGenericParameterTypes()[1];
+
+			Class<?> requestClass;
+			if (requestType instanceof Class) {
+				requestClass = parameterTypes[1];
+			} else {
+				try {
+					requestClass = activity.getRequestType();
+				} catch (NotImplementedException e) {
+					throw new IllegalStateException(
+							"The activity's getRequestType() method must return a requestType if the @Enactable method uses a generic type for its request.");
+				}
+			}
+
 			Context context = new Context(event.getGuild());
-			Class<?> requestType = parameterTypes[1];
 
 			try {
-				requestObj = requestMapper.map(args, requestType, context);
+				requestObj = requestMapper.map(args, requestClass, context);
 				LOG.info("Request: {}", requestObj);
 			} catch (RequestMappingException e) {
 				throw new ActivityUsageException(e.getMessage(), e);
@@ -240,8 +215,7 @@ class EventDispatcher {
 
 			} catch (IllegalAccessException | IllegalArgumentException e) {
 				throw new RuntimeException(
-						"Unable to invoke Enactable method " + enactableMethod + " of class " + activity.getClass(),
-						e);
+						"Unable to invoke Enactable method " + enactableMethod + " of class " + activity.getClass(), e);
 			} catch (InvocationTargetException e) {
 				Throwable cause = e.getCause();
 				if (cause instanceof TonbotException) {
@@ -256,14 +230,8 @@ class EventDispatcher {
 	}
 
 	private void sendUsageMessage(String errorMessage, Route route, ActivityDescriptor descriptor, IChannel channel) {
-		String usageMessage = new StringBuilder()
-				.append(errorMessage)
-				.append("\n\n")
-				.append("Usage:\n")
-				.append(activityPrinter.getBasicUsage(
-						route,
-						descriptor))
-				.toString();
+		String usageMessage = new StringBuilder().append(errorMessage).append("\n\n").append("Usage:\n")
+				.append(activityPrinter.getBasicUsage(route, descriptor)).toString();
 
 		botUtils.sendMessage(channel, usageMessage);
 	}

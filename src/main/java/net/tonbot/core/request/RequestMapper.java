@@ -74,14 +74,10 @@ public class RequestMapper {
 
 			ParamInfo lastParamInfo = paramInfos.get(paramInfos.size() - 1);
 
-			List<Class<?>> argTypes = paramInfos.stream()
-					.map(pi -> (Class<?>) pi.getType())
+			List<Class<?>> argTypes = paramInfos.stream().map(pi -> (Class<?>) pi.getType())
 					.collect(Collectors.toList());
 
-			List<Object> parsedValues = lineParser.parse(
-					args,
-					argTypes,
-					lastParamInfo.getParam().captureRemaining(),
+			List<Object> parsedValues = lineParser.parse(args, argTypes, lastParamInfo.getParam().captureRemaining(),
 					context);
 
 			for (int i = 0; i < parsedValues.size(); i++) {
@@ -90,13 +86,10 @@ public class RequestMapper {
 
 				if (parsedValue == null && !pi.isNullable()) {
 					StringBuilder sb = new StringBuilder();
-					sb.append("Missing argument ``")
-						.append(pi.getParam().name())
-						.append("``");
-					
+					sb.append("Missing argument ``").append(pi.getParam().name()).append("``");
+
 					if (!StringUtils.isBlank(pi.getParam().description())) {
-						sb.append(": ")
-							.append(pi.getParam().description());
+						sb.append(": ").append(pi.getParam().description());
 					} else {
 						sb.append(".");
 					}
@@ -178,32 +171,28 @@ public class RequestMapper {
 
 	private List<ParamInfo> extractParamInfosFromFields(Class<?> clazz) {
 
-		List<ParamInfo> paramInfos = FieldUtils.getFieldsListWithAnnotation(clazz, Param.class)
-				.stream()
-				.map(field -> {
-					Param paramAnnotation = field.getAnnotation(Param.class);
-					boolean nullable = field.getAnnotation(Nonnull.class) == null;
+		List<ParamInfo> paramInfos = FieldUtils.getFieldsListWithAnnotation(clazz, Param.class).stream().map(field -> {
+			Param paramAnnotation = field.getAnnotation(Param.class);
+			boolean nullable = field.getAnnotation(Nonnull.class) == null;
 
-					field.setAccessible(true);
+			field.setAccessible(true);
 
-					return new ParamInfo<>(paramAnnotation, field.getType(), (obj, val) -> {
-						try {
-							field.set(obj, val);
-						} catch (IllegalArgumentException | IllegalAccessException e) {
-							throw new IllegalStateException("Failed to set field " + field + " with data.", e);
-						}
-						return null;
-					}, nullable);
-				})
-				.collect(Collectors.toList());
+			return new ParamInfo<>(paramAnnotation, field.getType(), (obj, val) -> {
+				try {
+					field.set(obj, val);
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					throw new IllegalStateException("Failed to set field " + field + " with data.", e);
+				}
+				return null;
+			}, nullable);
+		}).collect(Collectors.toList());
 
 		return paramInfos;
 	}
 
 	private List<ParamInfo> extractParamInfosFromMethods(Class<?> clazz) {
 
-		List<ParamInfo> paramInfos = Arrays.asList(MethodUtils.getMethodsWithAnnotation(clazz, Param.class))
-				.stream()
+		List<ParamInfo> paramInfos = Arrays.asList(MethodUtils.getMethodsWithAnnotation(clazz, Param.class)).stream()
 				.filter(method -> {
 					if (method.getParameterTypes().length != 1) {
 						LOG.warn(
@@ -211,15 +200,13 @@ public class RequestMapper {
 								method);
 						return false;
 					} else if (!method.getReturnType().equals(Void.TYPE)) {
-						LOG.warn(
-								"Incorrect @Param annotation placement on method {}. The method must return void.",
+						LOG.warn("Incorrect @Param annotation placement on method {}. The method must return void.",
 								method);
 						return false;
 					}
 
 					return true;
-				})
-				.map(method -> {
+				}).map(method -> {
 					Param paramAnnotation = method.getAnnotation(Param.class);
 
 					Parameter methodParameter = method.getParameters()[0];
@@ -243,8 +230,7 @@ public class RequestMapper {
 						return null;
 					}, nullable);
 
-				})
-				.collect(Collectors.toList());
+				}).collect(Collectors.toList());
 
 		return paramInfos;
 	}

@@ -34,20 +34,17 @@ class ActivityPrinter {
 		sb.append(prefix);
 		sb.append(StringUtils.join(route, " "));
 
-		List<String> formattedParams = activityDescriptor.getParameters().stream()
-				.map(param -> {
-					// If the param explicitly includes brackets, then honor them.
-					// Angle brackets indicate required parameters
-					// Square brackets indicate optional parameters
-					if ((param.startsWith("[") && param.endsWith("]")) ||
-							(param.startsWith("<") && param.endsWith(">"))) {
-						return param;
-					} else {
-						// Params without explicit brackets are assumed to be required.
-						return "<" + param + ">";
-					}
-				})
-				.collect(Collectors.toList());
+		List<String> formattedParams = activityDescriptor.getParameters().stream().map(param -> {
+			// If the param explicitly includes brackets, then honor them.
+			// Angle brackets indicate required parameters
+			// Square brackets indicate optional parameters
+			if ((param.startsWith("[") && param.endsWith("]")) || (param.startsWith("<") && param.endsWith(">"))) {
+				return param;
+			} else {
+				// Params without explicit brackets are assumed to be required.
+				return "<" + param + ">";
+			}
+		}).collect(Collectors.toList());
 
 		sb.append(StringUtils.join(formattedParams, " "));
 

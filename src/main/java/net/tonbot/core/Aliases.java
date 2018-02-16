@@ -10,7 +10,7 @@ import net.tonbot.common.Route;
 interface Aliases {
 
 	Set<Activity> getKnownActivities();
-	
+
 	/**
 	 * Gets an immutable list of aliases for the given activity.
 	 * 

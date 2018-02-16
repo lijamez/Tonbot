@@ -21,9 +21,7 @@ class RulesPrinter {
 	private final IDiscordClient discordClient;
 
 	@Inject
-	public RulesPrinter(
-			PermissionManager permissionManager,
-			IDiscordClient discordClient) {
+	public RulesPrinter(PermissionManager permissionManager, IDiscordClient discordClient) {
 		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
 	}

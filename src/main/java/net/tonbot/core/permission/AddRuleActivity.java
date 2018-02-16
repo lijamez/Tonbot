@@ -14,21 +14,17 @@ import sx.blah.discord.handle.obj.IGuild;
 
 class AddRuleActivity implements Activity {
 
-	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
-			.route("permissions add")
+	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder().route("permissions add")
 			.parameters(ImmutableList.of("<index>", "<role>", "<allow/deny>", "<route path expression>"))
 			.description("Add a rule for this server.")
 			.usageDescription(
 					"Adds a rule at the given ``index`` which allows or denies the ``role`` to use command(s) "
-							+ "that satisfy a ``route path expression``.\n\n"
-							+ "**Arguments**:\n\n"
+							+ "that satisfy a ``route path expression``.\n\n" + "**Arguments**:\n\n"
 							+ "``index`` - The index to insert the rule at as shown by the ``permissions list`` command.\n"
-							+ "``role`` - A role mention.\n"
-							+ "``allow/deny`` - Must be either 'allow' or 'deny'\n"
+							+ "``role`` - A role mention.\n" + "``allow/deny`` - Must be either 'allow' or 'deny'\n"
 							+ "``route path expression`` - The command name or some expression to allow or deny for the given role. This route "
 							+ "must be the natural route, not an alias. A path expression may contain wildcards ``*`` or ``**``.\n\n"
-							+ "**Examples:**\n\n"
-							+ "```${absoluteReferencedRoute} 1 @somerole deny permissions **```\n"
+							+ "**Examples:**\n\n" + "```${absoluteReferencedRoute} 1 @somerole deny permissions **```\n"
 							+ "This would deny all users in ``@somerole`` from being able to use commands that *start with* ``permissions``\n\n"
 							+ "```${absoluteReferencedRoute} 1 @somerole allow help```\n"
 							+ "This would allow all users in ``@somerole`` to use the ``help`` command. "
@@ -41,10 +37,7 @@ class AddRuleActivity implements Activity {
 	private final BotUtils botUtils;
 
 	@Inject
-	public AddRuleActivity(
-			PermissionManager permissionManager,
-			RulesPrinter rulesPrinter,
-			BotUtils botUtils) {
+	public AddRuleActivity(PermissionManager permissionManager, RulesPrinter rulesPrinter, BotUtils botUtils) {
 		this.permissionManager = Preconditions.checkNotNull(permissionManager, "permissionManager must be non-null.");
 		this.rulesPrinter = Preconditions.checkNotNull(rulesPrinter, "rulesPrinter must be non-null.");
 		this.botUtils = Preconditions.checkNotNull(botUtils, "botUtils must be non-null.");
@@ -67,10 +60,7 @@ class AddRuleActivity implements Activity {
 		}
 
 		// Finally, we can create the rule.
-		Rule rule = new RoleRule(
-				routePathExp,
-				guild.getLongID(),
-				request.getRole().getLongID(),
+		Rule rule = new RoleRule(routePathExp, guild.getLongID(), request.getRole().getLongID(),
 				request.getAllowability() == Allowability.ALLOW);
 		try {
 			permissionManager.add(actualIndex, rule);

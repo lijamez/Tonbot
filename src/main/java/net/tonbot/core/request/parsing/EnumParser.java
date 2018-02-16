@@ -46,15 +46,13 @@ class EnumParser implements Parser {
 			}
 
 			List<Object> enumValues = Arrays.asList(targetType.getEnumConstants());
-			Object enumValue = enumValues.stream()
-					.filter(ev -> {
-						try {
-							return StringUtils.equalsIgnoreCase((CharSequence) nameMethod.invoke(ev), matchedValue);
-						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-							throw new IllegalStateException("Couldn't call the enum value's name() method.", e);
-						}
-					})
-					.findFirst()
+			Object enumValue = enumValues.stream().filter(ev -> {
+				try {
+					return StringUtils.equalsIgnoreCase((CharSequence) nameMethod.invoke(ev), matchedValue);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+					throw new IllegalStateException("Couldn't call the enum value's name() method.", e);
+				}
+			}).findFirst()
 					.orElseThrow(() -> new ParseException(
 							"Line parser encountered unexpected input which could not be parsed as an enum "
 									+ targetType + "."));

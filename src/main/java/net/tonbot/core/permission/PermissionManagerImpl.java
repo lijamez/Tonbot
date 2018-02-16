@@ -36,10 +36,8 @@ class PermissionManagerImpl implements PermissionManager {
 	private final ReadWriteLock lock;
 
 	@Inject
-	public PermissionManagerImpl(
-			@PublicActivities List<Activity> publicActivities,
-			@RestrictedActivities List<Activity> restrictedActivities,
-			File permissionsFile,
+	public PermissionManagerImpl(@PublicActivities List<Activity> publicActivities,
+			@RestrictedActivities List<Activity> restrictedActivities, File permissionsFile,
 			ObjectMapper objectMapper) {
 		this.guildConfigs = new HashMap<>();
 		// Activities that should always be accessible to everyone.
@@ -65,8 +63,8 @@ class PermissionManagerImpl implements PermissionManager {
 	private void load() {
 		lock.writeLock().lock();
 		try {
-			this.guildConfigs = objectMapper.readValue(
-					permissionsFile, new TypeReference<Map<Long, GuildConfiguration>>() {
+			this.guildConfigs = objectMapper.readValue(permissionsFile,
+					new TypeReference<Map<Long, GuildConfiguration>>() {
 					});
 		} catch (IOException e) {
 			throw new UncheckedIOException("Unable to read permissions file.", e);
@@ -124,8 +122,7 @@ class PermissionManagerImpl implements PermissionManager {
 		lock.writeLock().lock();
 		try {
 			long guildId = rule.getGuildId();
-			GuildConfiguration guildConfig = guildConfigs.computeIfAbsent(
-					guildId,
+			GuildConfiguration guildConfig = guildConfigs.computeIfAbsent(guildId,
 					k -> new GuildConfiguration(new ArrayList<>(), true));
 			guildConfig.getRules().add(index, rule);
 		} finally {
@@ -136,8 +133,7 @@ class PermissionManagerImpl implements PermissionManager {
 	private void addAllInternal(Collection<Rule> inputRules) {
 		for (Rule rule : inputRules) {
 			long guildId = rule.getGuildId();
-			GuildConfiguration guildConfig = guildConfigs.computeIfAbsent(
-					guildId,
+			GuildConfiguration guildConfig = guildConfigs.computeIfAbsent(guildId,
 					k -> new GuildConfiguration(new ArrayList<>(), true));
 			guildConfig.getRules().add(rule);
 		}
@@ -242,11 +238,8 @@ class PermissionManagerImpl implements PermissionManager {
 		Preconditions.checkNotNull(guild, "guild must be non-null.");
 
 		// The guild owner and the administrators can always access an activity.
-		boolean userIsAdmin = user.getLongID() == guild.getOwnerLongID()
-				|| user.getRolesForGuild(guild).stream()
-						.filter(role -> role.getPermissions().contains(Permissions.ADMINISTRATOR))
-						.findAny()
-						.isPresent();
+		boolean userIsAdmin = user.getLongID() == guild.getOwnerLongID() || user.getRolesForGuild(guild).stream()
+				.filter(role -> role.getPermissions().contains(Permissions.ADMINISTRATOR)).findAny().isPresent();
 		if (userIsAdmin) {
 			return true;
 		}
@@ -260,10 +253,8 @@ class PermissionManagerImpl implements PermissionManager {
 				return false;
 			}
 
-			Rule bestRule = guildConfig.getRules().stream()
-					.filter(rule -> rule.appliesTo(route.getPath(), user))
-					.findFirst()
-					.orElse(null);
+			Rule bestRule = guildConfig.getRules().stream().filter(rule -> rule.appliesTo(route.getPath(), user))
+					.findFirst().orElse(null);
 
 			if (bestRule != null) {
 				return bestRule.isAllow();

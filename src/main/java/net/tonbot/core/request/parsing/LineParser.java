@@ -61,9 +61,7 @@ public class LineParser {
 			if (i == types.size() - 1 && readRemaining && CharSequence.class.isAssignableFrom(typeToParse)) {
 				pr = new ParseResult(remainingArgs, StringUtils.EMPTY);
 			} else {
-				Parser suitableParser = parsers.stream()
-						.filter(parser -> parser.supports(typeToParse))
-						.findFirst()
+				Parser suitableParser = parsers.stream().filter(parser -> parser.supports(typeToParse)).findFirst()
 						.orElseThrow(() -> new IllegalArgumentException("Unsupported type " + typeToParse + "."));
 
 				pr = suitableParser.parse(remainingArgs, typeToParse, context);

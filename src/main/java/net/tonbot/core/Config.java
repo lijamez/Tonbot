@@ -39,11 +39,8 @@ class Config {
 	 *            Non-null.
 	 */
 	@JsonCreator
-	public Config(
-			@JsonProperty("prefix") String prefix,
-			@JsonProperty("discordBotToken") String discordBotToken,
-			@JsonProperty("plugins") List<String> pluginNames,
-			@JsonProperty("aliases") Map<String, String> aliases,
+	public Config(@JsonProperty("prefix") String prefix, @JsonProperty("discordBotToken") String discordBotToken,
+			@JsonProperty("plugins") List<String> pluginNames, @JsonProperty("aliases") Map<String, String> aliases,
 			@JsonProperty("color") String rgb) {
 		this.prefix = Preconditions.checkNotNull(prefix, "prefix must be non-null.");
 		this.discordBotToken = Preconditions.checkNotNull(discordBotToken, "discordBotToken must be non-null.");
