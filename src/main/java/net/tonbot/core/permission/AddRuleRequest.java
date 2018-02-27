@@ -35,7 +35,7 @@ class AddRuleRequest {
 	private Allowability allowability;
 
 	@Getter
-	@Param(name = "route path expression", ordinal = 3, description = "A path to the command.")
+	@Param(name = "route path expression", ordinal = 3, description = "A path to the command.", captureRemaining = true)
 	@Nonnull
 	private String path;
 }
