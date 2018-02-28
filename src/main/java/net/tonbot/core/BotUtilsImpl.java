@@ -62,6 +62,22 @@ class BotUtilsImpl implements BotUtils {
 			return true;
 		}).execute();
 	}
+	
+	@Override
+	public IMessage sendEmbedSync(IChannel channel, EmbedObject embedObj) {
+		Preconditions.checkNotNull(channel, "channel must be non-null.");
+		Preconditions.checkNotNull(embedObj, "embedObj must be non-null.");
+		
+		Future<IMessage> sentMessage = RequestBuffer.request(() -> {
+			return channel.sendMessage(embedObj);
+		});
+
+		try {
+			return sentMessage.get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new TonbotTechnicalFault("Unable to send message.", e);
+		}
+	}
 
 	@Override
 	public void sendEmbed(IChannel channel, EmbedObject embedObj, InputStream imageFileStream, String fileName) {
@@ -74,5 +90,23 @@ class BotUtilsImpl implements BotUtils {
 			channel.sendFile(embedObj, imageFileStream, fileName);
 			return true;
 		}).execute();
+	}
+	
+	@Override
+	public IMessage sendEmbedSync(IChannel channel, EmbedObject embedObj, InputStream imageFileStream, String fileName) {
+		Preconditions.checkNotNull(channel, "channel must be non-null.");
+		Preconditions.checkNotNull(embedObj, "embedObj must be non-null.");
+		Preconditions.checkNotNull(imageFileStream, "imageFileStream must be non-null.");
+		Preconditions.checkNotNull(fileName, "fileName must be non-null.");
+
+		Future<IMessage> sentMessage = RequestBuffer.request(() -> {
+			return channel.sendFile(embedObj, imageFileStream, fileName);
+		});
+
+		try {
+			return sentMessage.get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new TonbotTechnicalFault("Unable to send message.", e);
+		}
 	}
 }
