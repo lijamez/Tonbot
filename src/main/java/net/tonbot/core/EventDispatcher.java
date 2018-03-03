@@ -45,7 +45,7 @@ import sx.blah.discord.handle.obj.IChannel;
 class EventDispatcher {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EventDispatcher.class);
-	private static final long ERROR_TTL = 10000;
+	private static final long ERROR_TTL = 15000;
 	private static final TimeUnit ERROR_TTL_UNIT = TimeUnit.MILLISECONDS;
 
 	private static final String TOKENIZATION_DELIMITER = " ";
