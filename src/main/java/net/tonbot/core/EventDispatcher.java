@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
+import lombok.Data;
+import lombok.NonNull;
 import net.tonbot.common.Activity;
 import net.tonbot.common.ActivityDescriptor;
 import net.tonbot.common.ActivityUsageException;
@@ -132,12 +134,14 @@ class EventDispatcher {
 	private void enactActivity(ActivityMatch activityMatch, MessageReceivedEvent event, String args) {
 
 		Long latency = Long.MIN_VALUE;
-
+		
+		EnactableMethod enactableMethod = null;
 		try {
+			enactableMethod = getEnactableMethod(activityMatch.getMatchedActivity(), event, args);
+			
 			long start = System.nanoTime();
 			try {
-				Runnable runnable = getEnactableMethod(activityMatch.getMatchedActivity(), event, args);
-				runnable.run();
+				enactableMethod.getRunnable().run();
 			} finally {
 				latency = System.nanoTime() - start;
 			}
@@ -152,21 +156,25 @@ class EventDispatcher {
 		} finally {
 			LOG.info("Activity {} latency: {} ms", activityMatch.getMatchedActivity().getClass().getName(),
 					latency / 1_000_000);
+			
+			if (enactableMethod != null && enactableMethod.getEnactableAnnotation().deleteCommand()) {
+				botUtils.deleteMessagesQuietly(event.getMessage());
+			}
 		}
 	}
 
-	private Runnable getEnactableMethod(Activity activity, MessageReceivedEvent event, String args) {
+	private EnactableMethod getEnactableMethod(Activity activity, MessageReceivedEvent event, String args) {
 
-		List<Method> enactableMethods = MethodUtils.getMethodsListWithAnnotation(activity.getClass(), Enactable.class);
-		if (enactableMethods.size() != 1) {
+		List<Method> annotatedMethods = MethodUtils.getMethodsListWithAnnotation(activity.getClass(), Enactable.class);
+		if (annotatedMethods.size() != 1) {
 			throw new IllegalStateException(
 					"Activity " + activity.getClass() + " must have exactly 1 method with @Enactable annotation.");
 		}
 
-		Method enactableMethod = enactableMethods.get(0);
+		Method annotatedMethod = annotatedMethods.get(0);
 		// Check that this method takes in two arguments: MessageReceivedEvent and some
 		// Object
-		Class<?>[] parameterTypes = enactableMethod.getParameterTypes();
+		Class<?>[] parameterTypes = annotatedMethod.getParameterTypes();
 		if (parameterTypes.length < 1 || parameterTypes.length > 2) {
 			throw new IllegalStateException("Activity " + activity.getClass()
 					+ " method annotated with @Enactable must have 1 or 2 parameters. The first being a MessageReceivedEvent (required) and the second being any mappable object (if applicable).");
@@ -180,7 +188,7 @@ class EventDispatcher {
 		Object requestObj;
 
 		if (parameterTypes.length == 2) {
-			Type requestType = enactableMethod.getGenericParameterTypes()[1];
+			Type requestType = annotatedMethod.getGenericParameterTypes()[1];
 
 			Class<?> requestClass;
 			if (requestType instanceof Class) {
@@ -207,30 +215,34 @@ class EventDispatcher {
 			requestObj = null;
 		}
 
-		enactableMethod.setAccessible(true);
+		annotatedMethod.setAccessible(true);
 
-		return () -> {
+		Enactable enactableAnnotation = annotatedMethod.getAnnotation(Enactable.class);
+		
+		Runnable runnable = () -> {
 			try {
 				if (requestObj == null) {
-					enactableMethod.invoke(activity, event);
+					annotatedMethod.invoke(activity, event);
 				} else {
-					enactableMethod.invoke(activity, event, requestObj);
+					annotatedMethod.invoke(activity, event, requestObj);
 				}
 
 			} catch (IllegalAccessException | IllegalArgumentException e) {
 				throw new RuntimeException(
-						"Unable to invoke Enactable method " + enactableMethod + " of class " + activity.getClass(), e);
+						"Unable to invoke Enactable method " + annotatedMethod + " of class " + activity.getClass(), e);
 			} catch (InvocationTargetException e) {
 				Throwable cause = e.getCause();
 				if (cause instanceof TonbotException) {
 					throw (TonbotException) cause;
 				} else {
 					throw new RuntimeException(
-							"Unable to invoke Enactable method " + enactableMethod + " of class " + activity.getClass(),
+							"Unable to invoke Enactable method " + annotatedMethod + " of class " + activity.getClass(),
 							e);
 				}
 			}
 		};
+		
+		return new EnactableMethod(enactableAnnotation, runnable);
 	}
 
 	private void sendUsageMessage(String errorMessage, Route route, ActivityDescriptor descriptor, IChannel channel) {
@@ -238,5 +250,15 @@ class EventDispatcher {
 				.append(activityPrinter.getBasicUsage(route, descriptor)).toString();
 
 		botUtils.sendMessage(channel, usageMessage);
+	}
+	
+	@Data
+	private class EnactableMethod {
+		
+		@NonNull
+		Enactable enactableAnnotation;
+		
+		@NonNull
+		Runnable runnable;
 	}
 }
