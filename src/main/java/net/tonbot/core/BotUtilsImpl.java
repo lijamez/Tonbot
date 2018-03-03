@@ -150,18 +150,18 @@ class BotUtilsImpl implements BotUtils {
 		Preconditions.checkNotNull(timeUnit, "timeUnit must be non-null.");
 
 		new RequestBuilder(discordClient)
-		.shouldBufferRequests(true)
-		.setAsync(true)
-		.doAction(() -> {
-			IMessage msg = channel.sendMessage(embedObj);
-			
-			this.executorService.schedule(() -> {
-				deleteMessagesQuietly(msg);
-			}, delay, timeUnit); 
-			
-			return true;
-		})
-		.execute();
+			.shouldBufferRequests(true)
+			.setAsync(true)
+			.doAction(() -> {
+				IMessage msg = channel.sendMessage(embedObj);
+				
+				this.executorService.schedule(() -> {
+					deleteMessagesQuietly(msg);
+				}, delay, timeUnit); 
+				
+				return true;
+			})
+			.execute();
 	}
 	
 	@Override
