@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.NotImplementedException;
@@ -44,6 +45,8 @@ import sx.blah.discord.handle.obj.IChannel;
 class EventDispatcher {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EventDispatcher.class);
+	private static final long ERROR_TTL = 10000;
+	private static final TimeUnit ERROR_TTL_UNIT = TimeUnit.MILLISECONDS;
 
 	private static final String TOKENIZATION_DELIMITER = " ";
 
@@ -83,7 +86,8 @@ class EventDispatcher {
 
 		String messageWithoutPrefix = messageString.substring(prefix.length(), messageString.length()).trim();
 		List<String> tokens = Arrays.asList(messageWithoutPrefix.split(TOKENIZATION_DELIMITER)).stream()
-				.filter(token -> !StringUtils.isBlank(token)).collect(Collectors.toList());
+				.filter(token -> !StringUtils.isBlank(token))
+				.collect(Collectors.toList());
 
 		if (tokens.isEmpty()) {
 			return;
@@ -141,9 +145,9 @@ class EventDispatcher {
 			sendUsageMessage(e.getMessage(), activityMatch.getMatchedRoute(),
 					activityMatch.getMatchedActivity().getDescriptor(), event.getChannel());
 		} catch (TonbotBusinessException e) {
-			botUtils.sendMessage(event.getChannel(), e.getMessage());
+			botUtils.sendMessage(event.getChannel(), e.getMessage(), ERROR_TTL, ERROR_TTL_UNIT);
 		} catch (Exception e) {
-			botUtils.sendMessage(event.getChannel(), "Something bad happened. :confounded:");
+			botUtils.sendMessage(event.getChannel(), "Something bad happened. :confounded:", ERROR_TTL, ERROR_TTL_UNIT);
 			LOG.error("Uncaught exception received from activity.", e);
 		} finally {
 			LOG.info("Activity {} latency: {} ms", activityMatch.getMatchedActivity().getClass().getName(),

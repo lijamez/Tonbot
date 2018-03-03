@@ -6,13 +6,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 
 import net.tonbot.common.BotUtils;
@@ -30,10 +35,14 @@ class BotUtilsImpl implements BotUtils {
 	private static final Logger LOG = LoggerFactory.getLogger(BotUtilsImpl.class);
 
 	private final IDiscordClient discordClient;
+	private final ScheduledExecutorService executorService;
 
 	@Inject
 	public BotUtilsImpl(IDiscordClient discordClient) {
 		this.discordClient = Preconditions.checkNotNull(discordClient, "discordClient must be non-null.");
+		
+		ThreadFactory tf = new ThreadFactoryBuilder().setNameFormat("BotUtils Scheduled Thread %d").build();
+		this.executorService = Executors.newScheduledThreadPool(2, tf);
 	}
 
 	@Override
@@ -41,10 +50,35 @@ class BotUtilsImpl implements BotUtils {
 		Preconditions.checkNotNull(channel, "channel must be non-null.");
 		Preconditions.checkNotNull(message, "message must be non-null.");
 
-		new RequestBuilder(discordClient).shouldBufferRequests(true).setAsync(true).doAction(() -> {
-			channel.sendMessage(message);
-			return true;
-		}).execute();
+		new RequestBuilder(discordClient)
+			.shouldBufferRequests(true)
+			.setAsync(true)
+			.doAction(() -> {
+				channel.sendMessage(message);
+				return true;
+			})
+			.execute();
+	}
+	
+	@Override
+	public void sendMessage(IChannel channel, String message, long delay, TimeUnit timeUnit) {
+		Preconditions.checkNotNull(channel, "channel must be non-null.");
+		Preconditions.checkNotNull(message, "message must be non-null.");
+		Preconditions.checkNotNull(timeUnit, "timeUnit must be non-null.");
+		
+		new RequestBuilder(discordClient)
+			.shouldBufferRequests(true)
+			.setAsync(true)
+			.doAction(() -> {
+				IMessage msg = channel.sendMessage(message);
+				
+				this.executorService.schedule(() -> {
+					deleteMessagesQuietly(msg);
+				}, delay, timeUnit); 
+				
+				return true;
+			})
+			.execute();
 	}
 
 	@Override
@@ -68,10 +102,13 @@ class BotUtilsImpl implements BotUtils {
 		Preconditions.checkNotNull(channel, "channel must be non-null.");
 		Preconditions.checkNotNull(embedObj, "embedObj must be non-null.");
 
-		new RequestBuilder(discordClient).shouldBufferRequests(true).setAsync(true).doAction(() -> {
-			channel.sendMessage(embedObj);
-			return true;
-		}).execute();
+		new RequestBuilder(discordClient)
+			.shouldBufferRequests(true)
+			.setAsync(true)
+			.doAction(() -> {
+				channel.sendMessage(embedObj);
+				return true;
+			}).execute();
 	}
 	
 	@Override
@@ -97,10 +134,34 @@ class BotUtilsImpl implements BotUtils {
 		Preconditions.checkNotNull(imageFileStream, "imageFileStream must be non-null.");
 		Preconditions.checkNotNull(fileName, "fileName must be non-null.");
 
-		new RequestBuilder(discordClient).shouldBufferRequests(true).setAsync(true).doAction(() -> {
-			channel.sendFile(embedObj, imageFileStream, fileName);
+		new RequestBuilder(discordClient)
+			.shouldBufferRequests(true)
+			.setAsync(true)
+			.doAction(() -> {
+				channel.sendFile(embedObj, imageFileStream, fileName);
+				return true;
+			}).execute();
+	}
+	
+	@Override
+	public void sendEmbed(IChannel channel, EmbedObject embedObj, long delay, TimeUnit timeUnit) {
+		Preconditions.checkNotNull(channel, "channel must be non-null.");
+		Preconditions.checkNotNull(embedObj, "embedObj must be non-null.");
+		Preconditions.checkNotNull(timeUnit, "timeUnit must be non-null.");
+
+		new RequestBuilder(discordClient)
+		.shouldBufferRequests(true)
+		.setAsync(true)
+		.doAction(() -> {
+			IMessage msg = channel.sendMessage(embedObj);
+			
+			this.executorService.schedule(() -> {
+				deleteMessagesQuietly(msg);
+			}, delay, timeUnit); 
+			
 			return true;
-		}).execute();
+		})
+		.execute();
 	}
 	
 	@Override
