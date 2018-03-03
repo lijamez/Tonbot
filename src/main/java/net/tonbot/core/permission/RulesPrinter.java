@@ -78,8 +78,9 @@ class RulesPrinter {
 			sb.append("CAN NOT");
 		}
 
+		sb.append("** be used by ``");
 		IRole role = discordClient.getRoleByID(roleRule.getRoleId());
-		sb.append("** be used by role ``").append(role.getName()).append("``");
+		sb.append(role != null ? role.getName() : "<deleted role>").append("``");
 
 		return sb.toString();
 	}

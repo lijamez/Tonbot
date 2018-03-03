@@ -36,9 +36,12 @@ class PermissionManagerImpl implements PermissionManager {
 	private final ReadWriteLock lock;
 
 	@Inject
-	public PermissionManagerImpl(@PublicActivities List<Activity> publicActivities,
-			@RestrictedActivities List<Activity> restrictedActivities, File permissionsFile,
+	public PermissionManagerImpl(
+			@PublicActivities List<Activity> publicActivities,
+			@RestrictedActivities List<Activity> restrictedActivities, 
+			File permissionsFile,
 			ObjectMapper objectMapper) {
+		
 		this.guildConfigs = new HashMap<>();
 		// Activities that should always be accessible to everyone.
 		Preconditions.checkNotNull(publicActivities, "publicActivities must be non-null.");
@@ -211,13 +214,21 @@ class PermissionManagerImpl implements PermissionManager {
 
 			for (Activity publicActivity : publicActivities) {
 				Route route = publicActivity.getDescriptor().getRoute();
-				Rule rule = new RoleRule(route.getPath(), guild.getLongID(), guild.getEveryoneRole().getLongID(), true);
+				Rule rule = new RoleRule(
+						route.getPath(), 
+						guild.getLongID(), 
+						guild.getEveryoneRole().getLongID(), 
+						true);
 				rules.add(rule);
 			}
 
 			for (Activity restrictedActivity : restrictedActivities) {
 				Route route = restrictedActivity.getDescriptor().getRoute();
-				Rule rule = new RoleRule(route.getPath(), guild.getLongID(), guild.getEveryoneRole().getLongID(),
+				Rule rule = new RoleRule(
+						route.getPath(), 
+						guild.getLongID(), 
+						guild.getEveryoneRole()
+						.getLongID(),
 						false);
 				rules.add(rule);
 			}
@@ -239,7 +250,10 @@ class PermissionManagerImpl implements PermissionManager {
 
 		// The guild owner and the administrators can always access an activity.
 		boolean userIsAdmin = user.getLongID() == guild.getOwnerLongID() || user.getRolesForGuild(guild).stream()
-				.filter(role -> role.getPermissions().contains(Permissions.ADMINISTRATOR)).findAny().isPresent();
+				.filter(role -> role.getPermissions().contains(Permissions.ADMINISTRATOR))
+				.findAny()
+				.isPresent();
+		
 		if (userIsAdmin) {
 			return true;
 		}
@@ -253,8 +267,10 @@ class PermissionManagerImpl implements PermissionManager {
 				return false;
 			}
 
-			Rule bestRule = guildConfig.getRules().stream().filter(rule -> rule.appliesTo(route.getPath(), user))
-					.findFirst().orElse(null);
+			Rule bestRule = guildConfig.getRules().stream()
+					.filter(rule -> rule.appliesTo(route.getPath(), user))
+					.findFirst()
+					.orElse(null);
 
 			if (bestRule != null) {
 				return bestRule.isAllow();
