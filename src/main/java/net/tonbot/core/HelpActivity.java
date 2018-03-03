@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StrSubstitutor;
@@ -28,7 +29,12 @@ import sx.blah.discord.util.EmbedBuilder;
 
 class HelpActivity implements Activity {
 
-	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder().route("help").build();
+	private static final long HELP_MESSAGE_TTL = 3;
+	private static final TimeUnit HELP_MESSAGE_TTL_UNIT = TimeUnit.MINUTES;
+	
+	private static final ActivityDescriptor ACTIVITY_DESCRIPTOR = ActivityDescriptor.builder()
+			.route("help")
+			.build();
 
 	private final ActivityPrinter activityPrinter;
 	private final BotUtils botUtils;
@@ -55,7 +61,7 @@ class HelpActivity implements Activity {
 		return ACTIVITY_DESCRIPTOR;
 	}
 
-	@Enactable
+	@Enactable(deleteCommand = true)
 	public void enact(MessageReceivedEvent event, HelpRequest request) {
 		if (StringUtils.isBlank(request.getRoute())) {
 			printCommands(event.getAuthor(), event.getChannel(), event.getGuild());
@@ -127,7 +133,7 @@ class HelpActivity implements Activity {
 	private void printCommands(IUser user, IChannel channel, IGuild guild) {
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		embedBuilder.withColor(color);
-		embedBuilder.withDesc("Here's what I can do...");
+		embedBuilder.withDesc("Here's what I can do for you...");
 
 		plugins.stream().filter(plugin -> !plugin.isHidden()).forEach(plugin -> {
 			StringBuffer sb = new StringBuffer();
@@ -148,7 +154,9 @@ class HelpActivity implements Activity {
 		});
 
 		embedBuilder
-				.withFooterText("You can also say '" + prefix + "help <command>' to get more help for that command.");
-		botUtils.sendEmbed(channel, embedBuilder.build());
+				.withFooterText("You can also say '" + prefix + "help <command>' to get more help for that command. "
+						+ "This message will self-destruct in " + HELP_MESSAGE_TTL + " minutes.");
+		
+		botUtils.sendEmbed(channel, embedBuilder.build(), HELP_MESSAGE_TTL, HELP_MESSAGE_TTL_UNIT);
 	}
 }
