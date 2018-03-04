@@ -104,7 +104,9 @@ class EventDispatcher {
 		if (!permissionManager.checkAccessibility(activityMatch.getMatchedActivity(), event.getAuthor(),
 				event.getGuild())) {
 			LOG.debug("Activity '{}' was denied to user '{}' in guild '{}'",
-					activityMatch.getMatchedActivity().getClass(), event.getAuthor(), event.getGuild().getName());
+					activityMatch.getMatchedActivity().getClass(), 
+					event.getAuthor().getName(), 
+					event.getGuild().getName());
 			return;
 		}
 
