@@ -63,7 +63,6 @@ dependencies {
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-tmdb', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-wolframalpha', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-decisionmaker', version: 'master-SNAPSHOT'
-	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-pet', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-statistics', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-music', version: 'master-SNAPSHOT'
 	runtime group: 'com.github.lijamez', name: 'tonbot-plugin-jokes', version: 'master-SNAPSHOT'
@@ -71,8 +70,8 @@ dependencies {
 
 	implementation group: 'com.github.austinv11', name: 'Discord4J', version: '2.9.3'
 
-	implementation group: 'com.google.inject', name: 'guice', version: '4.1.0'
-	implementation group: 'com.google.guava', name: 'guava', version: '24.0-jre'
+	implementation group: 'com.google.inject', name: 'guice', version: '4.2.2'
+	implementation group: 'com.google.guava', name: 'guava', version: '27.1-jre'
 
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
 	implementation group: 'org.apache.commons', name: 'commons-text', version: '1.2'
